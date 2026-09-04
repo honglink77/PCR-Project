@@ -1,0 +1,3074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PCR Workbench · 原型</title>
+<style>
+
+  :root{
+    --bg:#FFFFFF; --rail:#F8FAFC; --soft:#F1F5F9;
+    --border:#E2E8F0; --border-2:#CBD5E1;
+    --ink:#1E293B; --ink-2:#64748B; --ink-3:#94A3B8;
+    --accent:#0D9488; --accent-ink:#0F766E; --accent-soft:#F0FDFA;
+    --green:#059669; --green-bg:#E7F5EF;
+    --red:#C4320A; --red-bg:#FCEDE7;
+    --amber:#B54708; --amber-bg:#FDF3E0;
+    --blue:#175CD3; --blue-bg:#EEF4FE;
+    --purple:#6941C6; --purple-bg:#F4F0FC;
+    /* 任务视图沿用的别名，保持与总览同色系 */
+    --panel:#FFFFFF; --panel-2:#FAFAF9; --canvas:#FAFAF9;
+    --border-strong:#DEDEDB;
+    --agree:#059669; --agree-bg:#E7F5EF;
+    --disagree:#C4320A; --disagree-bg:#FCEDE7;
+    --neutral:#63635E; --neutral-bg:#F0F0EE;
+    --warn:#B54708; --warn-bg:#FDF3E0;
+    --info:#0284C7; --info-bg:#E0F2FE;
+    --shadow:0 1px 2px rgba(26,26,24,.04);
+    --mono:"SF Mono","Cascadia Code",Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Noto Sans CJK SC",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  .mono{font-family:var(--mono);letter-spacing:-.02em}
+  ::-webkit-scrollbar{width:10px}
+  ::-webkit-scrollbar-thumb{background:#DDDDDA;border-radius:8px;border:3px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:#C9C9C5;background-clip:padding-box}
+  svg.i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  .app{display:grid;height:100vh;overflow:hidden;grid-template-rows:56px 1fr;grid-template-columns:248px 1fr;
+    transition:grid-template-columns .2s ease-in-out}
+  body.railoff .app{grid-template-columns:60px 1fr}
+
+  /* ══ LEFT RAIL ══ */
+  .rail{width:244px;flex:none;background:var(--rail);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .app > .rail{width:auto;min-width:0}
+  body.railoff > .app > .rail{align-items:center;justify-content:flex-start}
+  body.railoff > .app > .rail > :not(.rail-top){display:none}
+  .railtoggle{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--ink-3);
+    transition:.12s;flex:none}
+  .railtoggle:hover{background:var(--soft);color:var(--ink-2)}
+  .rail-top{display:flex;align-items:center;gap:8px;padding:12px;flex:none}
+  body.railoff > .app > .rail .rail-top{flex-direction:column;padding:12px 8px;width:100%}
+  .newchat{flex:1;min-width:0;background:var(--accent);color:#fff;font-size:13.5px;font-weight:600;
+    padding:8px 12px;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:7px;
+    transition:.14s}
+  .newchat:hover{background:#0F766E}
+  body.railoff > .app > .rail .newchat{flex:none;width:40px;height:40px;padding:0;align-self:center}
+  body.railoff > .app > .rail .newchat-label{display:none}
+
+  .nav{padding:6px 8px 12px;border-bottom:1px solid var(--border)}
+  .navitem{width:100%;display:flex;align-items:center;gap:10px;padding:7px 9px;border-radius:8px;
+    font-size:13.5px;color:var(--ink-2);transition:.12s;text-align:left}
+  .navitem:hover{background:var(--soft);color:var(--ink)}
+  .navitem.on{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+  .navitem .cnt{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink-3);
+    background:#EDEDEB;padding:1px 6px;border-radius:20px;min-width:19px;text-align:center}
+  .navitem.on .cnt{background:#BFE3DF;color:var(--accent-ink)}
+  .navitem .cnt.hot{background:var(--red-bg);color:var(--red)}
+
+  .histwrap{flex:1;overflow-y:auto;padding:12px 8px}
+  body.taskview .histwrap{display:none}
+  body.taskview.has-parse-session .histwrap{display:block;flex:none;max-height:120px;border-bottom:1px solid var(--border)}
+  body.taskview.has-parse-session .histwrap .hgroup,
+  body.taskview.has-parse-session .histwrap .hitem:not(#parseHistItem){display:none}
+  body.taskview .pinned{display:none}
+  .taskwrap{display:none;flex:1;min-height:0;flex-direction:column;overflow:hidden}
+  body.taskview .taskwrap{display:flex}
+  .hgroup{font-size:10.5px;font-weight:700;color:var(--ink-3);letter-spacing:.06em;padding:8px 9px 5px}
+  .hitem{width:100%;display:flex;align-items:flex-start;gap:8px;padding:7px 9px;border-radius:8px;transition:.12s;text-align:left}
+  .hitem:hover{background:#F0F0EE}
+  .hitem .d{width:6px;height:6px;border-radius:50%;flex:none;margin-top:6px}
+  .hitem .ht{font-size:13px;color:var(--ink-2);line-height:1.35;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hitem .hm{font-size:11px;color:var(--ink-3);margin-top:1px}
+  .hitem:hover .ht{color:var(--ink)}
+
+  .pinned{border-top:1px solid var(--border);padding:10px 8px}
+  .pitem{width:100%;display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;
+    font-size:12.5px;color:var(--ink-2);transition:.12s;text-align:left}
+  .pitem:hover{background:#F0F0EE;color:var(--ink)}
+  .rail-foot{border-top:1px solid var(--border);padding:8px}
+
+  /* ══ MAIN ══ */
+  .main{min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .topbar{grid-column:1/-1;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;
+    background:var(--bg);border-bottom:1px solid var(--border);z-index:40}
+  .logo{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink)}
+  .logo .mk{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:13px;font-weight:700}
+  .logo small{color:var(--ink-3);font-weight:400;font-size:12px;margin-left:2px}
+  .topbar .sp{flex:1}
+  .sel{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);
+    padding:5px 11px;border:1px solid var(--border);border-radius:8px;transition:.12s}
+  .sel:hover{border-color:var(--border-2);color:var(--ink)}
+  .ibtn{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;color:var(--ink-2);position:relative;transition:.12s}
+  .ibtn:hover{background:var(--soft)}
+  .ibtn .bd{position:absolute;top:4px;right:5px;min-width:15px;height:15px;padding:0 4px;border-radius:20px;
+    background:var(--red);color:#fff;font-size:9.5px;font-weight:700;display:grid;place-items:center;border:2px solid var(--bg)}
+  .av{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:11.5px;font-weight:600}
+
+  .scroll{flex:1;overflow-y:auto}
+  .page{max-width:1080px;margin:0 auto;padding:34px 30px 140px}
+
+  .greet h1{font-size:26px;font-weight:650;letter-spacing:-.02em}
+  .greet p{font-size:13.5px;color:var(--ink-3);margin-top:5px}
+
+  .sechead{display:flex;align-items:baseline;gap:10px;margin:34px 0 14px}
+  .sechead h2{font-size:15.5px;font-weight:650}
+  .sechead .lk{margin-left:auto;font-size:12.5px;color:var(--accent-ink);display:flex;align-items:center;gap:5px}
+  .sechead .lk:hover{text-decoration:underline}
+  .sechead .cn{font-size:12.5px;color:var(--ink-3)}
+
+  /* AI briefing */
+  .brief{border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:22px;background:linear-gradient(180deg,#FFFDFA,#FFF)}
+  .brief-h{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+  .brief-h .ai{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,#0D9488,#2CB3A6);
+    color:#fff;display:grid;place-items:center;font-size:10.5px;font-weight:700}
+  .brief-h .bt{font-size:13.5px;font-weight:650}
+  .brief-h .live{margin-left:auto;font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:5px}
+  .brief-h .live .pulse{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .bitem{display:flex;gap:11px;padding:10px 0;border-top:1px solid var(--border)}
+  .bitem:first-of-type{border-top:none;padding-top:2px}
+  .bitem .n{width:19px;height:19px;flex:none;border-radius:50%;font-size:10.5px;font-weight:700;display:grid;place-items:center;margin-top:2px}
+  .bitem.r .n{background:var(--red-bg);color:var(--red)}
+  .bitem.a .n{background:var(--amber-bg);color:var(--amber)}
+  .bitem .bc{font-size:13.5px;line-height:1.6}
+  .ent{color:var(--ink);font-weight:600;border-bottom:1.5px solid var(--accent-soft);cursor:pointer;transition:.12s;padding-bottom:1px}
+  .ent:hover{border-bottom-color:var(--accent);background:var(--accent-soft)}
+  .bitem .why{font-size:12px;color:var(--ink-3);margin-top:4px;display:flex;align-items:center;gap:5px;cursor:pointer}
+  .bitem .why:hover{color:var(--accent-ink)}
+  .evbox{margin-top:8px;background:var(--soft);border-radius:9px;padding:11px 13px;font-size:12.5px;color:var(--ink-2);display:none}
+  .evbox.show{display:block}
+  .evbox .er{display:flex;gap:8px;padding:4px 0}
+  .evbox .er .src{font-size:10.5px;color:var(--blue);background:var(--blue-bg);padding:1px 6px;border-radius:4px;flex:none;height:fit-content;margin-top:2px}
+
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:16px}
+  .kpi{padding:14px 16px;border-right:1px solid var(--border);cursor:pointer;transition:.12s}
+  .kpi:last-child{border-right:none}
+  .kpi:hover{background:var(--soft)}
+  .kpi .kl{font-size:11.5px;color:var(--ink-3)}
+  .kpi .kv{font-size:21px;font-weight:650;letter-spacing:-.02em;margin-top:3px;display:flex;align-items:baseline;gap:6px}
+  .kpi .kd{font-size:11.5px;font-weight:600}
+  .kd.up{color:var(--red)} .kd.dn{color:var(--green)} .kd.fl{color:var(--ink-3)}
+
+  /* module cards */
+  .mods{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .mod{border:1px solid var(--border);border-radius:13px;padding:17px;text-align:left;transition:.14s;background:var(--bg)}
+  .mod:hover{border-color:var(--border-2);transform:translateY(-1px)}
+  .mod .mh{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+  .mod .mi{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none}
+  .mi.b{background:var(--blue-bg);color:var(--blue)} .mi.p{background:var(--purple-bg);color:var(--purple)}
+  .mi.o{background:var(--accent-soft);color:var(--accent)}
+  .mi.t{background:#E0F2FE;color:#0284C7} .mi.g{background:var(--green-bg);color:var(--green)}
+  .mod .mt{font-size:14px;font-weight:650} .mod .ms{font-size:11.5px;color:var(--ink-3);margin-top:1px}
+  .mod .md{font-size:12.5px;color:var(--ink-2);line-height:1.5}
+  .mod .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+  .mod .tg{font-size:11px;color:var(--ink-2);background:var(--soft);padding:2.5px 8px;border-radius:6px}
+  .mod .tg.hot{background:var(--red-bg);color:var(--red);font-weight:600}
+
+  /* card grid */
+  .cards{display:grid;grid-template-columns:1.32fr 1fr;gap:14px}
+  .card{border:1px solid var(--border);border-radius:13px;overflow:hidden;background:var(--bg)}
+  .card-h{display:flex;align-items:center;gap:9px;padding:14px 17px 11px}
+  .card-h h3{font-size:13.5px;font-weight:650}
+  .card-h .ct{font-size:11.5px;color:var(--ink-3);margin-left:auto}
+  .card-b{padding:0 17px 15px}
+  .ai-line{display:flex;gap:7px;font-size:12px;color:var(--accent-ink);background:var(--accent-soft);
+    padding:8px 11px;border-radius:8px;margin:0 17px 13px;line-height:1.45}
+  .ai-line .sp{font-weight:700;flex:none}
+
+  /* watch list rows */
+  .wrow{display:flex;align-items:center;gap:12px;padding:11px 17px;border-top:1px solid var(--border);cursor:pointer;transition:.12s}
+  .wrow:hover{background:var(--soft)}
+  .wrow.open{background:var(--accent-soft)}
+  .wrow .dot{width:7px;height:7px;border-radius:50%;flex:none}
+  .dot.r{background:var(--red)} .dot.a{background:var(--amber)} .dot.g{background:var(--green)}
+  .wrow .wn{min-width:0;flex:1}
+  .wrow .wt{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wrow .wp{font-size:11px;color:var(--ink-3);margin-top:1px}
+  .prog{width:74px;flex:none}
+  .prog .bar{height:5px;background:#EDEDEB;border-radius:4px;overflow:hidden}
+  .prog .fil{height:100%;border-radius:4px}
+  .prog .pt{font-size:10.5px;color:var(--ink-3);margin-top:3px;text-align:right}
+  .sig{font-size:11.5px;width:52px;flex:none;text-align:center}
+  .sig.risk{color:var(--red);font-weight:600}
+  .sig.none{color:var(--ink-3)}
+  .cost{font-size:11.5px;width:64px;flex:none;text-align:right;font-weight:600}
+  .cost.up{color:var(--red)} .cost.flat{color:var(--ink-2)} .cost.na{color:var(--ink-3);font-weight:400}
+
+  /* inline task panel */
+  .inline{border-top:1px solid var(--border);background:var(--soft);padding:0;max-height:0;overflow:hidden;transition:max-height .28s ease}
+  .inline.open{max-height:640px}
+  .inl-in{padding:16px 17px}
+  .inl-h{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+  .inl-h .tt{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--accent-soft);color:var(--accent-ink)}
+  .inl-h h4{font-size:13.5px;font-weight:650}
+  .inl-h .cl{margin-left:auto;color:var(--ink-3);font-size:12px;display:flex;align-items:center;gap:5px}
+  .inl-h .cl:hover{color:var(--ink)}
+  .agent{display:flex;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+  .agent .ai{width:23px;height:23px;flex:none;border-radius:7px;background:linear-gradient(135deg,#0D9488,#2CB3A6);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:700}
+  .agent .tx{font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+  .agent .tx b{color:var(--ink);font-weight:650}
+  .sumtab{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px}
+  .sumtab th{text-align:left;font-size:11px;color:var(--ink-3);font-weight:600;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--soft)}
+  .sumtab td{padding:8px 12px;border-bottom:1px solid var(--border)}
+  .sumtab tr:last-child td{border-bottom:none}
+  .vt{font-size:10.5px;font-weight:650;padding:1.5px 7px;border-radius:5px}
+  .vt.ag{background:var(--green-bg);color:var(--green)} .vt.dg{background:var(--red-bg);color:var(--red)}
+  .vt.ni{background:#EFEFED;color:var(--ink-2)} .vt.pd{background:var(--amber-bg);color:var(--amber)}
+  .paths{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+  .path{border:1.5px solid var(--border);background:var(--bg);border-radius:9px;padding:9px 12px;text-align:left;transition:.12s}
+  .path:hover{border-color:var(--border-2)}
+  .path.on{border-color:var(--accent);background:var(--accent-soft)}
+  .path .pt{font-size:12.5px;font-weight:650} .path .pd{font-size:11px;color:var(--ink-3);margin-top:1px}
+  .inl-f{display:flex;align-items:center;gap:10px}
+  .inl-f .nt{font-size:11.5px;color:var(--ink-3)}
+  .inl-f .sp{flex:1}
+  .btn{font-size:12.5px;font-weight:600;padding:7px 15px;border-radius:8px;transition:.12s;
+    display:inline-flex;align-items:center;justify-content:center;line-height:1.2;border:1px solid transparent}
+  .btn-g,.btn-ghost{color:var(--ink-2);border-color:var(--border);background:var(--bg)}
+  .btn-g:hover,.btn-ghost:hover{border-color:var(--border-2);color:var(--ink);background:var(--soft)}
+  .btn-p,.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 1px 2px rgba(13,148,136,.22)}
+  .btn-p:hover,.btn-primary:hover{background:#0B7C72;border-color:#0B7C72;color:#fff}
+  .btn-p:disabled,.btn-primary:disabled{background:#A9D5D0;border-color:#A9D5D0;box-shadow:none;cursor:not-allowed}
+  .btn-warnghost{color:var(--warn);border-color:#E9C37A;background:var(--warn-bg)}
+  .btn-warnghost:hover{background:#FBE9C9;border-color:#D4A24A;color:#9A3B0A}
+  .pact{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
+
+  /* health / matrix / feed */
+  .hstat{display:flex;gap:9px;padding:2px 17px 13px}
+  .hs{flex:1;border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;cursor:pointer;transition:.12s}
+  .hs:hover{background:var(--soft)}
+  .hs .hv{font-size:19px;font-weight:650} .hs .hl{font-size:11px;color:var(--ink-3);margin-top:1px}
+  .hs.r .hv{color:var(--red)} .hs.a .hv{color:var(--amber)} .hs.g .hv{color:var(--green)}
+
+  table.mx{width:100%;border-collapse:collapse;font-size:12px}
+  table.mx th{font-size:10.5px;color:var(--ink-3);font-weight:600;padding:6px 4px;text-align:center;border-bottom:1px solid var(--border)}
+  table.mx th:first-child{text-align:left;padding-left:17px}
+  table.mx td{padding:7px 4px;text-align:center;border-bottom:1px solid var(--border);color:var(--ink-2)}
+  table.mx td:first-child{text-align:left;padding-left:17px;color:var(--ink);font-weight:500}
+  table.mx tr:last-child td{border-bottom:none}
+  .cell{display:inline-grid;place-items:center;width:25px;height:22px;border-radius:6px;cursor:pointer;transition:.12s}
+  .cell:hover{outline:1.5px solid var(--accent)}
+  .c0{color:#D2D2CE} .c1{background:#EAF6F4} .c2{background:#CFE9E5;color:var(--accent-ink)}
+  .c3{background:#A8D9D3;color:#0A5F58;font-weight:600}
+  .cw{background:var(--red-bg);color:var(--red);font-weight:600}
+
+  .feed{padding:2px 17px 8px}
+  .fr{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+  .fr:last-child{border-bottom:none}
+  .fr .fi{width:22px;height:22px;flex:none;border-radius:6px;display:grid;place-items:center}
+  .fi.r{background:var(--red-bg);color:var(--red)} .fi.b{background:var(--blue-bg);color:var(--blue)}
+  .fi.g{background:var(--green-bg);color:var(--green)} .fi.a{background:var(--amber-bg);color:var(--amber)}
+  .fr .fc{flex:1;min-width:0} .fr .fc .ft{line-height:1.45}
+  .fr .fc .fm{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .fr .new{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;margin-top:7px}
+
+  .loadwrap{display:flex;flex-direction:column;gap:8px;padding:2px 17px 6px}
+  .lrow{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .lrow .ln{width:96px;flex:none;color:var(--ink-2)}
+  .lrow .lb{flex:1;height:7px;background:#EFEFED;border-radius:4px;overflow:hidden}
+  .lrow .lf{height:100%;background:var(--accent);border-radius:4px;opacity:.75}
+  .lrow .lf.hot{background:var(--red)}
+  .lrow .lv{width:44px;text-align:right;font-size:11.5px;color:var(--ink-2);flex:none}
+
+  /* ask bar */
+  .askwrap{position:absolute;left:0;right:0;bottom:0;padding:16px 30px 20px;
+    background:linear-gradient(180deg,rgba(255,255,255,0),#fff 34%)}
+  .ask{max-width:1080px;margin:0 auto;position:relative}
+  .chips{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap}
+  .chip{font-size:12px;color:var(--ink-2);background:var(--bg);border:1px solid var(--border);padding:5px 11px;border-radius:20px;transition:.12s}
+  .chip:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+  .askbox{display:flex;align-items:center;gap:11px;border:1px solid var(--border-2);border-radius:13px;
+    padding:11px 15px;background:var(--bg);box-shadow:0 2px 10px rgba(26,26,24,.05);transition:.14s}
+  .askbox:focus-within{border-color:var(--accent);box-shadow:0 2px 14px rgba(13,148,136,.15)}
+  .askbox.drop-on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+  .askbox input{flex:1;border:none;outline:none;font-family:inherit;font-size:13.5px;color:var(--ink);background:none}
+  .askbox input::placeholder{color:var(--ink-3)}
+  .askbox .send{width:30px;height:30px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;transition:.12s}
+  .askbox .send:hover{background:#0B7C72}
+  .askbox .send:hover{background:#0B7C72}
+  .plusbtn,.clipbtn{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);
+    border:1px solid var(--border);background:var(--bg);flex:none;transition:.12s}
+  .plusbtn{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .plusbtn:hover,.plusbtn.on{background:#0F766E}
+  .clipbtn{border-radius:8px}
+  .clipbtn:hover{background:var(--soft);color:var(--ink)}
+  .plusmenu{display:none;position:absolute;left:0;bottom:46px;width:280px;background:var(--bg);border:1px solid var(--border-2);
+    border-radius:12px;box-shadow:0 12px 32px rgba(30,41,59,.16);padding:6px;z-index:40}
+  .plusmenu.show{display:block}
+  .plusmenu button{width:100%;text-align:left;padding:9px 10px;border-radius:8px;display:flex;flex-direction:column;gap:2px}
+  .plusmenu button:hover{background:var(--soft)}
+  .plusmenu .pm-t{font-size:13px;font-weight:500;color:var(--ink)}
+  .plusmenu .pm-s{font-size:11px;color:var(--ink-3)}
+  .plusmenu .pm-div{height:1px;background:var(--border);margin:4px 6px}
+  .ask-stack{position:relative}
+  .guide{display:none;position:absolute;left:0;right:0;bottom:58px;background:var(--bg);border:1px solid var(--border);
+    border-radius:12px;box-shadow:0 10px 28px rgba(30,41,59,.12);padding:10px 12px;z-index:30;max-height:280px;overflow:auto}
+  .guide.show{display:block}
+  .guide-g{font-size:12px;font-weight:500;color:var(--ink);margin:6px 4px 4px;display:flex;align-items:center;gap:6px}
+  .guide-g span{font-size:11px;font-weight:400;color:var(--ink-3)}
+  .guide-i{width:100%;text-align:left;padding:7px 10px;border-radius:8px;font-size:13px;color:var(--ink-2)}
+  .guide-i:hover,.guide-i.match{background:var(--accent-soft);color:var(--accent-ink)}
+  .guide-i.hide{display:none}
+  .detectbar{display:none;margin-bottom:8px;border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--accent-soft);position:relative;z-index:35}
+  .detectbar.show{display:block}
+  .detectbar p{font-size:12.5px;color:var(--ink);margin-bottom:8px}
+  .detectbar .db-act{display:flex;gap:8px}
+  .detectbar .db-act button{font-size:12px;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:#fff}
+  .detectbar .db-act button.pri{background:var(--accent);color:#fff;border-color:var(--accent)}
+  body.parsing .chips{display:none}
+  .guide.show ~ .chips{display:none}
+
+  .parse-bar{display:none;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);
+    border-radius:10px;background:var(--bg);cursor:pointer;max-width:1080px;margin:0 auto 12px;width:calc(100% - 60px);
+    position:sticky;top:0;z-index:20;box-shadow:0 1px 0 var(--border)}
+  body.parsing .parse-bar{display:flex}
+  .parse-rest{display:none;flex-direction:column;padding:8px 30px 140px;max-width:1080px;margin:0 auto;width:100%}
+  body.parsing .parse-rest{display:flex}
+  body.parsing #homeStack{display:none}
+  body.parsing.home-open #homeStack{display:block;padding-top:12px}
+  .parse-bar:hover{border-color:var(--border-2)}
+  .parse-bar .pb-t{font-size:13.5px;font-weight:500;flex:1}
+  .parse-flow{position:static;padding:4px 0 8px;background:transparent}
+  .plist{border:none;border-radius:0;background:transparent;overflow:visible;position:relative;max-width:520px}
+  .plist-h{display:flex;align-items:center;gap:10px;padding:4px 0 12px;cursor:pointer}
+  .plist-h h3{font-size:13px;font-weight:600;flex:1;color:var(--ink)}
+  .plist-h .pcnt{font-size:12px;color:var(--ink-3)}
+  .plist-toggle{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);color:var(--ink-3);
+    display:grid;place-items:center;font-size:12px;background:var(--bg)}
+  .plist-toggle:hover{background:var(--soft);color:var(--ink)}
+  .pstep{border:none;position:relative;padding-left:0;width:fit-content;max-width:100%}
+  .pstep:not(.last)::before{content:"";position:absolute;left:8px;top:22px;bottom:-2px;width:1.5px;background:#D8DEE6;z-index:0}
+  .pstep-h{display:inline-flex;align-items:flex-start;gap:10px;padding:6px 4px 6px 0;cursor:pointer;width:auto;max-width:100%;text-align:left}
+  .pstep-h:hover{background:transparent}
+  .pstep-h:hover .ptt{color:var(--accent-ink)}
+  .pico{width:18px;height:18px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:10px;margin-top:2px;
+    position:relative;z-index:1;font-weight:700;line-height:1}
+  .pstep.done .pico{background:var(--green);color:#fff}
+  .pstep.run .pico{background:var(--accent-soft);color:var(--accent);animation:spin 1s linear infinite;border:1.5px solid var(--accent);border-top-color:transparent}
+  .pstep.wait .pico{background:#EEF2F6;color:var(--ink-3)}
+  /* 提示态用黄底「!」，红色仅留给严重错误（×） */
+  .pstep.warn .pico,.pstep.warn-step .pico{background:#EAB308;color:#fff;animation:none;border:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .pstep .ptt{font-size:13.5px;color:var(--ink);flex:none;font-weight:500;width:auto;white-space:nowrap}
+  .pstep.wait .ptt{color:var(--ink-3);font-weight:400}
+  .pstep .psum{font-size:12px;color:var(--ink-3);white-space:nowrap;flex:none;max-width:220px;overflow:hidden;text-overflow:ellipsis;margin-left:2px}
+  .pstep.wait .psum{color:var(--ink-3)}
+  .pstep .chev{width:18px;height:18px;color:var(--ink-3);display:grid;place-items:center;font-size:12px;flex:none;margin-top:2px;
+    transition:transform .15s;margin-left:2px}
+  .pstep.open .chev{transform:rotate(90deg)}
+  .pstep .iinfo{width:22px;height:22px;border-radius:6px;color:var(--ink-3);display:grid;place-items:center;flex:none}
+  .pstep .iinfo:hover{background:var(--soft);color:var(--ink)}
+  .pstep-b{display:none;padding:2px 8px 14px 28px}
+  .pstep.open .pstep-b{display:block}
+  .prule{margin:0 0 10px;padding:10px 12px;border-radius:8px;background:var(--accent-soft);border:1px solid #BFE3DF}
+  .prule .prule-t{font-size:12.5px;font-weight:600;color:var(--accent-ink);margin-bottom:6px}
+  .prule ul{margin:0;padding-left:16px}
+  .prule li{font-size:12px;color:var(--ink-2);line-height:1.55;margin:2px 0}
+  .pcheck{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:12.5px;opacity:0;transform:translateY(4px);
+    transition:opacity .25s,transform .25s}
+  .pcheck.in{opacity:1;transform:none}
+  .pcheck .ck{width:16px;flex:none;text-align:center}
+  .pcheck.ok .ck{color:var(--green)}
+  .pcheck.warn .ck{color:var(--amber)}
+  .pcheck.err .ck{color:var(--red)}
+  .pcheck.run .ck{color:var(--accent)}
+  .pcheck.info .ck{color:var(--accent-ink)}
+  .pcheck.wait .ck{color:var(--ink-3)}
+  .pfill{margin-top:8px;font-size:11.5px;color:var(--ink-2);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .pbar{height:6px;background:#EEF2F6;border-radius:4px;overflow:hidden;margin-top:6px;flex:1;max-width:120px}
+  .pbar>i{display:block;height:100%;width:0;background:var(--accent);transition:width .4s}
+  .pgrp{margin-top:10px}
+  .pgrp-h{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:8px 0 4px;letter-spacing:.02em}
+  .rule-note{font-size:11px;color:var(--amber);margin-top:8px}
+  .plist.mini .pstep,.plist.mini .plist-sub{display:none}
+  .plist.mini .pstep.run,.plist.mini .pstep.warn,.plist.mini .pstep.warn-step{display:block}
+  .plist.mini .pstep-b{display:none !important}
+
+  .parse-user{padding:4px 0 14px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+  .parse-chat{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:8px 0 20px}
+  .bub{max-width:min(78%,640px);padding:12px 16px;border-radius:16px;font-size:13.5px;line-height:1.6}
+  .bub.me{align-self:flex-end;background:#F2F2F2;color:var(--ink);white-space:pre-wrap;border:none}
+  .bub.ai{align-self:flex-start;background:transparent;border:none;color:var(--ink);max-width:100%;width:100%;padding:0;border-radius:0}
+  .parse-ai{width:100%;max-width:520px;align-self:flex-start}
+  .parse-sep{height:0;border:none;border-top:1px solid #E5E7EB;margin:8px 0 18px;width:100%}
+  .ai-lead{font-size:13.5px;color:var(--ink);line-height:1.65;margin:0 0 14px}
+  .tl-wrap{position:relative;padding-right:36px;width:fit-content;max-width:100%}
+  .tl-expandall{position:absolute;right:0;top:0;width:28px;height:28px;border-radius:8px;border:1px solid var(--border);
+    background:var(--bg);color:var(--ink-3);display:grid;place-items:center;font-size:13px;z-index:2}
+  .tl-expandall:hover{background:var(--soft);color:var(--ink)}
+  .tl{display:flex;flex-direction:column;align-items:flex-start}
+  .tl-item{position:relative;padding:0 0 2px;width:fit-content;max-width:100%}
+  .tl-item .tl-h{display:inline-flex;align-items:flex-start;gap:10px;width:auto;text-align:left;padding:6px 0;cursor:pointer}
+  .tl-item .tl-h:hover .tl-t{color:var(--accent-ink)}
+  .tl-dot{width:18px;height:18px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:10px;margin-top:2px;
+    position:relative;z-index:1;background:var(--soft);color:var(--ink-3);font-weight:700;line-height:1}
+  .tl-item:not(.last)::before{content:"";position:absolute;left:8px;top:22px;bottom:0;width:1.5px;background:#D8DEE6}
+  .tl-item.done .tl-dot{background:var(--green);color:#fff}
+  .tl-item.warn .tl-dot{background:#EAB308;color:#fff}
+  .tl-item.err .tl-dot{background:var(--red);color:#fff}
+  .tl-item.info .tl-dot{background:var(--accent);color:#fff}
+  .tl-t{flex:none;font-size:13.5px;font-weight:500;color:var(--ink);line-height:1.4;white-space:nowrap}
+  .tl-chev{width:18px;height:18px;flex:none;color:var(--ink-3);display:grid;place-items:center;font-size:12px;margin-top:2px;
+    transition:transform .15s}
+  .tl-item.open .tl-chev{transform:rotate(90deg)}
+  .tl-b{display:none;padding:2px 0 14px 28px}
+  .tl-item.open .tl-b{display:block}
+  .tl-b .id{font-size:12.5px;color:var(--ink-2);line-height:1.55;margin-bottom:4px}
+  .tl-b .id b{color:var(--ink);font-weight:500}
+  .tl-b .iact{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .tl-b .iact .btn{font-size:12px;padding:5px 11px;font-weight:500}
+  .tl-item.done-iss{opacity:.72}
+  .tl-item.done-iss .iact{display:none}
+  .submit-dock{margin-top:8px;padding:0;border:none;border-radius:0;background:transparent;width:100%}
+  .submit-dock .sd-note{font-size:13px;color:var(--ink-2);line-height:1.65;margin-bottom:12px}
+  .submit-dock .pact{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:0}
+  .btn-force{font-size:12.5px;color:var(--ink-3);background:none;border:none;padding:4px 2px;text-decoration:underline;text-underline-offset:3px}
+  .btn-force:hover{color:var(--warn)}
+  .split-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .hitem .hm.live{color:var(--accent-ink)}
+  .hitem .d.spin{background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
+
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;
+    font-size:13px;padding:11px 18px;border-radius:10px;display:flex;align-items:center;gap:9px;opacity:0;pointer-events:none;
+    transition:.25s;z-index:60;box-shadow:0 8px 26px rgba(26,26,24,.28)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast .k{width:17px;height:17px;border-radius:50%;background:var(--green);display:grid;place-items:center;font-size:10px}
+
+  /* ══ PROTOTYPE MODE / TIPS ══ */
+  .modesw{display:flex;align-items:center;gap:2px;background:var(--soft);border:1px solid var(--border);
+    border-radius:9px;padding:2px}
+  .modesw button{font-size:11.5px;font-weight:600;color:var(--ink-3);padding:4px 10px;border-radius:7px;transition:.14s;
+    display:flex;align-items:center;gap:5px}
+  .modesw button.on{background:var(--bg);color:var(--ink);box-shadow:0 1px 2px rgba(26,26,24,.08)}
+  .modesw button.on.disc{color:var(--accent-ink)}
+
+  .tipdot{display:none;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;
+    font-size:9.5px;font-weight:700;place-items:center;cursor:pointer;flex:none;
+    vertical-align:middle;margin-left:5px;box-shadow:0 0 0 2.5px var(--accent-soft);transition:.14s;position:relative;z-index:5}
+  .tipdot:hover{background:#0B7C72;transform:scale(1.14)}
+  body.discuss .tipdot{display:inline-grid}
+  body.discuss .tipdot.abs{position:absolute;top:-7px;right:-7px;margin:0}
+
+  .tiphost{position:relative}
+
+  .tipcard{position:fixed;z-index:200;width:326px;background:var(--bg);border:1px solid var(--border-2);
+    border-radius:12px;box-shadow:0 12px 34px rgba(26,26,24,.17);padding:14px 15px;display:none;
+    animation:tipin .14s ease-out}
+  .tipcard.show{display:block}
+  @keyframes tipin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+  .tipcard .th{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .tipcard .tn{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;
+    font-size:10px;font-weight:700;display:grid;place-items:center;flex:none}
+  .tipcard .tt{font-size:13px;font-weight:650;line-height:1.35}
+  .tipcard .tx{margin-left:auto;color:var(--ink-3);font-size:15px;line-height:1;padding:2px 4px;border-radius:5px}
+  .tipcard .tx:hover{background:var(--soft);color:var(--ink)}
+  .tipsec{margin-bottom:9px}
+  .tipsec:last-child{margin-bottom:0}
+  .tipsec .sl{font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:4px;display:flex;align-items:center;gap:5px}
+  .tipsec.ix .sl{color:var(--blue)}
+  .tipsec.fn .sl{color:var(--purple)}
+  .tipsec .sb{font-size:12.5px;color:var(--ink-2);line-height:1.55}
+  .tipref{margin-top:10px;padding-top:9px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:5px}
+  .tipref .rf{font-size:10.5px;font-weight:600;color:var(--ink-2);background:var(--soft);
+    border:1px solid var(--border);padding:2px 7px;border-radius:5px}
+
+  /* ══ 用户菜单（评审工具收纳处）══ */
+  .usermenu{position:relative}
+  .av{border:none;cursor:pointer}
+  .umenu{position:absolute;top:40px;right:0;width:262px;background:var(--bg);border:1px solid var(--border-2);
+    border-radius:13px;box-shadow:0 14px 38px rgba(26,26,24,.18);padding:8px;z-index:180;
+    display:none;animation:umin .14s ease-out}
+  .umenu.show{display:block}
+  @keyframes umin{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+  .um-h{display:flex;align-items:center;gap:10px;padding:7px 9px 11px;border-bottom:1px solid var(--border);margin-bottom:7px}
+  .um-av{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;
+    font-size:12px;font-weight:600;flex:none}
+  .um-n{font-size:13.5px;font-weight:650}
+  .um-r{font-size:11.5px;color:var(--ink-3)}
+  .um-sec{font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--ink-3);padding:7px 9px 5px;display:flex}
+  .um-sec span{margin-left:auto;color:var(--purple);font-weight:600;letter-spacing:0}
+  .um-i{width:100%;display:flex;align-items:center;gap:10px;padding:8px 9px;border-radius:8px;
+    font-size:13px;color:var(--ink-2);text-align:left;transition:.12s}
+  .um-i:hover{background:var(--soft);color:var(--ink)}
+  .um-i.danger{color:var(--ink-3)}
+  .um-i.danger:hover{background:var(--red-bg);color:var(--red)}
+  .um-div{height:1px;background:var(--border);margin:7px 0}
+  .um-hint{font-size:11px;color:var(--ink-3);padding:6px 9px 2px;line-height:1.45}
+  .um-tools{display:none}
+  body.discuss .um-tools{display:block}
+  .modesw{display:flex;gap:3px;background:var(--soft);border:1px solid var(--border);border-radius:9px;padding:3px;margin:0 9px}
+  .modesw button{flex:1;font-size:12px;font-weight:600;color:var(--ink-3);padding:5px 8px;border-radius:7px;
+    transition:.14s;display:flex;align-items:center;justify-content:center;gap:5px}
+  .modesw button.on{background:var(--bg);color:var(--ink);box-shadow:0 1px 2px rgba(26,26,24,.09)}
+
+  /* ══ 讨论结论编辑 ══ */
+  .tipdot.noted{background:var(--purple);box-shadow:0 0 0 2.5px var(--purple-bg)}
+  .tipdot.noted:hover{background:#5B34B3}
+
+  .conc{margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+  .conc-h{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .conc-h .sl{font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--purple)}
+  .conc-h .who{margin-left:auto;font-size:10.5px;color:var(--ink-3)}
+  .stchips{display:flex;gap:5px;margin-bottom:7px}
+  .stchips button{font-size:10.5px;font-weight:600;color:var(--ink-3);border:1px solid var(--border);
+    background:var(--bg);padding:2px 8px;border-radius:20px;transition:.12s}
+  .stchips button:hover{border-color:var(--border-2)}
+  .stchips button.on[data-s="pending"]{background:var(--amber-bg);color:var(--amber);border-color:#F0D5A8}
+  .stchips button.on[data-s="agreed"]{background:var(--green-bg);color:var(--green);border-color:#B9DECD}
+  .stchips button.on[data-s="open"]{background:var(--red-bg);color:var(--red);border-color:#F2C4B4}
+  .conc textarea{width:100%;min-height:64px;border:1px solid var(--border);border-radius:8px;padding:8px 10px;
+    font-family:inherit;font-size:12.5px;line-height:1.55;color:var(--ink);resize:vertical;outline:none;transition:.12s}
+  .conc textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .conc textarea::placeholder{color:var(--ink-3)}
+  .conc-f{display:flex;align-items:center;gap:7px;margin-top:7px}
+  .conc-f .hint{font-size:10.5px;color:var(--ink-3)}
+  .conc-f .sp{flex:1}
+  .cbtn{font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:7px;transition:.12s}
+  .cbtn.g{color:var(--ink-3);border:1px solid var(--border);background:var(--bg)}
+  .cbtn.g:hover{color:var(--red);border-color:#F2C4B4}
+  .cbtn.p{background:var(--accent);color:#fff}
+  .cbtn.p:hover{background:#0B7C72}
+  .saved{font-size:10.5px;color:var(--green);display:flex;align-items:center;gap:4px;opacity:0;transition:.2s}
+  .saved.show{opacity:1}
+
+  /* ══ 导出工具条 ══ */
+  .tools{display:none;align-items:center;gap:7px;margin-left:auto}
+  body.discuss .tools{display:flex}
+  .tbtn{font-size:11.5px;font-weight:600;color:var(--accent-ink);background:var(--bg);
+    border:1px solid #BFE3DF;padding:4px 10px;border-radius:7px;display:flex;align-items:center;gap:5px;transition:.12s}
+  .tbtn:hover{background:var(--accent-soft)}
+  .tbtn.warn{color:var(--red);border-color:#F2C4B4}
+  .tbtn.warn:hover{background:var(--red-bg)}
+
+  /* ══ 结论清单面板 ══ */
+  .lscrim{position:fixed;inset:0;background:rgba(26,26,24,.28);z-index:150;opacity:0;pointer-events:none;transition:.2s}
+  .lscrim.show{opacity:1;pointer-events:auto}
+  .listp{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--bg);
+    border-left:1px solid var(--border);box-shadow:-8px 0 30px rgba(26,26,24,.13);z-index:160;
+    transform:translateX(100%);transition:transform .24s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+  .listp.show{transform:translateX(0)}
+  .lp-h{padding:18px 20px 12px;border-bottom:1px solid var(--border);flex:none}
+  .lp-h .r1{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  .lp-h h3{font-size:16px;font-weight:650}
+  .lp-h .x{margin-left:auto;width:28px;height:28px;border-radius:7px;display:grid;place-items:center;color:var(--ink-3)}
+  .lp-h .x:hover{background:var(--soft);color:var(--ink)}
+  .lp-h .sub{font-size:12px;color:var(--ink-3)}
+  .lp-bar{height:5px;background:#EFEFED;border-radius:4px;margin-top:10px;overflow:hidden}
+  .lp-bar span{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .3s}
+  .lp-search{margin-top:11px;display:flex;align-items:center;gap:8px;border:1px solid var(--border);
+    border-radius:9px;padding:7px 11px;transition:.12s}
+  .lp-search:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .lp-search input{flex:1;border:none;outline:none;font-family:inherit;font-size:13px;background:none;color:var(--ink)}
+  .lp-fil{display:flex;gap:6px;padding:11px 20px;border-bottom:1px solid var(--border);flex:none;flex-wrap:wrap}
+  .lp-fil button{font-size:11.5px;font-weight:600;color:var(--ink-2);background:var(--bg);border:1px solid var(--border);
+    padding:3.5px 10px;border-radius:20px;transition:.12s}
+  .lp-fil button:hover{border-color:var(--border-2)}
+  .lp-fil button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .lp-list{flex:1;overflow-y:auto;padding:8px}
+  .li{width:100%;display:flex;gap:11px;padding:11px 12px;border-radius:10px;text-align:left;transition:.12s;
+    border:1px solid transparent}
+  .li:hover{background:var(--soft);border-color:var(--border)}
+  .li .ln{width:21px;height:21px;flex:none;border-radius:50%;font-size:10.5px;font-weight:700;
+    display:grid;place-items:center;background:#EDEDEB;color:var(--ink-3);margin-top:1px}
+  .li.has .ln{background:var(--purple);color:#fff}
+  .li .lc{flex:1;min-width:0}
+  .li .lt{font-size:13px;font-weight:600;line-height:1.4}
+  .li .lx{font-size:11.5px;color:var(--ink-3);margin-top:3px;overflow:hidden;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.45}
+  .li.has .lx{color:var(--ink-2)}
+  .li .lst{font-size:10px;font-weight:700;padding:1.5px 7px;border-radius:20px;flex:none;height:fit-content;margin-top:2px}
+  .lst.agreed{background:var(--green-bg);color:var(--green)}
+  .lst.pending{background:var(--amber-bg);color:var(--amber)}
+  .lst.open{background:var(--red-bg);color:var(--red)}
+  .lst.none{background:#F0F0EE;color:var(--ink-3);font-weight:600}
+  .lp-empty{padding:40px 20px;text-align:center;color:var(--ink-3);font-size:13px}
+  .flash{animation:flash 1.5s ease-out}
+  @keyframes flash{0%,55%{box-shadow:0 0 0 6px rgba(13,148,136,.34)}100%{box-shadow:0 0 0 2.5px var(--accent-soft)}}
+  @media(max-width:1180px){.mods{grid-template-columns:1fr 1fr}.cards{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}}
+
+  /* ══ 任务视图容器 ══ */
+  body.taskview .scroll{overflow:hidden}
+  body.taskview .askwrap{display:none !important}
+  .view-task{display:flex;height:calc(100vh - 56px);width:100%}
+  .view-task .cols{flex:1;display:flex;min-height:0;width:100%}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:var(--sans);background:var(--canvas);color:var(--ink);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#DDDDDA;border-radius:6px;border:2px solid transparent;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background:#C9C9C5;background-clip:padding-box}
+
+  .view-task .mono{font-family:var(--mono);letter-spacing:-.02em}
+  .view-task .app{display:flex;flex-direction:column;height:100%;width:100%;overflow:hidden}
+
+  /* Top bar */
+  .view-task .topbar{height:56px;flex:none;background:var(--panel);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:16px;padding:0 16px;z-index:20}
+  .view-task .backhome{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:var(--ink-2);
+    text-decoration:none;transition:.12s;flex:none}
+  .view-task .backhome:hover{background:var(--soft);color:var(--ink)}
+  .view-task .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px}
+  .view-task .brand .dot{width:18px;height:18px;border-radius:5px;background:var(--accent);
+    display:grid;place-items:center;color:#fff;font-size:11px;font-weight:700}
+  .view-task .brand small{color:var(--ink-3);font-weight:500}
+  .view-task .topbar .spacer{flex:1}
+  .view-task .gsearch{width:280px;height:30px;background:var(--canvas);border:1px solid var(--border);border-radius:7px;
+    display:flex;align-items:center;gap:7px;padding:0 10px;color:var(--ink-3);font-size:12.5px}
+  .view-task .topbar .env{font-size:11.5px;color:var(--info);background:var(--info-bg);padding:3px 8px;border-radius:20px;font-weight:600}
+  .view-task .tohome{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);text-decoration:none;
+    border:1px solid var(--border);padding:5px 11px;border-radius:8px;transition:.12s}
+  .view-task .tohome:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+  .view-task .avatar{width:28px;height:28px;border-radius:50%;background:#2E3A4E;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600}
+  .view-task .iconbtn{width:30px;height:30px;border-radius:7px;display:grid;place-items:center;color:var(--ink-2);position:relative}
+  .view-task .iconbtn:hover{background:var(--canvas)}
+  .view-task .iconbtn .badge{position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--disagree);border:1.5px solid var(--panel)}
+
+  .view-task .cols{flex:1;display:flex;min-height:0}
+
+  /* Left rail task list (shown inside the shared sidebar on My Tasks) */
+  .taskwrap .rail-head{padding:14px 14px 8px}
+  .taskwrap .rail-head h2{font-size:11px;font-weight:400;letter-spacing:.06em;color:var(--ink-2);
+    display:flex;align-items:center;gap:8px}
+  .taskwrap .pill{background:var(--accent-soft);color:var(--accent-ink);font-size:10px;font-weight:500;
+    padding:1px 6px;border-radius:20px}
+  .taskwrap .rail-sub{font-size:11px;font-weight:400;color:var(--ink-3);margin-top:5px;line-height:1.5}
+  .taskwrap .filters{display:flex;gap:4px;flex-wrap:wrap;padding:4px 14px 12px;border-bottom:1px solid var(--border)}
+  .taskwrap .chip{font-size:11px;font-weight:400;color:var(--ink-2);background:transparent;border:1px solid transparent;
+    padding:3px 8px;border-radius:6px;transition:.12s}
+  .taskwrap .chip:hover{border-color:transparent;color:var(--ink);background:var(--soft)}
+  .taskwrap .chip.on{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent;font-weight:500}
+  .taskwrap .chip.on:hover{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+  .taskwrap .tasklist{flex:1;overflow-y:auto;padding:8px 8px 12px}
+
+  .taskwrap .task{padding:10px 10px 10px 12px;border-radius:8px;border:1px solid transparent;cursor:pointer;
+    transition:.12s;position:relative;margin-bottom:2px}
+  .taskwrap .task:hover{background:var(--soft);border-color:transparent}
+  .taskwrap .task.active{background:var(--accent-soft);border-color:transparent}
+  .taskwrap .task.active::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:2px;border-radius:2px;background:var(--accent)}
+  .taskwrap .task.done{opacity:.5}
+  .taskwrap .task-top{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+  .taskwrap .ttype{font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;letter-spacing:.03em}
+  .taskwrap .ttype.vote{background:var(--info-bg);color:var(--info)}
+  .taskwrap .ttype.eval{background:#F3EEFB;color:#6941C6}
+  .taskwrap .ttype.otm{background:var(--accent-soft);color:var(--accent-ink)}
+  .taskwrap .ttype.rev{background:var(--neutral-bg);color:var(--neutral)}
+  .taskwrap .ttype.wi{background:var(--agree-bg);color:var(--agree)}
+  .taskwrap .task .pcr{font-size:10.5px;font-weight:400;color:var(--ink-3);margin-left:auto}
+  .taskwrap .task h3{font-size:12.5px;font-weight:400;line-height:1.45;margin-bottom:4px;color:var(--ink-2);
+    letter-spacing:0}
+  .taskwrap .task.active h3{font-weight:500;color:var(--accent-ink)}
+  .taskwrap .task-meta{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:400;color:var(--ink-3)}
+  .taskwrap .task-meta .flag{color:var(--disagree);font-weight:500}
+  .taskwrap .task-meta .m{color:var(--warn);font-weight:400}
+  .taskwrap .due{margin-left:auto}
+  .taskwrap .due.late{color:var(--disagree);font-weight:500}
+
+  /* Center */
+  .view-task .center{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--soft)}
+  .view-task .center-head{flex:none;background:var(--panel);border-bottom:1px solid var(--border);
+    padding:22px max(56px, calc((100% - 640px) / 2)) 18px}
+  .view-task .ch-row1{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .view-task .ch-row1 .pcr{font-size:12px;font-weight:400;color:var(--ink-3)}
+  .view-task .stat{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--info-bg);color:var(--info)}
+  .view-task .center-head h1{font-size:18px;font-weight:500;letter-spacing:-.02em;line-height:1.35;color:var(--ink)}
+  .view-task .ch-sub{font-size:12px;font-weight:400;color:var(--ink-3);margin-top:6px;display:flex;gap:10px;align-items:center}
+
+  .view-task .center-body{flex:1;overflow-y:auto;padding:32px max(56px, calc((100% - 640px) / 2)) 48px;scroll-behavior:smooth}
+
+  .view-task .agent{display:flex;gap:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:16px 18px;margin-bottom:18px;box-shadow:none}
+  .view-task .agent .ai{width:24px;height:24px;flex:none;border-radius:6px;background:linear-gradient(135deg,#0D9488,#2CB3A6);
+    color:#fff;display:grid;place-items:center;font-size:10px;font-weight:600}
+  .view-task .agent .txt{font-size:13.5px;font-weight:400;color:var(--ink);line-height:1.7}
+  .view-task .agent .txt b{font-weight:500}
+  .view-task .agent .txt .muted{color:var(--ink-2);font-weight:400}
+
+  .view-task .block{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;
+    box-shadow:none;overflow:hidden}
+  .view-task .block-h{display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid var(--border)}
+  .view-task .block-h h4{font-size:13px;font-weight:500}
+  .view-task .block-h .draft{font-size:10.5px;font-weight:500;color:var(--warn);background:var(--warn-bg);padding:2px 7px;border-radius:5px}
+  .view-task .block-h .right{margin-left:auto;display:flex;gap:6px}
+  .view-task .block-b{padding:16px 18px}
+  .view-task .minibtn{font-size:11.5px;font-weight:400;color:var(--ink-2);border:1px solid var(--border);background:var(--panel);padding:3px 9px;border-radius:6px;transition:.12s}
+  .view-task .minibtn:hover{border-color:var(--border-strong);color:var(--ink)}
+
+  .view-task .comment{font-size:13.5px;line-height:1.75;font-weight:400;color:var(--ink);white-space:pre-wrap}
+  .view-task .comment.edit{background:var(--panel-2);border:1px solid var(--border);border-radius:8px;padding:14px 16px;outline:none}
+  .view-task .comment.edit:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+  /* Vote control */
+  .view-task .votebar{display:flex;gap:10px;margin-top:6px}
+  .view-task .voteopt{flex:1;border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center;transition:.12s;background:var(--panel)}
+  .view-task .voteopt:hover{border-color:var(--border-2)}
+  .view-task .voteopt .vt{font-size:13px;font-weight:500;margin-bottom:4px}
+  .view-task .voteopt .vd{font-size:11px;font-weight:400;color:var(--ink-3)}
+  .view-task .voteopt.sel-agree{border-color:var(--agree);background:var(--agree-bg)}
+  .view-task .voteopt.sel-agree .vt{color:var(--agree)}
+  .view-task .voteopt.sel-dis{border-color:var(--disagree);background:var(--disagree-bg)}
+  .view-task .voteopt.sel-dis .vt{color:var(--disagree)}
+  .view-task .voteopt.sel-ni{border-color:var(--neutral);background:var(--neutral-bg)}
+  .view-task .voteopt.sel-ni .vt{color:var(--neutral)}
+
+  /* validation */
+  .view-task .valid{display:flex;flex-direction:column;gap:8px}
+  .view-task .vrow{display:flex;align-items:flex-start;gap:9px;font-size:13px;font-weight:400}
+  .view-task .vrow .ic{width:16px;height:16px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:10px;color:#fff;margin-top:2px}
+  .view-task .vrow.ok .ic{background:var(--agree)} .vrow.ok{color:var(--ink)}
+  .view-task .vrow.warn .ic{background:var(--warn)}
+  .view-task .vrow.err .ic{background:var(--disagree)}
+  .view-task .vrow .vl{color:var(--ink);font-weight:400} .vrow .vs{color:var(--ink-3);margin-left:2px}
+
+  table.sum{width:100%;border-collapse:collapse;font-size:13px}
+  table.sum th{text-align:left;font-weight:500;color:var(--ink-2);padding:8px 12px;border-bottom:1px solid var(--border);background:var(--panel-2)}
+  table.sum td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top;font-weight:400}
+  table.sum tr:last-child td{border-bottom:none}
+  .view-task .tag{font-size:11px;font-weight:500;padding:1.5px 7px;border-radius:5px;white-space:nowrap}
+  .view-task .tag.agree{background:var(--agree-bg);color:var(--agree)}
+  .view-task .tag.dis{background:var(--disagree-bg);color:var(--disagree)}
+  .view-task .tag.ni{background:var(--neutral-bg);color:var(--neutral)}
+
+  .view-task .risk{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;font-weight:400}
+  .view-task .risk:last-child{border-bottom:none}
+  .view-task .risk .lv{font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;height:fit-content;flex:none}
+  .view-task .lv.high{background:var(--disagree-bg);color:var(--disagree)}
+  .view-task .lv.mid{background:var(--warn-bg);color:var(--warn)}
+  .view-task .risk .rt b{font-weight:500}
+  .view-task .risk .rt span{color:var(--ink-2);font-weight:400}
+
+  .view-task .wi{border:1px solid var(--border);border-radius:10px;padding:14px 16px;background:var(--panel-2)}
+  .view-task .wi-grid{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13px;margin-top:10px}
+  .view-task .wi-grid dt{color:var(--ink-3);font-weight:400} .wi-grid dd{color:var(--ink);font-weight:400}
+
+  .view-task .paths{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .view-task .path{border:1px solid var(--border);border-radius:10px;padding:12px 14px;transition:.12s;text-align:left}
+  .view-task .path:hover{border-color:var(--border-2)}
+  .view-task .path.on{border-color:var(--accent);background:var(--accent-soft)}
+  .view-task .path .pt{font-size:13px;font-weight:500} .path .pd{font-size:11.5px;font-weight:400;color:var(--ink-3);margin-top:3px}
+
+  /* action bar */
+  .view-task .actionbar{position:sticky;left:auto;right:auto;bottom:0;z-index:5;width:100%;flex:none;background:var(--panel);border-top:1px solid var(--border);
+    padding:14px max(56px, calc((100% - 640px) / 2));display:flex;align-items:center;gap:12px;box-shadow:none}
+  .view-task .ab-note{font-size:12px;font-weight:400;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+  .view-task .ab-spacer{flex:1}
+  .view-task .btn{font-size:13px;font-weight:500;padding:8px 16px;border-radius:8px;transition:.12s}
+  .view-task .btn-ghost{color:var(--ink-2);border:1px solid var(--border)}
+  .view-task .btn-ghost:hover{border-color:var(--border-strong);color:var(--ink)}
+  .view-task .btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(13,148,136,.26)}
+  .view-task .btn-primary:hover{background:#0B7C72}
+  .view-task .btn-primary:disabled{background:#A9D5D0;box-shadow:none;cursor:not-allowed}
+  .view-task .btn-warnghost{color:var(--warn);border:1px solid var(--warn-bg);background:var(--warn-bg)}
+  .view-task .btn-warnghost:hover{background:#FBE9C9}
+
+  /* Right */
+  .view-task .ctx{width:372px;flex:none;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+  .view-task .ctx-tabs{flex:none;display:flex;border-bottom:1px solid var(--border);padding:0 8px}
+  .view-task .ctx-tab{font-size:12.5px;font-weight:600;color:var(--ink-3);padding:12px 10px;border-bottom:2px solid transparent;transition:.12s}
+  .view-task .ctx-tab:hover{color:var(--ink-2)}
+  .view-task .ctx-tab.on{color:var(--ink);border-bottom-color:var(--accent)}
+  .view-task .ctx-body{flex:1;overflow-y:auto;padding:14px}
+
+  .view-task .sec{margin-bottom:18px}
+  .view-task .sec-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:9px;cursor:pointer;user-select:none}
+  .view-task .sec-h .caret{transition:.15s;font-size:10px}
+  .view-task .sec.collapsed .caret{transform:rotate(-90deg)}
+  .view-task .sec.collapsed .sec-c{display:none}
+
+  .view-task .fields{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;font-size:12.5px}
+  .view-task .fields dt{color:var(--ink-3)} .fields dd{color:var(--ink)}
+  .view-task .attach{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;margin-top:7px;transition:.12s;cursor:pointer}
+  .view-task .attach:hover{border-color:var(--border-strong);background:var(--panel-2)}
+  .view-task .attach .fx{width:24px;height:24px;flex:none;border-radius:5px;background:var(--info-bg);color:var(--info);display:grid;place-items:center;font-size:10px;font-weight:700}
+  .view-task .attach .fx.xls{background:var(--agree-bg);color:var(--agree)}
+  .view-task .attach .fmeta{color:var(--ink-3);font-size:11px}
+  .view-task .attach .fdl{margin-left:auto;color:var(--ink-3);display:grid;place-items:center}
+  .view-task .attach:hover .fdl{color:var(--accent-ink)}
+
+  /* Process Progress & Monitoring */
+  .view-task .pp{padding:4px 0 2px}
+  .view-task .pp-track{display:flex;align-items:flex-start;justify-content:space-between;position:relative;gap:0;padding:4px 0 2px}
+  .view-task .pp-line{position:absolute;left:10px;right:10px;top:13px;height:2px;background:#E5E7EB;z-index:0}
+  .view-task .pp-line-fill{position:absolute;left:10px;top:13px;height:2px;background:var(--green);z-index:0;transition:width .2s}
+  .view-task .pp-node{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;z-index:1}
+  .view-task .pp-dot{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #CBD5E1;display:grid;place-items:center;
+    color:#fff;font-size:8px;font-weight:700;line-height:1;position:relative}
+  .view-task .pp-node.done .pp-dot{background:var(--green);border-color:var(--green)}
+  .view-task .pp-node.cur .pp-dot{border:2.5px solid #2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.18);background:#fff}
+  .view-task .pp-bang{position:absolute;right:-5px;bottom:-4px;width:12px;height:12px;border-radius:50%;background:var(--red);color:#fff;
+    font-size:8px;font-weight:800;display:grid;place-items:center;border:1.5px solid #fff;line-height:1}
+  .view-task .pp-lab{font-size:8.5px;color:var(--ink-3);text-align:center;line-height:1.25;max-width:100%;word-break:break-word}
+  .view-task .pp-node.done .pp-lab{color:var(--green);font-weight:600}
+  .view-task .pp-node.cur .pp-lab{color:#2563EB;font-weight:700}
+  .view-task .pp-mon{margin-top:12px;border:1.5px solid var(--accent);border-radius:10px;padding:12px 12px 10px;background:#fff;
+    box-shadow:0 4px 14px rgba(13,148,136,.08)}
+  .view-task .pp-mon h5{font-size:12.5px;font-weight:650;color:var(--accent-ink);margin:0 0 10px}
+  .view-task .pp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+  .view-task .pp-grid .k{font-size:11px;color:var(--ink-3);margin-bottom:2px}
+  .view-task .pp-grid .v{font-size:12.5px;color:var(--ink);font-weight:500}
+  .view-task .pp-risk{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:650;color:#fff;background:var(--red);
+    padding:2px 8px;border-radius:999px;line-height:1.4}
+  .view-task .pp-risk.mid{background:var(--amber)}
+  .view-task .pp-risk.low{background:var(--green)}
+  .view-task .pp-barwrap{display:flex;align-items:center;gap:8px;margin-top:12px}
+  .view-task .pp-bar{flex:1;height:6px;background:#EEF2F6;border-radius:4px;overflow:hidden}
+  .view-task .pp-bar>i{display:block;height:100%;background:var(--accent);border-radius:4px}
+  .view-task .pp-pct{font-size:11.5px;color:var(--ink-2);font-weight:600;flex:none}
+
+  .view-task .simcard{border:1px solid var(--border);border-radius:9px;padding:11px;margin-bottom:9px;transition:.12s;cursor:pointer}
+  .view-task .simcard:hover{border-color:var(--border-strong);background:var(--panel-2)}
+  .view-task .simcard-top{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .view-task .sim%{font-size:11px;font-weight:700;color:var(--agree);background:var(--agree-bg);padding:1.5px 7px;border-radius:20px;margin-left:auto}
+  .view-task .simcard h5{font-size:12.5px;font-weight:600;line-height:1.4;margin-bottom:5px}
+  .view-task .simcard .sm{font-size:11px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:4px 10px}
+
+  .view-task .evi{display:flex;gap:9px;font-size:12px;padding:9px 0;border-bottom:1px dashed var(--border)}
+  .view-task .evi:last-child{border-bottom:none}
+  .view-task .evi .en{width:18px;height:18px;flex:none;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-size:10px;font-weight:700}
+  .view-task .evi .ec b{font-weight:600}
+  .view-task .evi .src{font-size:10.5px;color:var(--info);background:var(--info-bg);padding:1px 6px;border-radius:4px;margin-top:3px;display:inline-block}
+
+  /* modal + toast */
+  .scrim{position:fixed;inset:0;background:rgba(16,24,40,.42);display:none;place-items:center;z-index:50;backdrop-filter:blur(1.5px)}
+  .scrim.show{display:grid}
+  .modal{width:440px;max-width:92vw;background:var(--panel);border-radius:14px;box-shadow:0 20px 48px rgba(16,24,40,.28);overflow:hidden;animation:pop .16s ease-out}
+  @keyframes pop{from{transform:scale(.97);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal-h{padding:16px 18px 4px} .modal-h h3{font-size:15.5px;font-weight:650}
+  .modal-h p{font-size:12.5px;color:var(--ink-2);margin-top:4px}
+  .modal-b{padding:12px 18px}
+  .writeback{background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:12px;font-size:12.5px}
+  .writeback .wl{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--border)}
+  .writeback .wl:last-child{border-bottom:none}
+  .writeback .wl .k{color:var(--ink-3)} .writeback .wl .v{font-weight:600;text-align:right}
+  .modal-note{font-size:11.5px;color:var(--ink-3);margin-top:10px;display:flex;gap:7px}
+  .modal-f{padding:12px 18px 16px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid var(--border);margin-top:6px}
+  textarea.reason{width:100%;min-height:70px;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:inherit;font-size:12.5px;resize:vertical;outline:none;margin-top:8px}
+  textarea.reason:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+  .view-task .toast{display:none !important;position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+    font-size:13px;padding:11px 18px;border-radius:10px;display:flex;align-items:center;gap:9px;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 8px 24px rgba(16,24,40,.3)}
+  .view-task .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .view-task .toast .tk{width:18px;height:18px;border-radius:50%;background:var(--agree);display:grid;place-items:center;font-size:11px}
+
+  .view-task .empty{height:100%;display:grid;place-items:center;color:var(--ink-3);font-size:13px}
+  svg.i{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+      <div class="logo"><span class="mk">P</span>PCR <small id="crumb">Overview</small></div>
+      <div class="sp"></div>
+      <span class="tipdot" onclick="showTip(event,'mode',1)">1</span>
+      <button class="sel" onclick="toast('切换时间范围')">近 90 天<svg class="i" style="width:13px;height:13px"><path d="M4 6.5L8 10l4-3.5"/></svg></button>
+      <button class="sel" onclick="toast('切换 BU')">全部 BU<svg class="i" style="width:13px;height:13px"><path d="M4 6.5L8 10l4-3.5"/></svg></button>
+      <button class="ibtn" onclick="toast('3 条未读通知')"><svg class="i"><path d="M8 2a4 4 0 0 0-4 4v3l-1.4 2.4h10.8L12 9V6a4 4 0 0 0-4-4z"/><path d="M6.6 13a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bd">3</span></button>
+      <div class="usermenu">
+        <button class="av" onclick="toggleMenu(event)">JC</button>
+        <div class="umenu" id="umenu">
+          <div class="um-h"><div class="um-av">JC</div><div><div class="um-n">Jordan</div><div class="um-r">OTM · DTIT AI+</div></div></div>
+
+          <div class="um-sec">原型模式</div>
+          <div class="modesw">
+            <button id="mDemo" class="on" onclick="setMode('demo')"><svg class="i" style="width:12px;height:12px"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8z"/><circle cx="8" cy="8" r="1.8"/></svg>演示</button>
+            <button id="mDisc" onclick="setMode('discuss')"><svg class="i" style="width:12px;height:12px"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1z"/><path d="M8 7v4M8 4.6h.01"/></svg>讨论</button>
+          </div>
+          <div class="um-hint" id="umhint">演示模式：已隐藏全部说明标记</div>
+
+          <div class="um-tools" id="umtools">
+            <div class="um-sec">评审工具 <span id="ncnt">已记录 0 条</span></div>
+            <button class="um-i" onclick="closeMenu();openList()"><svg class="i"><path d="M6 4h7M6 8h7M6 12h7M3 4h.01M3 8h.01M3 12h.01"/></svg>结论清单</button>
+            <button class="um-i" onclick="closeMenu();expMd()"><svg class="i"><path d="M8 2v8M5 7.5L8 10.5l3-3M3 13h10"/></svg>导出纪要（Markdown）</button>
+            <button class="um-i" onclick="closeMenu();expHtml()"><svg class="i"><path d="M5.5 3H3v10h10V8"/><path d="M9 3h4v4"/><path d="M7 9l6-6"/></svg>导出批注版原型</button>
+            <button class="um-i" onclick="closeMenu();document.getElementById('impf').click()"><svg class="i"><path d="M8 10V2M5 4.5L8 1.5l3 3M3 13h10"/></svg>导入他人批注</button>
+            <input type="file" id="impf" accept=".json" style="display:none" onchange="impJson(this)">
+            <button class="um-i danger" onclick="closeMenu();clearAll()"><svg class="i"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5"/></svg>清空全部结论</button>
+          </div>
+
+          <div class="um-div"></div>
+          <button class="um-i" onclick="toast('账号设置')"><svg class="i"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M2.5 8h2M11.5 8h2M4.1 4.1l1.4 1.4M10.5 10.5l1.4 1.4M11.9 4.1l-1.4 1.4M5.5 10.5l-1.4 1.4"/></svg>账号设置</button>
+        </div>
+      </div>
+  </div>
+
+  <!-- LEFT RAIL -->
+  <aside class="rail">
+    <div class="rail-top">
+      <button class="newchat" onclick="newChatSession()" title="New Chat">
+        <svg class="i"><path d="M8 3v10M3 8h10"/></svg><span class="newchat-label">New Chat</span>
+      </button>
+      <button class="railtoggle" onclick="toggleRail()" title="Collapse sidebar">
+        <svg class="i"><rect x="2" y="3" width="12" height="10" rx="2"/><path d="M6 3v10"/></svg>
+      </button>
+    </div>
+
+    <div style="position:relative"><span class="tipdot abs" onclick="showTip(event,'nav',2)">2</span></div>
+    <nav class="nav">
+      <button class="navitem on" data-view="home" onclick="switchView('home')"><svg class="i"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="8.5" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="2" y="8.5" width="5.5" height="5.5" rx="1.5"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.5"/></svg>Overview</button>
+      <button class="navitem" data-view="task" onclick="switchView('task')"><svg class="i"><path d="M5.5 2h5a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 10.5 14h-5A1.5 1.5 0 0 1 4 12.5v-9A1.5 1.5 0 0 1 5.5 2z"/><path d="M6.5 6h3M6.5 9h3"/></svg>My Tasks<span class="cnt hot">3</span></button>
+    </nav>
+
+    <div class="taskwrap">
+      <div class="rail-head">
+        <h2>我的任务 <span class="pill" id="taskCount">6</span><span class="tipdot" onclick="showTip(event,'rail',21)">21</span></h2>
+        <div class="rail-sub">按 PACE 主流程组织 · 单击任务直接进入执行</div>
+      </div>
+      <div class="filters" id="filters">
+        <button class="chip on" data-f="all">全部</button>
+        <button class="chip" data-f="vote">Vote</button>
+        <button class="chip" data-f="eval">Evaluation</button>
+        <button class="chip" data-f="otm">Assessment</button>
+        <button class="chip" data-f="rev">Review</button>
+        <button class="chip" data-f="wi">Work Item</button>
+      </div>
+      <div class="tasklist" id="tasklist"></div>
+    </div>
+
+    <div class="histwrap">
+      <div class="hgroup">Today<span class="tipdot" onclick="showTip(event,'hist',3)">3</span></div>
+      <button class="hitem" id="parseHistItem" style="display:none" onclick="resumeParse()">
+        <span class="d spin"></span><span style="min-width:0"><div class="ht" id="parseHistTitle">T14p CPU SKU 变更 · 解析中</div><div class="hm live">进行中</div></span>
+      </button>
+      <button class="hitem"><span class="d" style="background:var(--red)"></span><span style="min-width:0"><div class="ht">认证延期的影响面分析</div><div class="hm">40 分钟前</div></span></button>
+      <button class="hitem"><span class="d" style="background:var(--accent)"></span><span style="min-width:0"><div class="ht">X1 产品线 PCR 撞期情况</div><div class="hm">2 小时前</div></span></button>
+      <div class="hgroup">Yesterday</div>
+      <button class="hitem"><span class="d" style="background:var(--blue)"></span><span style="min-width:0"><div class="ht">按产品看逾期分布</div><div class="hm">昨天</div></span></button>
+      <button class="hitem"><span class="d" style="background:var(--green)"></span><span style="min-width:0"><div class="ht">XX 订单交付项目进度</div><div class="hm">昨天</div></span></button>
+      <div class="hgroup">Earlier</div>
+      <button class="hitem"><span class="d" style="background:var(--purple)"></span><span style="min-width:0"><div class="ht">M90q 二供成本对比</div><div class="hm">3 天前</div></span></button>
+      <button class="hitem"><span class="d" style="background:var(--ink-3)"></span><span style="min-width:0"><div class="ht">Vote 环节积压根因</div><div class="hm">5 天前</div></span></button>
+    </div>
+
+    <div class="pinned">
+      <div class="hgroup" style="padding:2px 9px 6px">Pinned to Home</div>
+      <button class="pitem"><svg class="i" style="width:13px;height:13px"><path d="M8 2v6M5 5l3-3 3 3M3 11h10v3H3z"/></svg>X1 线撞期看板</button>
+      <button class="pitem"><svg class="i" style="width:13px;height:13px"><path d="M8 2v6M5 5l3-3 3 3M3 11h10v3H3z"/></svg>订单交付项目进度</button>
+    </div>
+
+    <div class="rail-foot">
+      <button class="navitem" onclick="toast('设置')"><svg class="i"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M2.5 8h2M11.5 8h2M4.1 4.1l1.4 1.4M10.5 10.5l1.4 1.4M11.9 4.1l-1.4 1.4M5.5 10.5l-1.4 1.4"/></svg>设置</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="scroll">
+      <div id="view-home">
+      <div class="parse-bar" id="parseBar" onclick="backToOverview()" title="返回总览">
+        <span>←</span>
+        <div class="pb-t">Overview · 148 in progress, 12 overdue</div>
+        <span id="parseBarCaret">▾</span>
+        <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrFold',37)">37</span>
+      </div>
+      <div class="page" id="homeStack">
+
+        <div class="greet">
+          <h1>下午好，Jordan</h1>
+          <p>OTM · 全盘 148 条 PCR 在途，其中 12 条已逾期</p>
+        </div>
+        <div style="display:none">
+        </div>
+
+        <!-- AI BRIEFING -->
+        <div class="brief">
+          <div class="brief-h">
+            <span class="ai">AI</span><span class="bt">现在需要你定的三件事</span><span class="tipdot" onclick="showTip(event,'brief',4)">4</span>
+            <span class="live"><span class="pulse"></span>数据更新至 2 分钟前</span>
+          </div>
+
+          <div class="bitem r">
+            <span class="n">1</span>
+            <div style="flex:1">
+              <div class="bc"><span class="ent" onclick="jump('X1 G13')">ThinkPad X1 G13 CPU 换代</span> 的认证周期增加 3 周，11/15 量产目标<b>已不可达</b>。需本周决定改期或缩减 GEO 范围。</div>
+              <div class="why" onclick="ev(this)"><svg class="i" style="width:12px;height:12px"><path d="M4 6.5L8 10l4-3.5"/></svg>依据 3 条证据</div><span class="tipdot" onclick="showTip(event,'evi',25)">25</span>
+              <div class="evbox">
+                <div class="er"><span class="src">Evaluation</span><span>Certification 职能提出 ANATEL/BIS 送测需额外 3 周，且不可并行。</span></div>
+                <div class="er"><span class="src">Target Date</span><span>目标实施日 2026-11-15，反推认证须在 10/20 前启动，现已超期。</span></div>
+                <div class="er"><span class="src">Similar PCR</span><span>CP-2024-09815 同类延期最终采用分批发布方式处理。</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bitem a">
+            <span class="n">2</span>
+            <div style="flex:1">
+              <div class="bc"><span class="ent" onclick="jump('XX 订单交付')">XX 客户订单交付</span><span class="tipdot" onclick="showTip(event,'ent',6)">6</span> 项目下 8 条 PCR，整体进度 61%，<b>落后计划 9 天</b>，瓶颈在 ODM 侧 BOM 建立未回写。</div>
+              <div class="why" onclick="ev(this)"><svg class="i" style="width:12px;height:12px"><path d="M4 6.5L8 10l4-3.5"/></svg>依据 2 条证据</div>
+              <div class="evbox">
+                <div class="er"><span class="src">Work Item</span><span>3 项 PLM BOM 建立任务超过 Target Date 未回写，ODM 侧未更新状态。</span></div>
+                <div class="er"><span class="src">项目汇总</span><span>8 条 PCR 中 5 条处于 Implementation，平均滞后 9 天。</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bitem a">
+            <span class="n">3</span>
+            <div style="flex:1">
+              <div class="bc">3 条 PCR 的成本影响已超出评估区间，但 <b>Cost 记录仍未维护</b>，将阻塞 Approve to Close。</div>
+              <div class="why" onclick="ev(this)"><svg class="i" style="width:12px;height:12px"><path d="M4 6.5L8 10l4-3.5"/></svg>依据 2 条证据</div>
+              <div class="evbox">
+                <div class="er"><span class="src">Cost Record</span><span>M90q 二供等 3 条 PCR 未建立成本记录，成本影响已由开发 Vote 识别。</span></div>
+                <div class="er"><span class="src">规则</span><span>Approve to Close 前需完成成本维护，当前为阻断项。</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI -->
+        <div style="position:relative"><span class="tipdot abs" onclick="showTip(event,'kpi',7)">7</span></div>
+        <div class="kpis">
+          <button class="kpi"><div class="kl">WIP PCR</div><div class="kv">148<span class="kd up">▲12</span></div></button>
+          <button class="kpi"><div class="kl">Overdue</div><div class="kv">12<span class="kd up">▲3</span></div></button>
+          <button class="kpi" onclick="switchView('task')"><div class="kl">Pending Decision</div><div class="kv">3<span class="kd fl">●</span></div></button>
+          <button class="kpi"><div class="kl">Avg Cycle</div><div class="kv">23<span class="kd dn">▼2d</span></div></button>
+          <button class="kpi"><div class="kl">Closed This Month</div><div class="kv">34<span class="kd dn">▲6</span></div></button>
+          <button class="kpi"><div class="kl">Critical</div><div class="kv">9<span class="kd fl">●</span></div></button>
+        </div>
+
+        <!-- MODULES -->
+        <div class="sechead"><h2>工作区</h2><span class="tipdot" onclick="showTip(event,'mods',8)">8</span><span class="cn">点击进入完整视图</span></div>
+        <div class="mods">
+          <button class="mod" onclick="switchView('task')">
+            <div class="mh"><span class="mi t"><svg class="i" style="width:17px;height:17px"><path d="M5.5 2h5a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 10.5 14h-5A1.5 1.5 0 0 1 4 12.5v-9A1.5 1.5 0 0 1 5.5 2z"/><path d="M6.5 6h3M6.5 9h3"/></svg></span>
+              <div><div class="mt">我的任务</div><div class="ms">Task Workbench</div></div></div>
+            <div class="md">按 PACE 主流程处理单条 PCR：投票、评估、审核与 OTM 决策。</div>
+            <div class="tags"><span class="tg">待办 12</span><span class="tg hot">待决策 3</span><span class="tg">批量 Vote</span></div>
+          </button>
+
+          <button class="mod" onclick="askPreset('按产品和项目维度分析 PCR 分布与瓶颈')">
+            <div class="mh"><span class="mi p"><svg class="i" style="width:17px;height:17px"><path d="M2.5 13.5V9M6.5 13.5V4M10.5 13.5V6.5M14 13.5V2.5"/></svg></span>
+              <div><div class="mt">统计分析</div><div class="ms">Portfolio Analytics</div></div></div>
+            <div class="md">按产品、项目、职能与 GEO 透视 PCR 分布、周期与瓶颈，可逐层钻取。</div>
+            <div class="tags"><span class="tg">产品维度</span><span class="tg">项目维度</span><span class="tg">趋势与周期</span></div>
+          </button>
+
+          <button class="mod" onclick="askPreset('查看进行中的 ODM 执行项目健康度')">
+            <div class="mh"><span class="mi o"><svg class="i" style="width:17px;height:17px"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg></span>
+              <div><div class="mt">执行管理</div><div class="ms">ODM Execution</div></div></div>
+            <div class="md">把每条进入实施的 PCR 当作小项目管理：进度、里程碑、风险与 Work Item。</div>
+            <div class="tags"><span class="tg">进行中 9</span><span class="tg hot">风险 2</span><span class="tg">ODM 回写</span></div>
+          </button>
+        </div>
+
+        <!-- WATCH + HEALTH -->
+        <div class="sechead"><h2>我关注的 PCR</h2><span class="tipdot" onclick="showTip(event,'watch',9)">9</span><span class="cn">12 条 · 按需要注意的程度排序</span>
+          <button class="lk" onclick="toast('管理订阅规则')">管理订阅<svg class="i" style="width:13px;height:13px"><path d="M6 4l3.5 4L6 12"/></svg></button></div>
+        <div class="cards">
+          <div class="card">
+            <div class="ai-line"><span class="sp">AI</span><span>3 条关注中的 PCR 都卡在认证或 ODM 回写，属于同一类瓶颈；建议优先处理 X1 G13。</span></div>
+
+            <div class="wrow" onclick="tog(this,'p1')">
+              <span class="dot r"></span>
+              <div class="wn"><div class="wt">X1 Carbon G13 CPU Ultra 165U 换代</div><div class="wp mono">PCR-2026-08871 · OTM Assessment</div></div>
+              <div class="prog"><div class="bar"><div class="fil" style="width:72%;background:var(--amber)"></div></div><div class="pt">72%</div></div>
+              <div class="sig risk">风险 2</div><div class="cost flat">● 持平</div><span class="tipdot" onclick="showTip(event,'signals',10)">10</span>
+            </div>
+            <div class="inline" id="p1">
+              <div class="inl-in">
+                <div class="inl-h"><span class="tt">OTM ASSESSMENT</span><h4>待你决策</h4><span class="tipdot" onclick="showTip(event,'inline',12)">12</span>
+                  <button class="cl" onclick="event.stopPropagation();tog(document.querySelector('[onclick*=p1]'),'p1')">收起 ▴</button></div>
+                <div class="agent"><span class="ai">AI</span><div class="tx">5 个职能已回收 4 个。<b>Certification 提出 Disagree</b>（认证 +3 周），Cost 尚未维护记录。处理路径由你决定，我只说明每条路径的条件与后果。</div></div>
+                <table class="sumtab">
+                  <thead><tr><th>职能</th><th>立场</th><th>关键结论</th></tr></thead>
+                  <tbody>
+                    <tr><td>Development</td><td><span class="vt ag">Agree</span></td><td>pin-to-pin 换代，无硬件影响</td></tr>
+                    <tr><td>Quality</td><td><span class="vt ag">Agree</span></td><td>沿用现有可靠性矩阵</td></tr>
+                    <tr><td>Supply Chain</td><td><span class="vt ni">No Impact</span></td><td>供货无变化</td></tr>
+                    <tr><td>Certification</td><td><span class="vt dg">Disagree</span></td><td>认证 +3 周，威胁 11/15 目标</td></tr>
+                    <tr><td>Cost</td><td><span class="vt pd">待维护</span></td><td>成本记录尚未建立</td></tr>
+                  </tbody>
+                </table>
+                <div style="position:relative"><span class="tipdot abs" onclick="showTip(event,'paths',13)">13</span></div>
+                <div class="paths">
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Approve with Work Item</div><div class="pd">带工作项批准 · 需 ≥1 有效 Work Item</div></button>
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Approve to Close</div><div class="pd">当前有未决成本项，暂不可用</div></button>
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Return</div><div class="pd">退回补充认证与成本材料</div></button>
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Pending</div><div class="pd">挂起等待认证最终结论</div></button>
+                </div>
+                <div class="inl-f">
+                  <span class="nt">决策与 Work Item 经你确认后才在 PACE 生效</span><span class="tipdot" onclick="showTip(event,'writeback',14)">14</span><span class="sp"></span>
+                  <button class="btn btn-g" onclick="event.stopPropagation();switchView('task')">完整视图</button>
+                  <button class="btn btn-p" id="p1btn" disabled onclick="event.stopPropagation();done('p1')">确认决策</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="wrow" onclick="tog(this,'p2')">
+              <span class="dot a"></span>
+              <div class="wn"><div class="wt">M90q G6 DDR5 颗粒二供导入</div><div class="wp mono">CP-2026-04412 · Implementation</div></div>
+              <div class="prog"><div class="bar"><div class="fil" style="width:45%;background:var(--amber)"></div></div><div class="pt">45%</div></div>
+              <div class="sig risk">风险 1</div><div class="cost up">▲ +2.1%</div>
+            </div>
+            <div class="inline" id="p2">
+              <div class="inl-in">
+                <div class="inl-h"><span class="tt">EXECUTION</span><h4>执行情况</h4>
+                  <button class="cl" onclick="event.stopPropagation();tog(document.querySelector('[onclick*=p2]'),'p2')">收起 ▴</button></div>
+                <div class="agent"><span class="ai">AI</span><div class="tx">4 项 Work Item 中 <b>1 项逾期</b>（ODM 侧 BOM 建立）。成本较评估基线上浮 2.1%，尚在可接受区间但需 Cost 确认。</div></div>
+                <table class="sumtab">
+                  <thead><tr><th>Work Item</th><th>系统 / ODM</th><th>状态</th></tr></thead>
+                  <tbody>
+                    <tr><td>二供 BOM 建立</td><td>PLM · ODM-A</td><td><span class="vt dg">逾期 3 天</span></td></tr>
+                    <tr><td>物料认证更新</td><td>T1</td><td><span class="vt ni">进行中</span></td></tr>
+                    <tr><td>采购计划调整</td><td>OD</td><td><span class="vt ag">已回写</span></td></tr>
+                    <tr><td>成本记录维护</td><td>PACE</td><td><span class="vt pd">待处理</span></td></tr>
+                  </tbody>
+                </table>
+                <div class="inl-f"><span class="nt">升级将通知 Assignee 及其负责人</span><span class="sp"></span>
+                  <button class="btn btn-g" onclick="event.stopPropagation();toast('已在「执行管理」中打开该项目')">执行项目</button>
+                  <button class="btn btn-p" onclick="event.stopPropagation();done('p2')">升级逾期项</button></div>
+              </div>
+            </div>
+
+            <div class="wrow" onclick="tog(this,'p3')">
+              <span class="dot r"></span>
+              <div class="wn"><div class="wt">T14 G6 面板二供 · 实施跟踪</div><div class="wp mono">PCR-2026-08830 · Implementation</div></div>
+              <div class="prog"><div class="bar"><div class="fil" style="width:30%;background:var(--red)"></div></div><div class="pt">30%</div></div>
+              <div class="sig risk">逾期 4d</div><div class="cost na">—</div><span class="tipdot" onclick="showTip(event,'cost',11)">11</span>
+            </div>
+            <div class="inline" id="p3">
+              <div class="inl-in">
+                <div class="inl-h"><span class="tt">EXECUTION</span><h4>执行情况</h4>
+                  <button class="cl" onclick="event.stopPropagation();tog(document.querySelector('[onclick*=p3]'),'p3')">收起 ▴</button></div>
+                <div class="agent"><span class="ai">AI</span><div class="tx">该 PCR 已<b>整体逾期 4 天</b>，根因是 OD 采购计划调整未完成，且 ODM 侧连续两周未更新状态。成本字段对你当前角色不可见。</div></div>
+                <div class="inl-f"><span class="nt">建议同时升级至 ODM 对接人</span><span class="sp"></span>
+                  <button class="btn btn-g" onclick="event.stopPropagation();toast('已打开执行项目工作区')">执行项目</button>
+                  <button class="btn btn-p" onclick="event.stopPropagation();done('p3')">升级并通知</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>执行健康度</h3><span class="tipdot" onclick="showTip(event,'health',15)">15</span><span class="ct">9 个进行中</span></div>
+            <div class="hstat">
+              <button class="hs r" onclick="toast('查看 2 个风险项目')"><div class="hv">2</div><div class="hl">风险</div></button>
+              <button class="hs a" onclick="toast('查看 3 个需关注项目')"><div class="hv">3</div><div class="hl">关注</div></button>
+              <button class="hs g" onclick="toast('查看 4 个健康项目')"><div class="hv">4</div><div class="hl">健康</div></button>
+            </div>
+            <div class="ai-line"><span class="sp">AI</span><span>2 个风险项目均因 ODM 侧回写滞后，非技术问题。</span></div>
+            <div class="card-h" style="padding-top:4px"><h3>职能负载</h3><span class="tipdot" onclick="showTip(event,'load',16)">16</span><span class="ct">Vote / Evaluation 积压</span></div>
+            <div class="loadwrap">
+              <div class="lrow"><span class="ln">Certification</span><span class="lb"><span class="lf hot" style="width:100%"></span></span><span class="lv">24</span></div>
+              <div class="lrow"><span class="ln">Development</span><span class="lb"><span class="lf" style="width:62%"></span></span><span class="lv">15</span></div>
+              <div class="lrow"><span class="ln">Cost</span><span class="lb"><span class="lf" style="width:37%"></span></span><span class="lv">9</span></div>
+              <div class="lrow"><span class="ln">Quality</span><span class="lb"><span class="lf" style="width:25%"></span></span><span class="lv">6</span></div>
+            </div>
+            <div class="ai-line" style="margin-top:12px"><span class="sp">AI</span><span>认证积压是当前主瓶颈，较上周增加 9 条。</span></div>
+          </div>
+        </div>
+
+        <!-- MATRIX + FEED -->
+        <div class="sechead"><h2>分布与动态</h2>
+          <button class="lk" onclick="toast('进入「统计分析」完整视图')">完整分析<svg class="i" style="width:13px;height:13px"><path d="M6 4l3.5 4L6 12"/></svg></button></div>
+        <div class="cards">
+          <div class="card">
+            <div class="card-h"><h3>产品 × 阶段分布</h3><span class="tipdot" onclick="showTip(event,'matrix',17)">17</span><span class="ct">点击单元格查看明细</span></div>
+            <div class="ai-line"><span class="sp">AI</span><span>积压集中在 Vote 阶段（41 条，较上周 +9）；X1 产品线同时压着 17 条变更，是当前最挤的产品线。</span></div>
+            <table class="mx">
+              <thead><tr><th>产品线</th><th>Submit</th><th>Review</th><th>Screen</th><th>Vote</th><th>Assess</th><th>Impl</th></tr></thead>
+              <tbody>
+                <tr><td>ThinkPad X1</td>
+                  <td><span class="cell c1" onclick="toast('X1 · Submit 阶段 2 条')">2</span></td>
+                  <td><span class="cell c2" onclick="toast('X1 · Review 阶段 3 条')">3</span></td>
+                  <td><span class="cell c1" onclick="toast('X1 · Screen 阶段 1 条')">1</span></td>
+                  <td><span class="cell c3" onclick="toast('X1 · Vote 阶段 4 条')">4</span></td>
+                  <td><span class="cell cw" onclick="toast('X1 · Assessment 2 条，含 1 条逾期')">2</span></td>
+                  <td><span class="cell c3" onclick="toast('X1 · Implementation 5 条')">5</span></td></tr>
+                <tr><td>ThinkCentre M90q<span class="tipdot" onclick="showTip(event,'dim',18)">18</span></td>
+                  <td><span class="cell c1">1</span></td><td><span class="cell c0">0</span></td>
+                  <td><span class="cell c1">2</span></td><td><span class="cell c1">1</span></td>
+                  <td><span class="cell c0">0</span></td><td><span class="cell cw">3</span></td></tr>
+                <tr><td>ThinkSystem SR650</td>
+                  <td><span class="cell c0">0</span></td><td><span class="cell c1">1</span></td>
+                  <td><span class="cell c0">0</span></td><td><span class="cell c1">2</span></td>
+                  <td><span class="cell c2">3</span></td><td><span class="cell c1">1</span></td></tr>
+                <tr><td>Legion Pro</td>
+                  <td><span class="cell c1">2</span></td><td><span class="cell c1">2</span></td>
+                  <td><span class="cell c1">1</span></td><td><span class="cell c2">3</span></td>
+                  <td><span class="cell c1">1</span></td><td><span class="cell c1">2</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>变化</h3><span class="tipdot" onclick="showTip(event,'feed',19)">19</span><span class="ct">自你上次登录 · 2 天前</span></div>
+            <div class="feed">
+              <div class="fr"><span class="fi r"><svg class="i" style="width:12px;height:12px"><path d="M8 3v6M8 12h.01"/></svg></span>
+                <div class="fc"><div class="ft">Certification 在 <span class="ent" onclick="jump('X1 G13')">X1 G13</span> 提出 Disagree</div><div class="fm">2 小时前 · 触发上方第 1 项</div></div><span class="new"></span></div>
+              <div class="fr"><span class="fi a"><svg class="i" style="width:12px;height:12px"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.5l2 1"/></svg></span>
+                <div class="fc"><div class="ft">OD 采购计划 Work Item 逾期转红</div><div class="fm">昨天 · T14 G6 面板二供</div></div><span class="new"></span></div>
+              <div class="fr"><span class="fi b"><svg class="i" style="width:12px;height:12px"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+                <div class="fc"><div class="ft"><span class="ent" onclick="jump('XX 订单交付')">XX 订单交付</span> 项目新纳入 2 条 PCR</div><div class="fm">昨天 · 现共 8 条</div></div></div>
+              <div class="fr"><span class="fi g"><svg class="i" style="width:12px;height:12px"><path d="M3 8.5l3 3 7-7"/></svg></span>
+                <div class="fc"><div class="ft">3 条 PCR 完成 Implementation Review</div><div class="fm">昨天 · 已聚合同类变化</div></div></div>
+              <div class="fr"><span class="fi a"><svg class="i" style="width:12px;height:12px"><path d="M8 2l6 11H2z"/></svg></span>
+                <div class="fc"><div class="ft">Vote 环节积压增加 9 条</div><div class="fm">2 天前 · 主要来自 Certification</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="parse-rest" id="parseLayer">
+        <div class="parse-user" id="parseUser"></div>
+        <div class="parse-flow" id="parseSticky">
+          <div class="plist" id="plist"></div>
+        </div>
+        <div class="parse-chat" id="parseChat"></div>
+      </div>
+      </div>
+      <div id="view-task" class="view-task" style="display:none">
+<div class="cols">
+    <!-- CENTER -->
+    <main class="center">
+      <div id="centerHead"></div>
+      <div class="center-body" id="centerBody"></div>
+      <div class="actionbar" id="actionbar" style="display:none"></div>
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="ctx">
+      <div class="ctx-tabs">
+        <button class="ctx-tab on" data-t="detail">PCR Details</button><span class="tipdot" onclick="showTip(event,'ctx',31)">31</span>
+        <button class="ctx-tab" data-t="similar">Similar PCR</button><span class="tipdot" onclick="showTip(event,'sim',32)">32</span>
+        <button class="ctx-tab" data-t="evidence">AI Evidence</button><span class="tipdot" onclick="showTip(event,'tevi',33)">33</span>
+      </div>
+      <div class="ctx-body" id="ctxBody"></div>
+    </aside>
+  </div>
+
+      </div>
+    </div>
+
+    <!-- ASK BAR -->
+    <div class="askwrap" id="askwrap">
+      <div class="ask">
+        <div style="position:relative"><span class="tipdot abs" onclick="showTip(event,'ask',20)">20</span>
+          <span class="tipdot abs" style="right:14px" onclick="showTip(event,'pcrEntry',35)">35</span>
+        </div>
+        <div class="guide" id="guide">
+          <div class="guide-g">提交变更需求 <span>粘贴邮件、会议纪要，或直接描述</span><span class="tipdot" onclick="showTip(event,'pcrGuide',36)">36</span></div>
+          <button class="guide-i" data-g="write" onclick="guideCreate()">粘贴邮件、会议纪要，或直接描述</button>
+          <div class="guide-g">提问与分析 <span>读取现状，不写入</span></div>
+          <button class="guide-i" data-g="read" onclick="askq(this)">X1 G13 现在什么状态</button>
+          <button class="guide-i" data-g="read" onclick="askq(this)">XX 订单交付项目为什么慢</button>
+          <button class="guide-i" data-g="read" onclick="askq(this)">按产品看逾期分布</button>
+          <button class="guide-i" data-g="read" onclick="askq(this)">对比 M90q 与相似案例成本</button>
+        </div>
+        <div class="chips" id="askChips">
+          <button class="chip" onclick="askq(this)">按产品看逾期分布</button>
+          <button class="chip" onclick="askq(this)">XX 订单交付项目为什么慢</button>
+          <button class="chip" onclick="askq(this)">认证积压的根因</button>
+          <button class="chip" onclick="askq(this)">对比 M90q 与相似案例成本</button>
+        </div>
+        <div class="detectbar" id="detectbar">
+          <p>检测到一段变更描述，看起来是硬件变更请求</p>
+          <div class="db-act">
+            <button class="pri" onclick="acceptDetect()">解析为 PCR</button>
+            <button onclick="dismissDetect()">就当普通提问</button>
+          </div>
+        </div>
+        <div class="ask-stack">
+          <div class="plusmenu" id="plusmenu">
+            <button onclick="menuCreate()"><span class="pm-t">📝 创建 PCR</span><span class="pm-s">从描述、邮件或纪要</span></button>
+            <div class="pm-div"></div>
+            <button onclick="menuUpload()"><span class="pm-t">📎 上传附件</span><span class="pm-s">邮件 / 文档 / 图片</span></button>
+            <div class="pm-div"></div>
+            <button onclick="menuFill('分析产品或项目')"><span class="pm-t">📊 分析产品或项目</span></button>
+            <button onclick="menuFill('查询 PCR 状态')"><span class="pm-t">🔍 查询 PCR 状态</span></button>
+          </div>
+          <div class="askbox" id="askbox">
+            <button class="plusbtn" id="plusbtn" title="创建与更多" onclick="togglePlus(event)">+</button>
+            <button class="clipbtn" title="上传附件" onclick="menuUpload()">
+              <svg class="i"><path d="M14 7.5l-6.2 6.2a3 3 0 0 1-4.2-4.2L9.5 3.6a2 2 0 0 1 2.8 2.8L6.4 12.3"/></svg>
+            </button>
+            <input id="askin" placeholder="问点什么，或让我分析某个产品、项目…">
+            <button class="send" onclick="sendq()"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
+          </div>
+        </div>
+        <input type="file" id="pcrfile" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.eml,.msg,.txt" style="display:none">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 任务视图：写回确认弹窗 -->
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+
+<!-- 结论清单面板 -->
+<div class="lscrim" id="lscrim" onclick="closeList()"></div>
+<aside class="listp" id="listp">
+  <div class="lp-h">
+    <div class="r1"><h3>结论清单</h3>
+      <button class="x" onclick="closeList()"><svg class="i"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="sub" id="lpsub">共 20 处说明</div>
+    <div class="lp-bar"><span id="lpbar" style="width:0%"></span></div>
+    <div class="lp-search">
+      <svg class="i" style="width:14px;height:14px;color:var(--ink-3)"><circle cx="7" cy="7" r="5"/><path d="M10.8 10.8L14 14"/></svg>
+      <input id="lpq" placeholder="搜索标题或结论内容…" oninput="renderList()">
+    </div>
+  </div>
+  <div class="lp-fil" id="lpfil">
+    <button class="on" data-f="all" onclick="setFil(this)">全部</button>
+    <button data-f="noted" onclick="setFil(this)">已记录</button>
+    <button data-f="none" onclick="setFil(this)">未讨论</button>
+    <button data-f="open" onclick="setFil(this)">有争议</button>
+    <button data-f="pending" onclick="setFil(this)">待确认</button>
+    <button data-f="agreed" onclick="setFil(this)">已确认</button>
+  </div>
+  <div class="lp-list" id="lplist"></div>
+</aside>
+
+<div class="toast" id="toast"><span class="k">✓</span><span id="tmsg"></span></div>
+
+
+
+<script>
+const TIPS_TASK={
+ rail:{t:'左侧任务导航：按 PACE 主流程组织',
+   ix:'覆盖 Review、OTM Screen、Vote、Evaluation、OTM Assessment、Work Item 等任务类型，可按类型筛选。单击任务直接进入执行态，不需再点「执行」。',
+   fn:'可按角色隐藏无权限的任务类型，但不能把现有主流程任务合并成无法映射到 PACE 的抽象任务。切换任务时须保持任务边界，避免不同 PCR、CP Root/Branch 的输入与证据混淆。',
+   ref:['P-01 任务即入口','P-04 按 PACE 主流程组织']},
+ badge:{t:'任务状态标识',
+   ix:'每条任务显示 PCR 状态、任务类型、Mandatory/Critical 标记与到期时间，逾期以红色标出。',
+   fn:'必须明确区分「PCR 状态、Task Name、处理动作」三类概念，不可混为一谈。Mandatory 与 Critical 影响后续阻断规则。',
+   ref:['P-04','FR-07']},
+ agent:{t:'Agent 引导区',
+   ix:'进入任务后 Agent 先说明它做了什么、结论是什么，而非等待用户提问。复杂意图澄清与内容生成优先通过对话完成。',
+   fn:'对话优先但不对话至上：明确的决策动作（Agree/Disagree、批量操作、高风险提交）仍使用结构化控件。',
+   ref:['P-02 对话优先但不对话至上']},
+ draft:{t:'AI Comment 草稿',
+   ix:'支持手工编写与 AI 生成。AI 结果只作为草稿，可接受、编辑、重新生成或放弃，未经确认不会写回。',
+   fn:'AI 生成的 Comment、Vote 建议及 Follow-up Action 必须先以草稿形式呈现。这是人在回路的核心体现。',
+   ref:['P-05 人在回路','FR-07']},
+ vote:{t:'Vote 立场选择',
+   ix:'使用明确控件选择 PACE 已配置选项（Agree / Disagree / No Impact），而非让 AI 代选。',
+   fn:'若为部分产品范围（Partial Scope），必须逐产品表达，不得只给整单结论。实际选项与各 BU 差异为上线前必须澄清项。',
+   ref:['FR-07','待确认：Partial Scope 规则']},
+ valid:{t:'提交前校验',
+   ix:'按 Task Type、PCR Type × Function 规则检查格式、完整性、Risk、Impact、Cost、Schedule 与 Evidence。',
+   fn:'校验状态须区分「通过、警告、阻断性错误、无法判断」四类。历史 Comment 覆盖率低时必须显示样本覆盖不足，不能把「无评论」解释为「无风险」。',
+   ref:['FR-07','FR-10 覆盖度提示']},
+ force:{t:'Force Submit 受控例外',
+   ix:'仅在存在警告或允许绕过的校验项时可用，需填写强制提交理由才能提交。',
+   fn:'不是普通提交选项，不得绕过硬性合规或数据完整性阻断。系统记录被绕过的校验项、提交人、时间与任务标识，并在 OTM Review 中明确标识。',
+   ref:['7.5 Force Submit 例外控制']},
+ otm:{t:'OTM 评估汇总',
+   ix:'按 PCR Type 模板汇总 Vote、Evaluation、Cost、产品范围、风险与未决项，明确 Mandatory 完成度与意见冲突。',
+   fn:'须区分事实、AI 推断、历史参考与待人工确认事项，并链接到来源任务或 Comment。',
+   ref:['FR-11 OTM 评估结论汇总']},
+ path:{t:'处理路径由 OTM 决定',
+   ix:'AI 解释每条路径的条件与后果，但不自动点击、不替代决策。Approve with Work Item 前需校验至少存在一个有效 Work Item。',
+   fn:'路径须对齐 PACE 可用动作：Approve with Work Item、Approve to Close、Quick Return、Return、Pending/Resume、Solution Proposed、Condition Approve。',
+   ref:['FR-11','待确认：与 PACE 状态机核对']},
+ wi:{t:'Work Item 草稿',
+   ix:'从已确认结论生成草稿，字段含 Task Description、Function Team、Owner、Target Date、影响产品、来源 Comment 与验收证据。',
+   fn:'Owner 依 Team/Function 配置与权限确定；日期依 Lead Time、目标实施日、依赖与工作日历推算，不得由模型自由猜测。OTM 确认后才在 PACE 创建。',
+   ref:['FR-12 Work Item 推荐']},
+ ctx:{t:'右侧上下文与证据区',
+   ix:'PCR 详情默认展开，进入 Comment 编辑时可自动折叠以释放空间，用户可随时重新展开。',
+   fn:'关键字段、附件或 Reference 读取失败时必须明确提示缺失项，不得将不完整信息包装为完整上下文。',
+   ref:['7.3 PCR 上下文呈现规则']},
+ sim:{t:'相似 PCR 检索',
+   ix:'展示 Top 3 相似案例与相似度，标注相似点与关键差异，由用户判断是否真正可比。',
+   fn:'相似度须综合产品、PCR Type、变更对象、变更动作、功能域与时间，禁止仅因产品名称相同直接类比。历史数据未证明 Closed 等于方案成功。',
+   ref:['FR-09','FR-05 重复检查']},
+ tevi:{t:'AI 证据可追溯',
+   ix:'每条 AI 建议与具体证据一一对应，可点击回溯原始记录。',
+   fn:'展示可验证的推荐理由、证据摘要与不确定性，不展示模型内部逐步推理过程。',
+   ref:['P-06 可解释可追溯']},
+ write:{t:'写回 PACE 前必须确认',
+   ix:'点击主操作弹出确认框，列示将写回的内容、目标系统与操作人。写回后返回成功、失败或部分失败状态。',
+   fn:'所有向 PACE 或目标系统的写回都必须经用户明确确认。失败时保留用户输入、证据版本与重试信息，不丢失已填内容。',
+   ref:['P-05 人在回路','7.4 写回规则']},
+};
+
+
+/* ══════════ 原型讨论模式：TIP 数据 ══════════ */
+const TIPS_HOME={
+ nav:{t:'左侧导航：轻量四入口',
+   ix:'「新会话」置顶为最高频动作。四个导航项常驻，带数字角标（我的任务 3、执行管理 2），无需进入即可知道哪里有事。当前项以主色底标识。',
+   fn:'四入口分工：我的任务=处理一条；统计分析=看全盘；执行管理=盯落地；总览=入口与摘要层。角标数字随数据实时变化。',
+   ref:['导航结构待业务确认命名']},
+ hist:{t:'会话历史与钉住',
+   ix:'历史按今天/昨天/更早分组，点击可回溯并续聊。「已钉到首页」是把某次分析结果固化为常驻卡片。',
+   fn:'用对话替代传统的「新建视图→配置图表→保存」，让用户以最少操作自定义面板。会话是过程，钉住的是结果，两者分区显示。',
+   ref:['AI 原生交互','少按钮原则']},
+ brief:{t:'AI 判断段：助手而非简报',
+   ix:'数据更新自动触发重算，右上角显示数据时点。页面停留时若结论变化，内容平静更新，不弹「点击刷新」。',
+   fn:'OTM 全局视角：第一句说的是全盘风险，不是个人待办。三条判断按严重度排序，每条都指向一个待决策事项。',
+   ref:['助手式实时计算','OTM 全局视角']},
+ evi:{t:'AI 建议可追溯',
+   ix:'点击「依据 N 条证据」就地展开，不跳页。每条证据标注来源类型（Evaluation / Target Date / Similar PCR）并可回溯原始记录。',
+   fn:'展示可验证的推荐理由与证据摘要，不展示模型内部推理过程。这是首页信任的基础——结论一旦不可验证，整个面板就失去价值。',
+   ref:['P-06 可解释可追溯','FR-09 / FR-10']},
+ ent:{t:'文中实体即导航',
+   ix:'判断段和变化流里带下划线的实体（PCR、项目）可点击。点击不跳页，而是就地设为当前话题并展开其上下文。',
+   fn:'消灭大量按钮与页面跳转的关键手段：用户读到哪、就能从哪进入下一步，不需要回到列表再查找。',
+   ref:['P-03 单页面完成','少按钮原则']},
+ kpi:{t:'KPI 带：管理者全局盘子',
+   ix:'每个指标带环比方向（▲红/▼绿/●持平）。点击任一指标就地展开对应明细并附 AI 归因，而非跳转到独立报表页。',
+   fn:'过渡期设计取中间值：结构用传统面板（信息密度、熟悉布局），交互用 AI（可追问、带归因）。不用 AI 的人当普通面板用即可。',
+   ref:['过渡期中间值']},
+ mods:{t:'模块入口卡片',
+   ix:'与左侧导航双路径并存：左栏随时可切换，首页卡片给新用户更明确的功能说明与当前负载提示。',
+   fn:'卡片上的标签显示实时状态（待决策 3、风险 2），让入口本身携带信息，而不只是一个跳转按钮。',
+   ref:['参考图风格']},
+ watch:{t:'我关注的 PCR：关注来源',
+   ix:'两类来源：自动（我是 OTM、我投过票、我是 Work Item Owner）与手动订阅（点一次星）。自动那批无需任何操作即出现。',
+   fn:'默认按「需要注意的程度」排序，红的、卡住的、待决策的自动浮上来，不按编号或时间排。首次登录时 AI 主动完成订阅，避免空面板。',
+   ref:['要求1：关注的PCR进展','空状态设计']},
+ signals:{t:'每行只给三个信号',
+   ix:'进度（Work Item 完成率）、风险（数量+最高等级）、成本（相对评估基线的偏差方向）。一行扫过去即可判断是否点入。',
+   fn:'刻意不堆字段。传统列表会展示十几列，这里只留决策所需的三个维度，其余在展开面板中呈现。',
+   ref:['信息密度取舍']},
+ cost:{t:'成本可见性受权限约束',
+   ix:'首页仅显示偏差方向与幅度（▲+2.1% / ●持平），具体金额需权限才能展开。无权限显示「—」而非空白。',
+   fn:'成本继承 PACE 角色与用户组权限，不得因 AI 汇总扩大可见范围。显示「—」而非空白是刻意的：空白会被误读为「没有成本影响」。',
+   ref:['FR-08 成本权限','复核结论：成本能力']},
+ inline:{t:'就地展开处理面板',
+   ix:'点击关注列表任意一行，在首页原地展开处理面板，不跳页。处理完收起继续看全局。「完整视图」按钮通向对应模块，供连续批量处理场景使用。',
+   fn:'解决管理者「边看全局边顺手处理」的场景，避免首页与任务页之间来回切换。同时保留独立任务页，两条路径并存。',
+   ref:['P-01 任务即入口','P-03 单页面完成']},
+ paths:{t:'处理路径需人工决策',
+   ix:'必须先选择一条路径，「确认决策」按钮才可用。AI 只解释每条路径的条件与后果，不自动选择、不代替点击。',
+   fn:'处理路径须与 PACE 实际状态机一一对应（Approve with Work Item / Approve to Close / Return / Pending 等），此为上线前必须澄清项。',
+   ref:['P-05 人在回路','FR-11 OTM 汇总']},
+ writeback:{t:'写回前必须确认',
+   ix:'所有 AI 产出先以草稿呈现，向 PACE 写回前必须经用户明确确认。Work Item 需 OTM 审阅编辑后才正式分发。',
+   fn:'AI 提供建议、校验与证据，不替代业务用户做最终决策。这是整个产品的核心边界。',
+   ref:['P-05 人在回路','FR-12 Work Item']},
+ health:{t:'执行健康度：ODM 阶段',
+   ix:'按健康度分三档，点击进入对应项目清单。下方 AI 归因说明风险的共性根因，而非罗列个例。',
+   fn:'ODM 执行阶段作为独立小项目管理：进度、里程碑、风险登记册、Work Item 四位一体。ODM 方另有极简填报门户，与本界面权限分离。',
+   ref:['要求2：ODM小项目','FR-13/14 下发与回写']},
+ load:{t:'职能负载',
+   ix:'显示各职能 Vote/Evaluation 积压量，最高者标红。点击可下钻到该职能的具体任务清单。',
+   fn:'管理者视角特有内容——AI 摘要擅长挑出三件事，不擅长让你把全局扫一遍。这类分布数据必须以传统图表形式给足。',
+   ref:['管理者信息密度']},
+ matrix:{t:'产品 × 阶段矩阵',
+   ix:'行为产品线、列为生命周期阶段、格子为数量，颜色深浅表示密集度，红色格表示含逾期。点击单元格就地展开该组 PCR 明细。',
+   fn:'产品维度的核心视图：一个机型身上同时压着几条变更、堆在哪个阶段、有没有撞期。项目维度为另一轴，可在统计分析中切换。',
+   ref:['要求1：产品/项目维度统计']},
+ dim:{t:'三个维度互不重叠',
+   ix:'产品＝一个机型被多条 PCR 压着（反向索引）；项目＝跨多条 PCR 的交付目标；CP/SP＝单条 PCR 的内部结构，不是项目。',
+   fn:'项目归属为可选，因此统计必须保留「未归属项目」这一常态桶。CP 有 root+branch 但不等于项目，一个项目内可同时含 CP 与 SP。',
+   ref:['维度定义已确认','待确认：项目归属字段']},
+ feed:{t:'变化流：只推变化不推状态',
+   ix:'三条规则：只推变化（「逾期转红」是，「目前逾期」不是）；同类聚合（5条同因亮红合成1条）；可标记已读与静音。',
+   fn:'小圆点表示未读。来源包括 Vote 落地、Work Item 回写、成本变更、任务逾期、项目成员变动。做不好就是噪音，聚合规则是关键。',
+   ref:['要求2：变化与information']},
+ ask:{t:'对话替代筛选器',
+   ix:'直接输入即新建会话，回车发送。建议 chip 提供引导。传统筛选器（顶部时间/BU）同时保留，不强迫任何人使用对话。',
+   fn:'过渡期的核心策略：AI 能力是加在传统之上，而非替代传统。愿意用对话的人省掉翻找，不用的人完全不受影响。',
+   ref:['过渡期中间值','少按钮原则']},
+ mode:{t:'原型模式切换',
+   ix:'讨论模式显示全部 TIP 标记，用于内部评审与需求对齐；演示模式隐藏全部标记，用于业务确认会演示。',
+   fn:'同一份原型应对两种场合：业务确认会需要干净界面让人专注体验，内部评审需要解释每个设计点的依据与交互逻辑。',
+   ref:['原型使用方式']},
+ pcrEntry:{t:'四条创建入口的分工',
+   ix:'`+` 菜单是创建主入口；回形针是高频上传的一层入口；粘贴长文本/邮件会浮出识别条；聚焦输入框弹出引导面板。',
+   fn:'创建 PCR 不新增导航或页面，全部从首页对话完成。上传不藏在第二层，避免高频动作多点一次。',
+   ref:['少按钮原则','P-03 单页面完成']},
+ pcrGuide:{t:'引导面板只分写入与读取',
+   ix:'聚焦后浮出两组：提交变更需求（写入）与提问与分析（读取）。打字时按关键词过滤条目，而不是把面板关掉。',
+   fn:'分组界线是「写入 vs 读取」，不再拆查询/分析。失焦或选中某条后收起。',
+   ref:['过渡期中间值']},
+ pcrFold:{t:'返回总览不丢会话',
+   ix:'点击顶部「← 总览」回到首页看板；左侧「进行中」会话仍保留，再点即可回到提交 PCR。',
+   fn:'管理者需要随时对照全盘数字。返回总览是挂起而非删除，避免觉得进了另一个系统又找不回来。',
+   ref:['P-03 单页面完成']},
+ pcrList:{t:'进度清单钉在对话上方',
+   ix:'五步清单 sticky 固定，不随对话滚动。补充信息时清单始终在视野内，核对结果能立刻看见。',
+   fn:'管理者一边补字段一边看规则反馈。钉住避免滚回对话顶部找进度。',
+   ref:['人在回路','P-03 单页面完成']},
+ pcrRules:{t:'规则在执行时可见',
+   ix:'当前步骤自动展开，显示正在使用的规则与逐条核对结果，而不是只藏在 ⓘ 后面。',
+   fn:'用户很少主动点 ⓘ。规则最有说服力的时刻是 AI 正在用它的那一刻。ⓘ 改为完整规则说明书。',
+   ref:['P-06 可解释可追溯']},
+ pcrDyn:{t:'步骤可动态插入',
+   ix:'AI 发现应拆分为两条 PCR 等特殊问题时，清单中临时插入带感叹号的待办步骤。',
+   fn:'问题变成必须处理的待办，而不是淹没在对话流里。点击未开始步骤会提示前置条件。',
+   ref:['待业务确认：拆分规则']},
+ pcrForce:{t:'强制提交是受控例外',
+   ix:'存在警告项时可强制提交，必须填写理由；理由与被绕过的校验项留痕并对 OTM 可见。硬性合规项不可绕过。',
+   fn:'Force Submit 不是普通提交。绕过项、提交人、时间写入记录。',
+   ref:['7.5 Force Submit 例外控制']},
+ pcrCount:{t:'完善度用计数而不是百分比',
+   ix:'清单头部显示「2/5 已完成」，步骤内区分必须补充与建议补充的条数，进度条只作辅助。',
+   fn:'百分比会诱导凑数字。计数能分清必须项（阻断）与建议项（不阻断）。必须项全部通过即可提交。',
+   ref:['待业务确认：必填规则']},
+ pcrPace:{t:'提交目标必须明示',
+   ix:'提交验证步骤明确告知：将在 PACE 中创建 PCR，进入 Review，由 LM / Portfolio / Sponsor 审核，随后可在 My Tasks 跟踪。',
+   fn:'避免用户以为提交只发生在本工具内部。写回目标系统必须可见。',
+   ref:['P-05 人在回路','7.4 写回规则']},
+};
+
+/* ══════════ 模式切换 ══════════ */
+let mode='demo';
+function setMode(m){
+  mode=m;
+  document.body.classList.toggle('discuss',m==='discuss');
+  document.getElementById('mDisc').classList.toggle('on',m==='discuss');
+  document.getElementById('mDemo').classList.toggle('on',m==='demo');
+  document.getElementById('umhint').textContent = m==='discuss'
+    ? '讨论模式：页面显示说明标记，点击可记录结论'
+    : '演示模式：已隐藏全部说明标记';
+  hideTip();
+  if(m==='demo')closeList();
+  toast(m==='discuss'?'已切换为讨论模式':'已切换为演示模式');
+}
+
+/* 用户菜单开关 */
+function toggleMenu(e){
+  e.stopPropagation();
+  document.getElementById('umenu').classList.toggle('show');
+}
+function closeMenu(){document.getElementById('umenu').classList.remove('show');}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.usermenu'))closeMenu();
+});
+
+/* ══════════ 讨论结论：本地存储 ══════════ */
+let VIEW='home';
+const LSKS={home:'pcr_home_notes_v1',task:'pcr_task_notes_v1'};
+let ALL={home:{},task:{}};
+Object.keys(LSKS).forEach(v=>{try{ALL[v]=JSON.parse(localStorage.getItem(LSKS[v])||'{}');}catch(e){ALL[v]={};}});
+let NOTES=ALL.home, TIPS=TIPS_HOME;
+
+const ST={pending:'待确认',agreed:'已确认',open:'有争议'};
+function saveNotes(){
+  ALL[VIEW]=NOTES;
+  try{localStorage.setItem(LSKS[VIEW],JSON.stringify(NOTES));}
+  catch(e){toast('本地存储不可用，请用「导出」保存');}
+  paintDots();
+}
+function toggleRail(){
+  document.body.classList.toggle('railoff');
+  railManual=true;
+  syncRailTip();
+}
+function syncRailTip(){
+  const btn=document.querySelector('.app > .rail .railtoggle');
+  if(btn) btn.title=document.body.classList.contains('railoff')?'Expand sidebar':'Collapse sidebar';
+}
+let railManual=false;
+function switchView(v){
+  // 离开解析页时仅挂起会话（保留左侧「进行中」），不销毁，便于点历史回来
+  if(typeof PARSE!=='undefined' && PARSE.active){
+    if(v==='home'){
+      suspendParse();
+      if(VIEW===v){document.querySelector('.scroll').scrollTop=0;closeMenu();return;}
+    }else{
+      suspendParse();
+    }
+  }
+  if(VIEW===v){closeMenu();return;}
+  VIEW=v; NOTES=ALL[v]; TIPS=(v==='home'?TIPS_HOME:TIPS_TASK);
+  document.querySelectorAll('[data-view]').forEach(el=>el.classList.toggle('on',el.dataset.view===v));
+  document.getElementById('view-home').style.display = v==='home'?'':'none';
+  document.getElementById('view-task').style.display = v==='task'?'':'none';
+  document.getElementById('crumb').textContent = v==='home'?'Overview':'My Tasks';
+  if(v==='task'&&!window.__taskInit){window.__taskInit=1;renderTaskAll();}
+  document.body.classList.toggle('taskview', v==='task');
+  syncRailTip();
+  const ask=document.getElementById('askwrap');
+  if(ask)ask.style.display=(v==='home'?'':'none');
+  hideTip();closeList();closeMenu();
+  document.querySelector('.scroll').scrollTop=0;
+  paintDots();
+}
+function paintDots(){
+  document.querySelectorAll('.tipdot').forEach(d=>{
+    const k=(d.getAttribute('onclick')||'').match(/'(\w+)'/);
+    if(k)d.classList.toggle('noted',!!(NOTES[k[1]]&&NOTES[k[1]].txt));
+  });
+  const n=Object.values(NOTES).filter(x=>x&&x.txt).length;
+  const el=document.getElementById('ncnt');
+  if(el)el.textContent=n?`已记录 ${n} 条结论`:'已记录 0 条';
+  if(document.getElementById('listp')&&document.getElementById('listp').classList.contains('show'))renderList();
+}
+
+function setSt(k,s){
+  NOTES[k]=NOTES[k]||{txt:'',st:'pending'};
+  NOTES[k].st=s;saveNotes();
+  document.querySelectorAll('.stchips button').forEach(b=>b.classList.toggle('on',b.dataset.s===s));
+}
+function saveConc(k){
+  const ta=document.getElementById('concta');if(!ta)return;
+  const v=ta.value.trim();
+  if(!v){delete NOTES[k];}
+  else{NOTES[k]=NOTES[k]||{st:'pending'};NOTES[k].txt=v;
+       NOTES[k].at=new Date().toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});}
+  saveNotes();
+  const s=document.getElementById('savedtag');
+  if(s){s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1600);}
+}
+function delConc(k){
+  if(!NOTES[k])return;
+  delete NOTES[k];saveNotes();
+  const ta=document.getElementById('concta');if(ta)ta.value='';
+  toast('已删除该条结论');
+}
+
+/* ══════════ 导出 / 导入 ══════════ */
+function dl(name,content,type){
+  const b=new Blob([content],{type:type+';charset=utf-8'});
+  const u=URL.createObjectURL(b),a=document.createElement('a');
+  a.href=u;a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1200);
+}
+function stamp(){const d=new Date();
+  return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;}
+
+function expMd(){
+  const ks=Object.keys(NOTES).filter(k=>NOTES[k]&&NOTES[k].txt);
+  if(!ks.length){toast('还没有记录任何结论');return;}
+  const order=Object.keys(TIPS);
+  ks.sort((a,b)=>order.indexOf(a)-order.indexOf(b));
+  let md=`# PCR Workbench · ${VIEW==='home'?'总览首页':'任务处理页'} · 评审结论\n\n`;
+  md+=`导出时间：${new Date().toLocaleString('zh-CN')}　|　共 ${ks.length} 条\n\n`;
+  const grp={agreed:[],pending:[],open:[]};
+  ks.forEach(k=>grp[NOTES[k].st||'pending'].push(k));
+  md+=`> 已确认 ${grp.agreed.length}　待确认 ${grp.pending.length}　有争议 ${grp.open.length}\n\n---\n\n`;
+  ks.forEach((k,i)=>{
+    const t=TIPS[k],n=NOTES[k];
+    md+=`## ${i+1}. ${t.t}\n\n`;
+    md+=`**状态**：${ST[n.st||'pending']}${n.at?`　（${n.at}）`:''}\n\n`;
+    md+=`**讨论结论**\n\n${n.txt}\n\n`;
+    md+=`<details><summary>原设计说明</summary>\n\n`;
+    md+=`- 交互逻辑：${t.ix}\n- 功能点：${t.fn}\n`;
+    if(t.ref)md+=`- 依据：${t.ref.join('、')}\n`;
+    md+=`\n</details>\n\n`;
+  });
+  md+=`---\n\n### 待办\n\n`;
+  grp.open.concat(grp.pending).forEach(k=>md+=`- [ ] ${TIPS[k].t}（${ST[NOTES[k].st||'pending']}）\n`);
+  dl(`PCR${VIEW==='home'?'首页':'任务页'}评审结论_${stamp()}.md`,md,'text/markdown');
+  toast(`已导出 ${ks.length} 条结论`);
+}
+
+function expHtml(){
+  const n=Object.values(ALL.home).filter(x=>x&&x.txt).length+Object.values(ALL.task).filter(x=>x&&x.txt).length;
+  if(!n){toast('还没有记录任何结论');return;}
+  let src=document.documentElement.outerHTML;
+  // strip any previously injected seed, then inject current notes
+  src=src.replace(/<script id="seed">[\s\S]*?<\/script>/,'');
+  const seed=`<script id="seed">window.__SEED__=${JSON.stringify(ALL)};<\/script>`;
+  src=src.replace('</head>',seed+'</head>');
+  dl(`PCR原型_含批注_${stamp()}.html`,'<!DOCTYPE html>'+src,'text/html');
+  toast('已导出带批注的原型，可直接发给同事');
+}
+
+function impJson(inp){
+  const f=inp.files&&inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);let c=0;
+      const isMulti=d.home||d.task;
+      ['home','task'].forEach(v=>{
+        const src=isMulti?d[v]:(v===VIEW?d:null); if(!src)return;
+        const dict=(v==='home'?TIPS_HOME:TIPS_TASK);
+        Object.keys(src).forEach(k=>{if(dict[k]&&src[k]&&src[k].txt){ALL[v][k]=src[k];c++;}});
+        try{localStorage.setItem(LSKS[v],JSON.stringify(ALL[v]));}catch(e){}
+      });
+      NOTES=ALL[VIEW];paintDots();hideTip();toast(`已合并导入 ${c} 条结论`);
+    }catch(e){toast('文件格式无法识别');}
+    inp.value='';
+  };
+  r.readAsText(f);
+}
+
+function clearAll(){
+  const n=Object.values(NOTES).filter(x=>x&&x.txt).length;
+  if(!n){toast('当前没有结论可清空');return;}
+  if(!confirm(`将清空当前视图保存的 ${n} 条讨论结论，且无法撤销。\n建议先「导出纪要」再清空。确定继续？`))return;
+  NOTES={};saveNotes();hideTip();toast('已清空全部结论');
+}
+
+/* ══════════ 结论清单面板 ══════════ */
+let lpFil='all',lockScroll=false;
+function dotOf(key){
+  return [...document.querySelectorAll('.tipdot')].find(d=>{
+    const m=(d.getAttribute('onclick')||'').match(/'(\w+)'/);return m&&m[1]===key;});
+}
+function openList(){
+  renderList();
+  document.getElementById('listp').classList.add('show');
+  document.getElementById('lscrim').classList.add('show');
+}
+function closeList(){
+  document.getElementById('listp').classList.remove('show');
+  document.getElementById('lscrim').classList.remove('show');
+}
+function setFil(b){
+  lpFil=b.dataset.f;
+  document.querySelectorAll('#lpfil button').forEach(x=>x.classList.toggle('on',x===b));
+  renderList();
+}
+function tipNum(key){
+  const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
+  const i=Object.keys(dict).indexOf(key);
+  if(VIEW==='task') return i+21;
+  return i<20 ? i+1 : 35+(i-20);
+}
+function renderList(){
+  const q=(document.getElementById('lpq').value||'').trim().toLowerCase();
+  const keys=Object.keys(TIPS);
+  const done=keys.filter(k=>NOTES[k]&&NOTES[k].txt).length;
+  document.getElementById('lpsub').textContent=`共 ${keys.length} 处说明 · 已讨论 ${done}`;
+  document.getElementById('lpbar').style.width=(done/keys.length*100)+'%';
+
+  const rows=keys.map(k=>({k,i:tipNum(k),t:TIPS[k],n:NOTES[k]})).filter(r=>{
+    const st=r.n&&r.n.txt?(r.n.st||'pending'):null;
+    if(lpFil==='noted'&&!st)return false;
+    if(lpFil==='none'&&st)return false;
+    if(['open','pending','agreed'].includes(lpFil)&&st!==lpFil)return false;
+    if(q){const hay=(r.t.t+' '+(r.n&&r.n.txt||'')).toLowerCase();if(!hay.includes(q))return false;}
+    return true;
+  });
+
+  const host=document.getElementById('lplist');
+  if(!rows.length){host.innerHTML='<div class="lp-empty">没有符合条件的条目</div>';return;}
+  host.innerHTML=rows.map(r=>{
+    const has=r.n&&r.n.txt, st=has?(r.n.st||'pending'):'none';
+    const label=has?ST[st]:'未讨论';
+    const sub=has?r.n.txt:r.t.ix;
+    return `<button class="li ${has?'has':''}" onclick="goTip('${r.k}')">
+      <span class="ln">${r.i}</span>
+      <span class="lc"><span class="lt">${r.t.t}</span><span class="lx">${sub.replace(/</g,'&lt;')}</span></span>
+      <span class="lst ${st}">${label}</span></button>`;
+  }).join('');
+}
+function goTip(key){
+  closeList();
+  const d=dotOf(key);
+  if(!d){toast('该标记在当前任务视图中不可见，请先在左侧切换任务');return;}
+  lockScroll=true;
+  d.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>{
+    d.classList.add('flash');
+    setTimeout(()=>d.classList.remove('flash'),1600);
+    showTip({stopPropagation(){},currentTarget:d},key, tipNum(key));
+    setTimeout(()=>lockScroll=false,120);
+  },460);
+}
+
+/* ══════════ TIP 弹层 ══════════ */
+let tipEl=null;
+function ensureTip(){
+  if(tipEl)return tipEl;
+  tipEl=document.createElement('div');
+  tipEl.className='tipcard';
+  document.body.appendChild(tipEl);
+  return tipEl;
+}
+function hideTip(){if(tipEl)tipEl.classList.remove('show');
+  document.querySelectorAll('.tipdot.act').forEach(d=>d.classList.remove('act'));}
+
+function showTip(e,key,num){
+  e.stopPropagation();
+  const d=TIPS[key];if(!d)return;
+  const nt=NOTES[key]||{txt:'',st:'pending'};
+  const el=ensureTip();
+  el.innerHTML=`
+    <div class="th"><span class="tn">${num}</span><span class="tt">${d.t}</span>
+      <button class="tx" onclick="hideTip()">×</button></div>
+    <div class="tipsec ix"><div class="sl">◆ 交互逻辑</div><div class="sb">${d.ix}</div></div>
+    <div class="tipsec fn"><div class="sl">◆ 功能点说明</div><div class="sb">${d.fn}</div></div>
+    ${d.ref?`<div class="tipref">${d.ref.map(r=>`<span class="rf">${r}</span>`).join('')}</div>`:''}
+    <div class="conc">
+      <div class="conc-h"><span class="sl">◆ 讨论结论</span>
+        <span class="who">${nt.at?'更新于 '+nt.at:'尚未记录'}</span></div>
+      <div class="stchips">
+        ${Object.keys(ST).map(s=>`<button data-s="${s}" class="${(nt.st||'pending')===s?'on':''}"
+          onclick="setSt('${key}','${s}')">${ST[s]}</button>`).join('')}
+      </div>
+      <textarea id="concta" placeholder="记录会上的结论、修改意见或待办…">${(nt.txt||'').replace(/</g,'&lt;')}</textarea>
+      <div class="conc-f">
+        <span class="saved" id="savedtag">✓ 已保存到本机</span>
+        <span class="hint" id="hinttag">Ctrl+Enter 保存</span><span class="sp"></span>
+        <button class="cbtn g" onclick="delConc('${key}')">删除</button>
+        <button class="cbtn p" onclick="saveConc('${key}')">保存结论</button>
+      </div>
+    </div>`;
+  el.classList.add('show');
+  const r=e.currentTarget.getBoundingClientRect();
+  const w=326,h=el.offsetHeight;
+  let left=r.right+10, top=r.top-6;
+  if(left+w>innerWidth-14) left=r.left-w-10;
+  if(left<14) left=14;
+  if(top+h>innerHeight-14) top=Math.max(14,innerHeight-h-14);
+  el.style.left=left+'px'; el.style.top=top+'px';
+  document.querySelectorAll('.tipdot.act').forEach(x=>x.classList.remove('act'));
+  e.currentTarget.classList.add('act');
+  const ta=el.querySelector('#concta');
+  ta.addEventListener('keydown',ev=>{
+    ev.stopPropagation();
+    if(ev.key==='Enter'&&(ev.ctrlKey||ev.metaKey)){saveConc(key);}
+  });
+}
+document.addEventListener('click',ev=>{
+  if(tipEl&&!tipEl.contains(ev.target)&&!ev.target.closest('.tipdot')
+     &&!ev.target.closest('.listp'))hideTip();
+});
+addEventListener('scroll',()=>{if(!lockScroll)hideTip();},true);
+addEventListener('resize',hideTip);
+addEventListener('keydown',e=>{if(e.key==='Escape'){hideTip();closeList();closeMenu();if(typeof closePlus==='function')closePlus();if(typeof hideGuide==='function')hideGuide();}});
+
+/* ══════════ 原有交互 ══════════ */
+let tm;
+function toast(m){const t=document.getElementById('toast');document.getElementById('tmsg').textContent=m;
+  t.classList.add('show');clearTimeout(tm);tm=setTimeout(()=>t.classList.remove('show'),2400);}
+
+function ev(el){const b=el.parentElement.querySelector('.evbox');b.classList.toggle('show');
+  el.querySelector('svg').style.transform=b.classList.contains('show')?'rotate(180deg)':'';}
+
+function tog(row,id){
+  const p=document.getElementById(id),open=p.classList.contains('open');
+  document.querySelectorAll('.inline').forEach(x=>x.classList.remove('open'));
+  document.querySelectorAll('.wrow').forEach(x=>x.classList.remove('open'));
+  if(!open){p.classList.add('open');row.classList.add('open');}
+}
+function pick(b){b.parentElement.querySelectorAll('.path').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');document.getElementById('p1btn').disabled=false;}
+function done(id){document.getElementById(id).classList.remove('open');
+  document.querySelectorAll('.wrow').forEach(x=>x.classList.remove('open'));toast('已确认并写回 PACE');}
+function jump(n){toast('已将「'+n+'」设为当前话题');}
+function askPreset(q){
+  switchView('home');
+  const i=document.getElementById('askin');
+  if(i){i.value=q;i.focus();}
+  toast('已填入提问，回车即可开始分析');
+}
+function askq(b){document.getElementById('askin').value=b.textContent;document.getElementById('askin').focus();hideGuide();}
+function sendq(){const v=document.getElementById('askin').value.trim();
+  if(!v){document.getElementById('askin').focus();return;}
+  if(typeof PARSE!=='undefined' && PARSE.active){
+    const host=document.getElementById('parseUser');
+    const el=document.createElement('div');el.className='bub me';el.textContent=v;
+    host.appendChild(el);document.getElementById('askin').value='';
+    toast('已补充信息');return;
+  }
+  if(typeof PARSE!=='undefined' && PARSE.createIntent){startParse(v);return;}
+  toast('已新建会话：'+(v.length>16?v.slice(0,16)+'…':v));document.getElementById('askin').value='';}
+document.getElementById('askin').addEventListener('keydown',e=>{if(e.key==='Enter')sendq();});
+
+/* ══════════ 启动初始化 ══════════ */
+(function init(){
+  // 若是「导出批注版」打开的文件，优先载入其中携带的结论
+  if(window.__SEED__){
+    let c=0;
+    ['home','task'].forEach(v=>{
+      const src=window.__SEED__[v]; if(!src)return;
+      const dict=(v==='home'?TIPS_HOME:TIPS_TASK);
+      Object.keys(src).forEach(k=>{if(dict[k]&&src[k]&&src[k].txt){ALL[v][k]=src[k];c++;}});
+      try{localStorage.setItem(LSKS[v],JSON.stringify(ALL[v]));}catch(e){}
+    });
+    NOTES=ALL[VIEW];
+    if(c)setTimeout(()=>toast(`本文件携带 ${c} 条讨论结论`),700);
+  }
+  paintDots();
+})();
+
+
+/* ══════════ 任务视图渲染逻辑 ══════════ */
+
+const CHK='<svg class="i" style="width:11px;height:11px;stroke-width:2.4"><path d="M2.5 8l3.5 3.5 7-8"/></svg>';
+const WRN='!'; const ERR='×';
+
+/* ---------- data ---------- */
+const TASKS={
+  t1:{type:'vote',tt:'VOTE',ttl:'CPU 换代 · 请对开发影响投票',pcr:'PCR-2026-08871',status:'In Progress',
+      product:'ThinkPad X1 Carbon Gen 13',func:'Development / RD',mandatory:true,critical:false,due:'今日到期',late:false,
+      change:'Replace Intel Core Ultra 7 155U with Ultra 7 165U, covering all GEO main MTMs; no hardware changes to motherboard power supply and cooling; need to confirm BIOS and certification impact.',
+      name:'X1 Carbon G13 CPU Ultra 165U Replacement',geo:'WW',date:'2026-11-15',stage:'Implementation',progress:30,risk:'high'},
+  t2:{type:'vote',tt:'VOTE',ttl:'BOM 变更 · 内存颗粒替代投票',pcr:'CP-2026-04412',status:'Voting',
+      product:'ThinkCentre M90q Gen6',func:'Development / RD',mandatory:true,critical:false,due:'2 天后',late:false,
+      change:'Switch DDR5 DRAM from Supplier A to Supplier B (same spec, pin-to-pin), covering 4 MTMs.',
+      name:'M90q G6 DDR5 Dual-source Introduction',geo:'NA / EMEA',date:'2026-10-30',stage:'Review',progress:45,risk:'low'},
+  t3:{type:'eval',tt:'EVAL',ttl:'认证范围扩展 · 专项评估',pcr:'SP-2026-11938',status:'Assessment',
+      product:'ThinkSystem SR650 V3',func:'Certification',mandatory:false,critical:false,due:'3 天后',late:false,
+      change:'Extend existing model certification to Brazil and India; assess ANATEL / BIS compliance and test lead time.',
+      name:'SR650 V3 Certification Scope Extension (BR/IN)',geo:'LAS / IN',date:'2026-12-20',stage:'Assessment',progress:55,risk:'mid'},
+  t4:{type:'otm',tt:'OTM',ttl:'OTM 评估汇总 · 待决策',pcr:'PCR-2026-08871',status:'Assessment',
+      product:'ThinkPad X1 Carbon Gen 13',func:'OTM',mandatory:true,critical:true,due:'今日到期',late:true,
+      change:'Consolidate Vote and Evaluation results from 5 functions, identify risks and open items, and choose the handling path.',
+      name:'X1 Carbon G13 CPU Replacement · OTM Assessment',geo:'WW',date:'2026-11-15',stage:'Assessment',progress:60,risk:'high'},
+  t5:{type:'rev',tt:'REVIEW',ttl:'Portfolio Review · 散热方案变更',pcr:'CP-2026-04455',status:'In Review',
+      product:'Legion Pro 7i Gen10',func:'Portfolio',mandatory:false,critical:false,due:'明日到期',late:false,
+      change:'Upgrade from dual-fan to triple-fan module to improve full-load thermal performance; Portfolio to confirm necessity and priority.',
+      name:'Legion Pro 7i G10 Triple-fan Thermal Upgrade',geo:'WW',date:'2026-11-01',stage:'Review',progress:40,risk:'low'},
+  t6:{type:'wi',tt:'WORK ITEM',ttl:'实施跟踪 · Work Item 状态复核',pcr:'PCR-2026-08830',status:'Implementation',
+      product:'ThinkPad T14 Gen6',func:'Multi',mandatory:false,critical:false,due:'逾期 4 天',late:true,
+      change:'Track execution and write-back of 3 released Work Items; identify overdue items and decide whether to escalate.',
+      name:'T14 G6 Panel Dual-source · Implementation Work Items',geo:'WW',date:'2026-10-25',stage:'Implementation',progress:30,risk:'high'},
+};
+const ORDER=['t1','t2','t3','t4','t5','t6'];
+
+/* similar PCR + evidence keyed loosely by task */
+const SIM={
+  t1:[{pcr:'PCR-2025-07612',n:'X1 Carbon G12 Ultra 155U→165U 换代',s:'94%',m:['同产品线','同变更动作','Closed']},
+      {pcr:'PCR-2025-03340',n:'X1 Yoga G9 CPU 换代（同代 U 系列）',s:'88%',m:['相邻产品','CPU 换代','Closed']},
+      {pcr:'CP-2024-09815',n:'T14s CPU 换代 BIOS 兼容问题',s:'81%',m:['BIOS 影响','有 Return 记录']}],
+  t4:[{pcr:'PCR-2025-07612',n:'X1 Carbon G12 Ultra 换代（成本参考）',s:'94%',m:['成本 $0 增量','Closed']},
+      {pcr:'CP-2024-09815',n:'T14s CPU 换代（含认证延期风险）',s:'81%',m:['认证 +3wk','风险案例']}],
+};
+const EVI={
+  t1:[{t:'开发 Vote 输入标准（PCR Type: CPU 换代 × Development）已比对，Risk / Schedule 两项必答点缺失。',s:'规则库 · Vote 输入标准 v3'},
+      {t:'相似 PCR-2025-07612 为同一换代动作，历史结论为 Agree、无硬件影响。',s:'Historical Case'},
+      {t:'BIOS 兼容为该类变更高频关注点，来源 CP-2024-09815 的 Return Comment。',s:'历史 Comment'}],
+  t4:[{t:'5 个 Mandatory 职能中 4 个已完成 Vote，Cost 尚未维护成本记录。',s:'PACE Task 状态'},
+      {t:'认证职能提出 +3 周测试周期风险，可能影响 11/15 目标实施日。',s:'Evaluation Comment'},
+      {t:'相似案例成本增量为 0，可作为 Work Item 目标日推算参考。',s:'Similar PCR 成本'}],
+};
+
+/* ---------- state ---------- */
+let cur='t1', filter='all';
+const state={}; // per task: {vote, path, done}
+ORDER.forEach(id=>state[id]={vote:null,path:null,done:false});
+
+/* ---------- render left ---------- */
+function renderTaskList(){
+  const host=document.getElementById('tasklist');
+  const items=ORDER.filter(id=>filter==='all'||TASKS[id].type===filter);
+  document.getElementById('taskCount').textContent=items.length;
+  host.innerHTML=items.map(id=>{
+    const t=TASKS[id],s=state[id];
+    return `<div class="task ${id===cur?'active':''} ${s.done?'done':''}" data-id="${id}">
+      <div class="task-top">
+        <span class="ttype ${t.type}">${t.tt}</span>
+        <span class="pcr mono">${t.pcr}</span>
+        ${id===ORDER[0]?'<span class="tipdot" onclick="event.stopPropagation();showTip(event,\'badge\',22)">22</span>':''}
+      </div>
+      <h3>${t.ttl}</h3>
+      <div class="task-meta">
+        <span>${t.product}</span>
+      </div>
+      <div class="task-meta" style="margin-top:4px">
+        ${t.critical?'<span class="flag">● Critical</span>':''}
+        ${t.mandatory?'<span class="m">Mandatory</span>':''}
+        <span class="due ${t.late?'late':''}">${s.done?'已完成':t.due}</span>
+      </div>
+    </div>`;
+  }).join('');
+  host.querySelectorAll('.task').forEach(el=>el.onclick=()=>{cur=el.dataset.id;renderTaskAll();});
+}
+
+/* ---------- render center ---------- */
+function renderCenter(){
+  const t=TASKS[cur],s=state[cur];
+  document.getElementById('centerHead').innerHTML=`
+    <div class="center-head">
+      <div class="ch-row1"><span class="pcr mono">${t.pcr}</span><span class="stat">${t.status}</span></div>
+      <h1>${t.name}</h1>
+      <div class="ch-sub"><span>${t.tt} Task</span>·<span>${t.func}</span>·<span>目标实施日 ${t.date}</span></div>
+    </div>`;
+  const body=document.getElementById('centerBody');
+  body.innerHTML={vote:voteView,eval:evalView,otm:otmView,rev:revView,wi:wiView}[t.type](t,s);
+  wireCenter();
+  renderActionBar();
+}
+
+function voteView(t,s){return `
+  <div class="agent"><div class="ai">AI</div><div class="txt"><span class="tipdot" onclick="showTip(event,'agent',23)">23</span>
+    我已读取该 PCR 的变更详情与产品范围，并按 <b>${t.func} 的 Vote 输入标准</b>做了完整性检查。下方是我生成的 Comment 草稿——<span class="muted">你可以直接编辑，确认后才会写回 PACE。</span>
+  </div></div>
+
+  <div class="block">
+    <div class="block-h"><h4>Comment 草稿</h4><span class="tipdot" onclick="showTip(event,'draft',24)">24</span><span class="draft">AI 草稿 · 未提交</span>
+      <div class="right"><button class="minibtn" data-act="regen">重新生成</button></div></div>
+    <div class="block-b"><div class="comment edit" contenteditable="true">开发侧确认：本次由 Ultra 155U 换代至 165U 为同封装、同供电 pin-to-pin 替代，主板无硬件改动。已核对参考机型 X1 Carbon G12（PCR-2025-07612）同类换代结论为无影响。
+
+需补充：① BIOS microcode 版本与兼容性验证计划；② 换代后满载功耗与散热余量的验证数据。</div></div>
+  </div>
+
+  <div class="block">
+    <div class="block-h"><h4>你的 Vote 立场</h4><span class="tipdot" onclick="showTip(event,'vote',25)">25</span></div>
+    <div class="block-b">
+      <div class="votebar" data-votebar>
+        <button class="voteopt ${s.vote==='agree'?'sel-agree':''}" data-vote="agree"><div class="vt">Agree</div><div class="vd">同意变更</div></button>
+        <button class="voteopt ${s.vote==='dis'?'sel-dis':''}" data-vote="dis"><div class="vt">Disagree</div><div class="vd">存在阻碍</div></button>
+        <button class="voteopt ${s.vote==='ni'?'sel-ni':''}" data-vote="ni"><div class="vt">No Impact</div><div class="vd">无影响</div></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-h"><h4>提交前校验</h4><span class="tipdot" onclick="showTip(event,'valid',26)">26</span><span class="tag ${s.vote?'':'ni'}" style="margin-left:auto">${s.vote?'2 通过 · 1 警告':'待投票'}</span></div>
+    <div class="block-b"><div class="valid">
+      <div class="vrow ok"><span class="ic">${CHK}</span><span><span class="vl">产品范围完整</span><span class="vs">— 已覆盖全 GEO 主 MTM</span></span></div>
+      <div class="vrow ok"><span class="ic">${CHK}</span><span><span class="vl">Comment 非空且含结论</span></span></div>
+      <div class="vrow warn"><span class="ic">${WRN}</span><span><span class="vl">Schedule 影响未明确说明</span><span class="vs">— 建议补充 BIOS 验证周期；可 Force Submit</span></span></div>
+    </div></div>
+  </div>`;
+}
+
+function evalView(t,s){return `
+  <div class="agent"><div class="ai">AI</div><div class="txt">
+    这是一个 <b>Evaluation Task</b>——以专项分析与证据为主，不套用 Agree/Disagree 选项。我整理了认证范围扩展的关键评估点与历史周期数据供你填写结论。
+  </div></div>
+  <div class="block">
+    <div class="block-h"><h4>专项分析草稿</h4><span class="draft">AI 草稿</span></div>
+    <div class="block-b"><div class="comment edit" contenteditable="true">巴西（ANATEL）与印度（BIS）认证均需本地实验室送测。基于同平台历史记录，ANATEL 约 4–6 周、BIS 约 6–8 周，存在并行送测可能。
+
+结论建议：可行，但目标实施日 2026-12-20 偏紧，建议将认证列为关键路径并预留缓冲。</div></div>
+  </div>
+  <div class="block">
+    <div class="block-h"><h4>评估要点检查</h4></div>
+    <div class="block-b"><div class="valid">
+      <div class="vrow ok"><span class="ic">${CHK}</span><span><span class="vl">合规范围已明确</span><span class="vs">— ANATEL / BIS</span></span></div>
+      <div class="vrow ok"><span class="ic">${CHK}</span><span><span class="vl">测试周期已量化</span></span></div>
+      <div class="vrow err"><span class="ic">${ERR}</span><span><span class="vl">缺少 Evidence 附件</span><span class="vs">— 阻断性：需附历史送测记录</span></span></div>
+    </div></div>
+  </div>`;
+}
+
+function otmView(t,s){return `
+  <div class="agent"><div class="ai">AI</div><div class="txt">
+    5 个职能的评估已基本回收。我按 PCR Type 模板汇总了 Vote 分布、成本、风险与未决项——<b>处理路径由你决定</b>，我只解释每条路径的条件与后果。
+  </div></div>
+
+  <div class="block">
+    <div class="block-h"><h4>职能评估汇总</h4><span class="tipdot" onclick="showTip(event,'otm',28)">28</span><span class="tag ni" style="margin-left:auto">Mandatory 4/5 完成</span></div>
+    <div class="block-b" style="padding:0">
+      <table class="sum"><thead><tr><th>职能</th><th>Vote</th><th>关键结论</th></tr></thead><tbody>
+        <tr><td>Development / RD</td><td><span class="tag agree">Agree</span></td><td>pin-to-pin 换代，无硬件影响</td></tr>
+        <tr><td>Quality</td><td><span class="tag agree">Agree</span></td><td>沿用现有可靠性矩阵</td></tr>
+        <tr><td>Supply Chain</td><td><span class="tag ni">No Impact</span></td><td>供货无变化</td></tr>
+        <tr><td>Certification</td><td><span class="tag dis">Disagree</span></td><td>认证 +3 周，威胁目标日</td></tr>
+        <tr><td>Cost</td><td><span class="tag ni">— 待维护</span></td><td style="color:var(--warn)">成本记录尚未维护</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-h"><h4>风险与未决项</h4><span class="tag dis" style="margin-left:auto">2 项</span></div>
+    <div class="block-b">
+      <div class="risk"><span class="lv high">高</span><div class="rt"><b>认证周期威胁目标实施日</b> <span>— Certification 评估 +3 周，11/15 目标日存在逾期风险</span></div></div>
+      <div class="risk"><span class="lv mid">中</span><div class="rt"><b>Cost 成本记录未维护</b> <span>— Approve to Close 前需补齐或转 Work Item</span></div></div>
+    </div>
+  </div>
+
+  <div class="block">
+    <div class="block-h"><h4>AI 推荐 Work Item 草稿</h4><span class="tipdot" onclick="showTip(event,'wi',30)">30</span><span class="draft">待 OTM 确认</span></div>
+    <div class="block-b"><div class="wi">
+      <b style="font-size:13px">补齐认证送测计划并锁定关键路径</b>
+      <dl class="wi-grid">
+        <dt>Function Team</dt><dd>Certification</dd>
+        <dt>Owner</dt><dd>依职能配置 · 待确认</dd>
+        <dt>Target Date</dt><dd>2026-10-20（按 Lead Time 反推）</dd>
+        <dt>来源 Comment</dt><dd>Certification Evaluation</dd>
+      </dl>
+    </div></div>
+  </div>
+
+  <div class="block">
+    <div class="block-h"><h4>选择处理路径</h4><span class="tipdot" onclick="showTip(event,'path',29)">29</span></div>
+    <div class="block-b"><div class="paths" data-paths>
+      <button class="path ${s.path==='awi'?'on':''}" data-path="awi"><div class="pt">Approve with Work Item</div><div class="pd">带工作项批准 · 需 ≥1 有效 Work Item</div></button>
+      <button class="path ${s.path==='close'?'on':''}" data-path="close"><div class="pt">Approve to Close</div><div class="pd">直接关闭 · 当前有未决成本项</div></button>
+      <button class="path ${s.path==='return'?'on':''}" data-path="return"><div class="pt">Return</div><div class="pd">退回补充材料</div></button>
+      <button class="path ${s.path==='pending'?'on':''}" data-path="pending"><div class="pt">Pending</div><div class="pd">挂起等待认证结论</div></button>
+    </div></div>
+  </div>`;
+}
+
+function revView(t,s){return `
+  <div class="agent"><div class="ai">AI</div><div class="txt">
+    我把这条 PCR 的变更详情、产品范围与附件做了摘要，方便你快速判断。<b>Approve / Return / Reject 由你决定</b>，Comment 我可以帮你起草。
+  </div></div>
+  <div class="block"><div class="block-h"><h4>PCR 摘要</h4></div>
+    <div class="block-b"><div class="comment">Legion Pro 7i Gen10 拟将双风扇散热升级为三风扇方案，目标是提升 CPU+GPU 满载散热能力与降噪表现。变更涉及风扇模组、导风罩与 BIOS 风扇曲线，不改动主板与结构件。</div></div>
+  </div>
+  <div class="block"><div class="block-h"><h4>Review Comment 草稿</h4><span class="draft">AI 草稿</span></div>
+    <div class="block-b"><div class="comment edit" contenteditable="true">方向认可：三风扇方案对旗舰游戏本的满载散热与噪声有实质收益。建议明确：① 相对现方案的成本增量区间；② 是否影响整机厚度与重量指标。</div></div>
+  </div>`;
+}
+
+function wiView(t,s){return `
+  <div class="agent"><div class="ai">AI</div><div class="txt">
+    这条 PCR 有 3 项已下发的 Work Item。我按 Target Date 与回写状态做了异常识别——<b>1 项已逾期</b>，可一键升级至负责人。
+  </div></div>
+  <div class="block"><div class="block-h"><h4>Work Item 执行状态</h4><span class="tag dis" style="margin-left:auto">1 逾期</span></div>
+    <div class="block-b" style="padding:0">
+      <table class="sum"><thead><tr><th>Work Item</th><th>系统</th><th>Owner</th><th>状态</th></tr></thead><tbody>
+        <tr><td>面板二供 BOM 建立</td><td>PLM</td><td>L. Chen</td><td><span class="tag agree">已回写</span></td></tr>
+        <tr><td>T1 认证信息更新</td><td>T1</td><td>M. Rao</td><td><span class="tag ni">进行中</span></td></tr>
+        <tr><td>OD 采购计划调整</td><td>OD</td><td>K. Sato</td><td><span class="tag dis">逾期 4 天</span></td></tr>
+      </tbody></table>
+    </div>
+  </div>`;
+}
+
+/* ---------- action bar ---------- */
+function renderActionBar(){
+  const t=TASKS[cur],s=state[cur],bar=document.getElementById('actionbar');
+  const cfg={
+    vote:{note:'AI 建议仅为草稿，确认后写回 PACE',primary:'确认并写回 Vote',ready:!!s.vote,force:true},
+    eval:{note:'存在阻断性校验项，需补充 Evidence',primary:'提交评估结论',ready:false,force:true},
+    otm:{note:'处理路径与 Work Item 需你确认后才在 PACE 生效',primary:'确认处理决策',ready:!!s.path,force:false},
+    rev:{note:'最终审核动作由你决定',primary:'Approve',ready:true,force:false,extra:['Return','Reject']},
+    wi:{note:'升级动作将通知 Assignee 及其负责人',primary:'升级逾期项',ready:true,force:false},
+  }[t.type];
+  if(s.done){
+    bar.style.display='flex';
+    bar.innerHTML=`<span class="ab-note" style="color:var(--agree)"><span style="color:var(--agree)">✓</span> 本任务已提交并写回 PACE</span><div class="ab-spacer"></div><button class="btn btn-ghost" data-act="reopen">重新打开</button>`;
+    bar.querySelector('[data-act=reopen]').onclick=()=>{s.done=false;renderTaskAll();};
+    return;
+  }
+  bar.style.display='flex';
+  let extra=(cfg.extra||[]).map(x=>`<button class="btn btn-ghost" data-act="alt">${x}</button>`).join('');
+  bar.innerHTML=`
+    <span class="ab-note"><svg class="i" style="width:13px;height:13px"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1z"/><path d="M8 5v4M8 11h.01"/></svg>${cfg.note}</span>
+    <div class="ab-spacer"></div>
+    ${cfg.force?'<button class="btn btn-warnghost" data-act="force">Force Submit</button><span class="tipdot" onclick="showTip(event,\'force\',27)">27</span>':''}
+    ${extra}
+    <button class="btn btn-primary" data-act="primary" ${cfg.ready?'':'disabled'}>${cfg.primary}</button>
+    <span class="tipdot" onclick="showTip(event,'write',34)">34</span>`;
+  bar.querySelector('[data-act=primary]')?.addEventListener('click',()=>openWriteback());
+  bar.querySelector('[data-act=force]')?.addEventListener('click',()=>openForce());
+  bar.querySelectorAll('[data-act=alt]').forEach(b=>b.onclick=()=>openWriteback(b.textContent));
+}
+
+/* ---------- wiring center interactions ---------- */
+function wireCenter(){
+  const s=state[cur];
+  document.querySelectorAll('[data-votebar] .voteopt').forEach(b=>b.onclick=()=>{
+    s.vote=b.dataset.vote;renderCenter();
+  });
+  document.querySelectorAll('[data-paths] .path').forEach(b=>b.onclick=()=>{
+    s.path=b.dataset.path;renderCenter();
+  });
+  document.querySelector('[data-act=regen]')?.addEventListener('click',e=>{
+    e.target.textContent='生成中…';setTimeout(()=>e.target.textContent='重新生成',700);
+  });
+}
+
+/* ---------- right panel ---------- */
+let ctxTab='detail';
+const PCR_STAGES=['Create','Review','Screen','Assessment','Implementation','Benefit Tracking','Close'];
+function pcrStageInfo(t){
+  const stages=PCR_STAGES;
+  let idx=stages.indexOf(t.stage);
+  if(idx<0){
+    if(t.status==='Implementation'||t.status==='In Progress') idx=4;
+    else if(t.status==='Assessment') idx=3;
+    else if(t.status==='In Review'||t.status==='Voting') idx=1;
+    else idx=1;
+  }
+  const progress=t.progress!=null?t.progress:Math.round((idx/Math.max(stages.length-1,1))*100);
+  const risk=t.risk||(t.late?'high':(t.critical?'mid':'low'));
+  const riskLabel=risk==='high'?'High Risk':risk==='mid'?'Medium':'Low Risk';
+  return {stages,idx,cur:stages[idx],progress,risk,riskLabel};
+}
+function renderProcessProgress(t){
+  const info=pcrStageInfo(t);
+  const fillPct=info.idx<=0?0:Math.round((info.idx/(info.stages.length-1))*100);
+  const nodes=info.stages.map((name,i)=>{
+    const cls=i<info.idx?'done':(i===info.idx?'cur':'');
+    const bang=(i===info.idx && info.risk==='high')?'<span class="pp-bang">!</span>':'';
+    const mark=i<info.idx?'✓':'';
+    return `<div class="pp-node ${cls}"><span class="pp-dot">${mark}${bang}</span><span class="pp-lab">${name}</span></div>`;
+  }).join('');
+  return `<div class="pp">
+    <div class="pp-track">
+      <div class="pp-line"></div>
+      <div class="pp-line-fill" style="width:calc(${fillPct}% - 10px)"></div>
+      ${nodes}
+    </div>
+    <div class="pp-mon">
+      <h5>${info.cur} Monitoring</h5>
+      <div class="pp-grid">
+        <div><div class="k">Current Stage</div><div class="v">${info.cur}</div></div>
+        <div><div class="k">Execution Progress</div><div class="v">${info.progress}%</div></div>
+        <div><div class="k">Risk Level</div><div class="v"><span class="pp-risk ${info.risk}">⚠ ${info.riskLabel}</span></div></div>
+        <div><div class="k">Target Completion Date</div><div class="v">${t.date}</div></div>
+      </div>
+      <div class="pp-barwrap"><div class="pp-bar"><i style="width:${info.progress}%"></i></div><span class="pp-pct">${info.progress}%</span></div>
+    </div>
+  </div>`;
+}
+function renderCtx(){
+  const t=TASKS[cur];
+  const body=document.getElementById('ctxBody');
+  const dlSvg=`<svg class="i" style="width:14px;height:14px"><path d="M8 2v8M5 7.5L8 10.5l3-3M3 13h10"/></svg>`;
+  if(ctxTab==='detail'){
+    body.innerHTML=`
+      <div class="sec" data-sec>
+        <div class="sec-h"><span class="caret">▾</span>Basic Information</div>
+        <div class="sec-c"><dl class="fields">
+          <dt>PCR#</dt><dd class="mono">${t.pcr}</dd>
+          <dt>Name</dt><dd>${t.name}</dd>
+          <dt>Product</dt><dd>${t.product}</dd>
+          <dt>GEO</dt><dd>${t.geo}</dd>
+          <dt>Function</dt><dd>${t.func}</dd>
+          <dt>Target Completion Date</dt><dd>${t.date}</dd>
+          <dt>Status</dt><dd>${t.status}</dd>
+        </dl></div>
+      </div>
+      <div class="sec" data-sec>
+        <div class="sec-h"><span class="caret">▾</span>Process Progress &amp; Monitoring</div>
+        <div class="sec-c">${renderProcessProgress(t)}</div>
+      </div>
+      <div class="sec" data-sec>
+        <div class="sec-h"><span class="caret">▾</span>Change Request in Detail</div>
+        <div class="sec-c"><div style="font-size:12.5px;line-height:1.6;color:var(--ink)">${t.change}</div></div>
+      </div>
+      <div class="sec" data-sec>
+        <div class="sec-h"><span class="caret">▾</span>Attachments &amp; Reference</div>
+        <div class="sec-c">
+          <div class="attach"><span class="fx">PDF</span><div><div>Change Technical Manual.pdf</div><div class="fmeta">1.2 MB · v2</div></div><span class="fdl">${dlSvg}</span></div>
+          <div class="attach"><span class="fx xls">XLS</span><div><div>Impacted MTM List.xlsx</div><div class="fmeta">86 KB</div></div><span class="fdl">${dlSvg}</span></div>
+        </div>
+      </div>`;
+  } else if(ctxTab==='similar'){
+    const sims=SIM[cur]||SIM.t1;
+    body.innerHTML=`<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Similarity by product, change action, and function domain · for reference only; judge comparability yourself</div>`+
+      sims.map(x=>`<div class="simcard">
+        <div class="simcard-top"><span class="mono" style="font-size:11.5px;color:var(--ink-2)">${x.pcr}</span><span class="sim%">${x.s}</span></div>
+        <h5>${x.n}</h5>
+        <div class="sm">${x.m.map(m=>`<span>· ${m}</span>`).join('')}</div>
+      </div>`).join('');
+  } else {
+    const ev=EVI[cur]||EVI.t1;
+    body.innerHTML=`<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Evidence sources behind each AI suggestion; click to trace original records</div>`+
+      ev.map((e,i)=>`<div class="evi"><span class="en">${i+1}</span><div class="ec"><div>${e.t}</div><span class="src">${e.s}</span></div></div>`).join('');
+  }
+  body.querySelectorAll('[data-sec] .sec-h').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('collapsed'));
+}
+document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
+  ctxTab=b.dataset.t;
+  document.querySelectorAll('.ctx-tab').forEach(x=>x.classList.toggle('on',x===b));
+  renderCtx();
+});
+
+/* ---------- modals ---------- */
+const scrim=document.getElementById('scrim'),modalHost=document.getElementById('modalHost');
+function closeModal(){if(scrim)scrim.classList.remove('show');}
+if(scrim)scrim.onclick=e=>{if(e.target===scrim)closeModal();};
+
+function openWriteback(alt){
+  const t=TASKS[cur],s=state[cur];
+  const voteLabel={agree:'Agree',dis:'Disagree',ni:'No Impact'}[s.vote];
+  const pathLabel={awi:'Approve with Work Item',close:'Approve to Close',return:'Return',pending:'Pending'}[s.path];
+  let rows='';
+  if(t.type==='vote')rows=`<div class="wl"><span class="k">Vote 结果</span><span class="v">${voteLabel}</span></div>
+    <div class="wl"><span class="k">Comment</span><span class="v">已编辑（含结论）</span></div>`;
+  else if(t.type==='otm')rows=`<div class="wl"><span class="k">处理路径</span><span class="v">${pathLabel}</span></div>
+    <div class="wl"><span class="k">Work Item</span><span class="v">1 项草稿一并创建</span></div>`;
+  else if(t.type==='rev')rows=`<div class="wl"><span class="k">审核动作</span><span class="v">${alt||'Approve'}</span></div>`;
+  else if(t.type==='wi')rows=`<div class="wl"><span class="k">动作</span><span class="v">升级 1 项逾期 Work Item</span></div>`;
+  else rows=`<div class="wl"><span class="k">动作</span><span class="v">提交评估结论</span></div>`;
+  modalHost.innerHTML=`<div class="modal">
+    <div class="modal-h"><h3>确认写回 PACE</h3><p>${t.pcr} · ${t.tt} Task</p></div>
+    <div class="modal-b">
+      <div class="writeback">${rows}
+        <div class="wl"><span class="k">目标系统</span><span class="v mono">PACE</span></div>
+        <div class="wl"><span class="k">操作人</span><span class="v">Jordan (JC)</span></div>
+      </div>
+      <div class="modal-note"><svg class="i" style="width:13px;height:13px;flex:none"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1z"/><path d="M8 5v4M8 11h.01"/></svg>写回后将留痕；如需撤回请在 PACE 中操作。</div>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-x>取消</button><button class="btn btn-primary" data-ok>确认写回</button></div>
+  </div>`;
+  scrim.classList.add('show');
+  modalHost.querySelector('[data-x]').onclick=closeModal;
+  modalHost.querySelector('[data-ok]').onclick=()=>{closeModal();s.done=true;renderTaskAll();toast('已写回 PACE · 任务完成');};
+}
+
+function openForce(){
+  const t=TASKS[cur];
+  modalHost.innerHTML=`<div class="modal">
+    <div class="modal-h"><h3>Force Submit（受控例外）</h3><p>存在警告项时的强制提交，将完整留痕并对 OTM 可见</p></div>
+    <div class="modal-b">
+      <div class="writeback" style="border-color:var(--warn-bg);background:var(--warn-bg)">
+        <div class="wl"><span class="k">被绕过的校验</span><span class="v" style="color:var(--warn)">Schedule 影响未说明</span></div>
+      </div>
+      <div style="font-size:12px;color:var(--ink-2);margin-top:10px">强制提交理由（必填）</div>
+      <textarea class="reason" placeholder="例如：BIOS 验证周期将在下一版本补充，不影响本轮换代结论…"></textarea>
+    </div>
+    <div class="modal-f"><button class="btn btn-ghost" data-x>取消</button><button class="btn btn-warnghost" data-ok>强制提交</button></div>
+  </div>`;
+  scrim.classList.add('show');
+  const ta=modalHost.querySelector('.reason');
+  modalHost.querySelector('[data-x]').onclick=closeModal;
+  modalHost.querySelector('[data-ok]').onclick=()=>{
+    if(!ta.value.trim()){ta.style.borderColor='var(--disagree)';ta.focus();return;}
+    closeModal();state[cur].done=true;renderTaskAll();toast('已 Force Submit · 理由已留痕');
+  };
+}
+
+/* ---------- toast ---------- */
+function toast(msg){
+  const el=document.getElementById('toast');
+  const slot=document.getElementById('tmsg')||document.getElementById('toastMsg');
+  if(slot)slot.textContent=msg;
+  if(!el)return;
+  el.classList.add('show');clearTimeout(tm);tm=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+/* ---------- filters ---------- */
+document.getElementById('filters').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
+  filter=c.dataset.f;
+  document.querySelectorAll('#filters .chip').forEach(x=>x.classList.toggle('on',x===c));
+  const items=ORDER.filter(id=>filter==='all'||TASKS[id].type===filter);
+  if(items.length&&!items.includes(cur)){cur=items[0];}
+  renderTaskAll();
+});
+
+/* ---------- render all ---------- */
+function renderTaskAll(){renderTaskList();renderCenter();renderCtx();
+  if(typeof paintDots==='function')paintDots();}
+
+/* ══════════ 创建 PCR ══════════ */
+const DEMO_MAIL=`Hi team, Per confirmed by intel, there will be a X9 12Xe non-vPro
+Processor in Nova Lake scope, with better cost and same performance.
+Please help to change the orginal MS5 X9 12Xe vPro to this T6 non-vPro
+SKU on CPU list, no increase to total number of PCBA or NRE, thanks.`;
+const RULE_FOOT='⚠ 原型阶段规则示例，实际规则待业务确认';
+const STEP_RULES={
+  s1:{lead:'正在按「变更内容识别」规则核对：',items:[
+    '识别 PCR Type（Hardware/SBB、Software、Cost Reduction 等）',
+    '识别变更对象与动作（替换 / 新增 / 移除 / 升级）',
+    '判定 CP（root+branch）或 SP（单条）；置信度不足时不自动填写'
+  ]},
+  s2:{lead:'正在按「影响产品识别」规则核对：',items:[
+    '产品名须匹配主数据；匹配不上则提示',
+    '原文未提区域时不默认填 WW，标为缺失并追问',
+    '同一变更跨多个产品线时，提示是否拆分'
+  ]},
+  s3:{lead:'正在按 Hardware/SBB 的必填规则核对：',items:[
+    '必须项：Impacted Products、Business Case、目标实施日、Geo、变更前后描述',
+    '建议项不阻断提交；字段间一致性（如成本叙事 vs Business Case）要提示'
+  ]},
+  s4:{lead:'正在按「可行性与价值」三维规则评估：',items:[
+    '技术：相似 PCR 先例、硬件/认证/兼容影响',
+    '时间：目标实施日 vs 同类历史周期',
+    '价值：成本方向、业务驱动力；AI 给建议，人做决定'
+  ]},
+  s5:{lead:'正在按「提交验证」规则把关：',items:[
+    'Type 合理性、必填完整性、字段逻辑一致性',
+    '重复性检查、拆分建议；硬性合规项不可 Force Submit 绕过',
+    '提交目标明示：写入 PACE，进入 Review'
+  ]}
+};
+
+function ruleBanner(key){
+  const r=STEP_RULES[key]||STEP_RULES.s1;
+  return `<div class="prule"><div class="prule-t">${r.lead}</div><ul>${r.items.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+}
+function stepBody(key,checks,extra=''){
+  return ruleBanner(key)+checks+(extra||'')+`<div class="rule-note">${RULE_FOOT}</div>`;
+}
+const PARSE={
+  active:false,createIntent:false,text:'',files:[],skipped:false,animating:false,
+  timers:[],steps:[],homeOpen:false,split:false,forceReason:'',suspended:false,
+  fields:null,issues:{},splitDecision:null,issueOpen:{},thinkOpen:false,issueExpandAll:false
+};
+const PH_ASK='问点什么，或让我分析某个产品、项目…';
+const PH_CREATE='描述你的变更需求，或粘贴邮件、会议纪要…';
+const PH_MORE='补充信息…';
+
+function extractFields(text){
+  const t=text||'';
+  const products=[];
+  if(/T14p/i.test(t)) products.push('ThinkPad T14p Gen 5');
+  if(/X1\s*(Carbon|G13)/i.test(t)) products.push('ThinkPad X1');
+  if(/M90q/i.test(t)) products.push('ThinkCentre M90q');
+  if(!products.length && /X9\s*12Xe/i.test(t) && /vPro/i.test(t)) products.push('ThinkPad T14p Gen 5');
+  const sku=(t.match(/X9\s*12Xe(?:\s*(?:non-)?vPro)?/i)||t.match(/Ultra\s*[0-9]+\s*\d*U/i)||[''])[0].trim();
+  let action='变更';
+  if(/replac|change|换/i.test(t)) action='替换';
+  if(/upgrade|升级/i.test(t)) action='升级';
+  if(/\badd\b|新增/i.test(t)) action='新增';
+  let geo=null;
+  if(/\bPRC\b|China|中国/i.test(t)) geo='PRC';
+  else if(/\bWW\b|worldwide|全球/i.test(t)) geo='WW';
+  else if(/Brazil/i.test(t)) geo='Brazil';
+  const looksMail=/Hi team|Per confirmed|Subject:|Best regards|thanks\./i.test(t);
+  return {products,sku,action,geo,pcrType:'Hardware/SBB',looksMail,long:t.length>80,costTalk:/better cost|cost saving|NRE|PCBA/i.test(t)};
+}
+
+function initParseFields(ex){
+  PARSE.fields={
+    products:{group:'must',k:'ok',t:'Impacted Products',d:ex.products[0]||'已匹配'},
+    change:{group:'must',k:'ok',t:'Change Request 完整性',d:'已说明变更前后'},
+    bc:{group:'must',k:'warn',t:'Business Case Reason',d:'填了 Marketing Request，但原文强调成本优势',val:'Marketing Request'},
+    geo:{group:'must',k:'err',t:'Geo Impact',d:ex.geo||'原文未提及区域',val:ex.geo||null},
+    target:{group:'must',k:'err',t:'Target Implementation',d:'与创建日相同（2025-08-25），通常不合理',val:'2025-08-25'},
+    cp:{group:'sug',k:'ok',t:'CP Team',d:ex.products[0]||'—'},
+    nre:{group:'sug',k:'info',t:'NRE / Profit Impact',d:'原文可量化，建议写入',val:null},
+    evidence:{group:'sug',k:'wait',t:'Evidence 附件',d:'未提供'}
+  };
+  PARSE.issues={bc:false,geo:false,target:false,nre:false};
+  PARSE.splitDecision=null;
+}
+
+function fieldGroups(){
+  const f=PARSE.fields||{};
+  const must=Object.values(f).filter(x=>x.group==='must');
+  const sug=Object.values(f).filter(x=>x.group==='sug');
+  const mustDone=must.filter(x=>x.k==='ok').length;
+  const sugDone=sug.filter(x=>x.k==='ok').length;
+  return {must,sug,mustDone,sugDone,mustTotal:must.length,sugTotal:sug.length};
+}
+
+function missingMustLabels(){
+  const map={bc:'Business Case',geo:'Geo',target:'目标日'};
+  return Object.keys(map).filter(k=>PARSE.fields&&PARSE.fields[k]&&PARSE.fields[k].k!=='ok').map(k=>map[k]);
+}
+
+function mustAllOk(){const g=fieldGroups();return g.mustDone===g.mustTotal;}
+
+function syncStepStates(){
+  const ex=extractFields(PARSE.text);
+  const prod=ex.products[0]||'未识别';
+  const u=stepBy('u'),p=stepBy('p'),f=stepBy('f'),v=stepBy('v'),s=stepBy('s'),sp=stepBy('split');
+  if(u){u.st='done';u.sum=ex.pcrType;}
+  if(p){p.st='done';p.sum=prod;}
+  const miss=missingMustLabels();
+  if(f){
+    if(mustAllOk()){f.st='done';f.sum='必填已齐';}
+    else{f.st='warn';f.sum=miss.length?('还差 '+miss.join('、')):'待确认';}
+  }
+  if(sp){
+    if(PARSE.splitDecision==='split'){sp.st='done';sp.sum='已拆分为 2 条';}
+    else if(PARSE.splitDecision==='keep'){sp.st='done';sp.sum='已确认不拆分';}
+    else{sp.st='warn';sp.sum='AI 建议拆分';}
+  }
+  if(v){v.st='done';v.sum='建议补充后再提';}
+  if(s){
+    if(!mustAllOk()){s.st='wait';s.sum='待前置完成';s.pre='需先补全必填信息';}
+    else{s.st='done';s.sum='→ 提交至 PACE';}
+  }
+}
+
+function closePlus(){const m=document.getElementById('plusmenu'),b=document.getElementById('plusbtn');
+  if(m)m.classList.remove('show');if(b)b.classList.remove('on');}
+function togglePlus(e){e.stopPropagation();const m=document.getElementById('plusmenu');
+  const on=!m.classList.contains('show');closePlus();if(on){m.classList.add('show');document.getElementById('plusbtn').classList.add('on');hideGuide();}}
+function hideGuide(){const g=document.getElementById('guide');if(g)g.classList.remove('show');}
+function showGuide(){if(PARSE.active)return;document.getElementById('guide').classList.add('show');filterGuide();}
+function filterGuide(){
+  const q=(document.getElementById('askin').value||'').toLowerCase();
+  document.querySelectorAll('#guide .guide-i').forEach(el=>{
+    const hit=!q||el.textContent.toLowerCase().includes(q);
+    el.classList.toggle('hide',!hit);el.classList.toggle('match',!!q&&hit);
+  });
+  document.querySelectorAll('#guide .guide-g').forEach(g=>{
+    let n=g.nextElementSibling,any=false;
+    while(n&&!n.classList.contains('guide-g')){
+      if(n.classList.contains('guide-i')&&!n.classList.contains('hide')) any=true;
+      n=n.nextElementSibling;
+    }
+    g.style.display=any?'':'none';
+  });
+}
+function menuCreate(){closePlus();PARSE.createIntent=true;document.getElementById('askin').placeholder=PH_CREATE;
+  document.getElementById('askin').focus();showGuide();
+  document.querySelectorAll('#guide .guide-i[data-g=write]').forEach(x=>x.classList.add('match'));
+  toast('请描述变更需求');}
+function guideCreate(){menuCreate();hideGuide();}
+function menuFill(q){closePlus();document.getElementById('askin').value=q;document.getElementById('askin').focus();hideGuide();}
+function menuUpload(){closePlus();document.getElementById('pcrfile').click();}
+function acceptDetect(){startParse(document.getElementById('askin').value.trim()||DEMO_MAIL);}
+function dismissDetect(){document.getElementById('detectbar').classList.remove('show');}
+
+function plusInit(){
+  const inp=document.getElementById('askin'), box=document.getElementById('askbox'), file=document.getElementById('pcrfile');
+  inp.addEventListener('focus',()=>{if(!PARSE.active)showGuide();});
+  inp.addEventListener('input',()=>{if(!PARSE.active){showGuide();filterGuide();}});
+  inp.addEventListener('blur',()=>{setTimeout(()=>{if(!document.activeElement||!document.activeElement.closest('.ask'))hideGuide();},180);});
+  inp.addEventListener('paste',e=>{
+    const txt=(e.clipboardData&&e.clipboardData.getData('text'))||'';
+    setTimeout(()=>{
+      const v=inp.value||txt;
+      const ex=extractFields(v);
+      if(ex.long||ex.looksMail){hideGuide();document.getElementById('detectbar').classList.add('show');}
+    },0);
+  });
+  file.addEventListener('change',()=>{
+    PARSE.files=[...file.files];
+    toast('已添加 '+(PARSE.files.length)+' 个附件');
+    if(!PARSE.createIntent){PARSE.createIntent=true;inp.placeholder=PH_CREATE;}
+  });
+  ;['dragenter','dragover'].forEach(ev=>box.addEventListener(ev,e=>{e.preventDefault();box.classList.add('drop-on');}));
+  ;['dragleave','drop'].forEach(ev=>box.addEventListener(ev,e=>{e.preventDefault();box.classList.remove('drop-on');}));
+  box.addEventListener('drop',e=>{
+    const fs=[...e.dataTransfer.files];if(!fs.length)return;
+    PARSE.files=fs;toast('已添加 '+fs.length+' 个附件');PARSE.createIntent=true;inp.placeholder=PH_CREATE;
+  });
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#plusmenu')&&!e.target.closest('#plusbtn'))closePlus();
+  });
+  document.addEventListener('click',e=>{
+    if(!PARSE.animating||PARSE.skipped)return;
+    if(e.target.closest('button,input,textarea,a,.iinfo,.tipdot,.plusmenu,.iss-card,.submit-dock'))return;
+    skipParse();
+  });
+}
+
+function newChatSession(){
+  if(PARSE.active||PARSE.suspended||PARSE.text){
+    exitParseMode();
+  }
+  document.querySelector('.scroll').scrollTop=0;
+  toast('已新建会话');
+  const inp=document.getElementById('askin');if(inp){inp.value='';inp.focus();}
+}
+function clearParseTimers(){PARSE.timers.forEach(id=>clearTimeout(id));PARSE.timers=[];}
+function later(ms,fn){PARSE.timers.push(setTimeout(fn,ms));}
+
+function startParse(text){
+  PARSE.text=text||DEMO_MAIL;PARSE.createIntent=false;PARSE.skipped=false;
+  PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
+  initParseFields(extractFields(PARSE.text));
+  document.getElementById('detectbar').classList.remove('show');
+  document.getElementById('askin').value='';
+  hideGuide();closePlus();
+  enterParseMode();
+  const ex=extractFields(PARSE.text);
+  setParseUser(PARSE.text);
+  runParseAnim(ex);
+}
+
+function showParseHist(){
+  const el=document.getElementById('parseHistItem');
+  if(!el)return;
+  el.style.display='';
+  document.body.classList.add('has-parse-session');
+  const ex=extractFields(PARSE.text||'');
+  const prod=(ex.products[0]||'变更').replace('ThinkPad ','');
+  const title=document.getElementById('parseHistTitle');
+  if(title) title.textContent=prod+' CPU SKU 变更 · 解析中';
+}
+function hideParseHist(){
+  const el=document.getElementById('parseHistItem');
+  if(el) el.style.display='none';
+  document.body.classList.remove('has-parse-session');
+}
+
+function enterParseMode(){
+  PARSE.active=true;PARSE.homeOpen=false;PARSE.suspended=false;
+  document.body.classList.add('parsing');document.body.classList.remove('home-open','taskview');
+  showParseHist();
+  document.getElementById('plist').classList.remove('mini');
+  const caret=document.getElementById('parseBarCaret');if(caret)caret.textContent='▾';
+  document.getElementById('askin').placeholder=PH_MORE;
+  document.querySelector('.scroll').scrollTop=0;
+  document.getElementById('parseUser').innerHTML='';
+  document.getElementById('parseChat').innerHTML='';
+}
+
+/** 临时离开解析页：隐藏 UI，保留字段/步骤/原文，左侧历史仍可点回 */
+function suspendParse(){
+  if(!PARSE.text && !PARSE.steps.length) return;
+  clearParseTimers();
+  PARSE.active=false;PARSE.homeOpen=false;PARSE.animating=false;PARSE.suspended=true;
+  document.body.classList.remove('parsing','home-open');
+  document.getElementById('askin').placeholder=PH_ASK;
+  const pl=document.getElementById('plist');if(pl)pl.classList.remove('mini');
+  showParseHist();
+}
+
+/** 结束会话（提交成功 / 新建会话）：清空并隐藏历史项 */
+function exitParseMode(){
+  clearParseTimers();
+  PARSE.active=false;PARSE.createIntent=false;PARSE.homeOpen=false;PARSE.animating=false;PARSE.suspended=false;
+  PARSE.text='';PARSE.steps=[];PARSE.fields=null;PARSE.issues={};PARSE.splitDecision=null;PARSE.issueOpen={};
+  document.body.classList.remove('parsing','home-open');
+  document.getElementById('askin').placeholder=PH_ASK;
+  const pl=document.getElementById('plist');if(pl){pl.classList.remove('mini');pl.innerHTML='';}
+  const pu=document.getElementById('parseUser');if(pu)pu.innerHTML='';
+  const pc=document.getElementById('parseChat');if(pc)pc.innerHTML='';
+  hideParseHist();
+}
+
+function ensureHomeView(){
+  if(VIEW==='home')return;
+  VIEW='home'; NOTES=ALL.home; TIPS=TIPS_HOME;
+  document.querySelectorAll('[data-view]').forEach(el=>el.classList.toggle('on',el.dataset.view==='home'));
+  document.getElementById('view-home').style.display='';
+  document.getElementById('view-task').style.display='none';
+  document.getElementById('crumb').textContent='Overview';
+  document.body.classList.remove('taskview');
+  const ask=document.getElementById('askwrap');if(ask)ask.style.display='';
+}
+
+function resumeParse(){
+  if(!PARSE.text && !(PARSE.steps&&PARSE.steps.length)){
+    toast('没有进行中的解析会话');
+    return;
+  }
+  if(!PARSE.text) PARSE.text=DEMO_MAIL;
+  ensureHomeView();
+  // 恢复解析 UI：不走 enterParseMode，避免清空已有 DOM
+  PARSE.active=true;PARSE.homeOpen=false;PARSE.suspended=false;PARSE.animating=false;
+  document.body.classList.add('parsing');
+  document.body.classList.remove('home-open','taskview');
+  showParseHist();
+  const pl=document.getElementById('plist');if(pl)pl.classList.remove('mini');
+  const caret=document.getElementById('parseBarCaret');if(caret)caret.textContent='▾';
+  document.getElementById('askin').placeholder=PH_MORE;
+  if(!PARSE.fields) initParseFields(extractFields(PARSE.text));
+  const needUser=!document.querySelector('#parseUser .bub');
+  const needSteps=!document.querySelector('#plist .pstep');
+  const needAi=!document.querySelector('#parseChat .tl-item');
+  if(needUser) setParseUser(PARSE.text);
+  if(needSteps||needAi||!PARSE.steps.length){
+    finishParse(extractFields(PARSE.text));
+  }else{
+    syncStepStates();
+    collapseAllSteps();
+    renderPlist();
+    renderConclusion();
+  }
+  document.querySelector('.scroll').scrollTop=0;
+  const layer=document.getElementById('parseLayer');
+  if(layer) layer.scrollIntoView({block:'start'});
+}
+
+function toggleHomeFold(){
+  // 兼容旧调用：改为返回总览
+  backToOverview();
+}
+function backToOverview(){
+  ensureHomeView();
+  suspendParse();
+  document.querySelector('.scroll').scrollTop=0;
+}
+function collapsePlistToHome(){backToOverview();}
+
+function setParseUser(t){
+  const el=document.getElementById('parseUser');
+  el.innerHTML=`<div class="bub me">${(t||'').replace(/</g,'&lt;')}</div>`;
+}
+function clearParseAI(){document.getElementById('parseChat').innerHTML='';}
+function collapseAllSteps(){PARSE.steps.forEach(s=>s.open=false);}
+function toggleIssue(id){
+  PARSE.issueOpen[id]=!PARSE.issueOpen[id];
+  renderConclusion();
+}
+function toggleAllIssues(){
+  const rows=['bc','geo','target','nre'];
+  const openAll=rows.some(id=>!PARSE.issueOpen[id]);
+  rows.forEach(id=>PARSE.issueOpen[id]=openAll);
+  PARSE.issueExpandAll=openAll;
+  renderConclusion();
+}
+function toggleThink(){/* 解析过程入口已改为分隔线，保留空函数避免旧调用报错 */}
+function renderConclusion(){
+  const host=document.getElementById('parseChat');
+  const iss=PARSE.issues||{};
+  if(!PARSE.issueOpen) PARSE.issueOpen={};
+  const rows=[
+    {id:'bc',ic:'warn',cls:'warn',title:'Business Case 与原文不符',
+      lines:[`原文强调 <b>"better cost and same performance"</b>`,`当前填写：<b>${PARSE.fields.bc.val||'Marketing Request'}</b>`,`建议改为：<b>Cost Saving</b>`],
+      acts:iss.bc?null:`<button class="btn btn-primary" type="button" onclick="resolveIssue('bc','adopt')">采纳建议</button><button class="btn btn-ghost" type="button" onclick="resolveIssue('bc','keep')">保持不变</button>`,
+      done:iss.bc,doneTxt:iss.bc==='adopt'?'已改为 Cost Saving':'已保持 Marketing Request'},
+    {id:'geo',ic:'err',cls:'err',title:'Geo Impact 范围存疑',
+      lines:[`原文未提及任何区域信息`,`当前填写：<b>${PARSE.fields.geo.val||'PRC（默认草稿）'}</b>`,`Intel SKU 变更通常为全球性，确认只影响 PRC 吗？`],
+      acts:iss.geo?null:`<button class="btn btn-primary" type="button" onclick="resolveIssue('geo','ww')">改为 WW</button><button class="btn btn-ghost" type="button" onclick="resolveIssue('geo','prc')">确认仅 PRC</button><button class="btn btn-ghost" type="button" onclick="resolveIssue('geo','later')">稍后处理</button>`,
+      done:iss.geo&&iss.geo!=='later',doneTxt:iss.geo==='ww'?'已改为 WW':iss.geo==='prc'?'已确认仅 PRC':''},
+    {id:'target',ic:'err',cls:'err',title:'目标实施日不合理',
+      lines:[`目标实施日 <b>2025-08-25</b> 与创建日相同`,`建议按 Lead Time 反推合理日期（同类约 18 天）`],
+      acts:iss.target?null:`<button class="btn btn-primary" type="button" onclick="resolveIssue('target','ai')">让 AI 推算</button><button class="btn btn-ghost" type="button" onclick="resolveIssue('target','manual')">手动填写</button>`,
+      done:!!iss.target,doneTxt:iss.target==='ai'?'已改为 2025-09-12':'已手动确认日期'},
+    {id:'nre',ic:'info',cls:'info',title:'NRE 信息可量化',
+      lines:[`原文明确 <b>"no increase to PCBA or NRE"</b>`,`建议提取到 Profit Impact 字段`],
+      acts:iss.nre?null:`<button class="btn btn-primary" type="button" onclick="resolveIssue('nre','write')">写入 Profit Impact</button><button class="btn btn-ghost" type="button" onclick="resolveIssue('nre','skip')">忽略</button>`,
+      done:!!iss.nre,doneTxt:iss.nre==='write'?'已写入 Profit Impact':'已忽略'}
+  ];
+  const openCount=rows.filter(r=>!r.done&&!(r.id==='geo'&&iss.geo==='later')).length;
+  let html=`<div class="parse-ai">
+    <hr class="parse-sep" aria-hidden="true">
+    <p class="ai-lead">发现 ${rows.length} 个需要你确认的问题${openCount?`，还剩 ${openCount} 项待处理`:''}。点开每一项即可处理。</p>
+    <div class="tl-wrap">
+      <button type="button" class="tl-expandall" title="展开/收起全部" onclick="toggleAllIssues()">↕</button>
+      <div class="tl">`;
+  rows.forEach((r,i)=>{
+    const opened=!!PARSE.issueOpen[r.id];
+    const icon=r.done?'✓':(r.ic==='warn'?'!':r.ic==='err'?'✗':'ⓘ');
+    html+=`<div class="tl-item ${r.cls}${r.done?' done-iss':''}${opened?' open':''}${i===rows.length-1?' last':''}" data-iss="${r.id}">
+      <button type="button" class="tl-h" onclick="toggleIssue('${r.id}')">
+        <span class="tl-dot">${icon}</span>
+        <span class="tl-t">${r.title}</span>
+        <span class="tl-chev">›</span>
+      </button>
+      <div class="tl-b">
+        ${r.lines.map(l=>`<div class="id">${l}</div>`).join('')}
+        ${r.done?`<div class="id"><b>${r.doneTxt}</b></div>`:''}
+        ${r.acts?`<div class="iact">${r.acts}</div>`:''}
+        <div class="rule-note">${RULE_FOOT}</div>
+      </div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+  if(mustAllOk()){
+    html+=`<div class="submit-dock" id="submitDock">
+      <div class="sd-note">提交后将在 <b>PACE</b> 中创建 PCR 记录，进入 <b>Review</b> 阶段，由 LM / Portfolio / Sponsor 审核。你将在「My Tasks」中跟踪后续状态。<span class="tipdot" onclick="showTip(event,'pcrPace',43)">43</span></div>
+      <div class="pact">
+        <button class="btn btn-primary" type="button" onclick="submitPcr()">提交至 PACE</button>
+        <button class="btn-force" type="button" onclick="openPcrForce()">Force Submit</button>
+        <span class="tipdot" onclick="showTip(event,'pcrForce',41)">41</span>
+      </div>
+    </div>`;
+  }else{
+    html+=`<div class="submit-dock" style="opacity:.85"><div class="sd-note">必须项全部通过后，将在此处显示「提交至 PACE」。当前还差：${missingMustLabels().join('、')||'待确认项'}。</div></div>`;
+  }
+  html+='</div>';
+  host.innerHTML=html;
+}
+
+function resolveIssue(id,act){
+  PARSE.issues[id]=act;
+  if(id==='bc'){
+    if(act==='adopt'){PARSE.fields.bc.k='ok';PARSE.fields.bc.val='Cost Saving';PARSE.fields.bc.d='Cost Saving（已按原文成本优势修正）';}
+    else{PARSE.fields.bc.k='ok';PARSE.fields.bc.d='Marketing Request（已确认保持）';}
+  }
+  if(id==='geo'){
+    if(act==='ww'){PARSE.fields.geo.k='ok';PARSE.fields.geo.val='WW';PARSE.fields.geo.d='WW';}
+    else if(act==='prc'){PARSE.fields.geo.k='ok';PARSE.fields.geo.val='PRC';PARSE.fields.geo.d='PRC（已确认仅 PRC）';}
+    else{toast('Geo 稍后处理，仍计为未完成');}
+  }
+  if(id==='target'){
+    PARSE.fields.target.k='ok';
+    PARSE.fields.target.val=act==='ai'?'2025-09-12':'2025-09-01';
+    PARSE.fields.target.d=PARSE.fields.target.val+(act==='ai'?'（按 Lead Time 反推）':'（手动确认）');
+  }
+  if(id==='nre'){
+    if(act==='write'){PARSE.fields.nre.k='ok';PARSE.fields.nre.d='已写入：PCBA/NRE 无增加';PARSE.fields.nre.val='no increase';}
+    else{PARSE.fields.nre.k='ok';PARSE.fields.nre.d='已忽略';}
+  }
+  refreshParseUI(true);
+  toast(act==='later'?'已标记稍后处理':'已更新字段与清单');
+}
+
+function refreshParseUI(keepOpen){
+  const openId=keepOpen?(PARSE.steps.find(s=>s.open)||{}).id:null;
+  syncStepStates();
+  fillAllStepBodies(extractFields(PARSE.text));
+  if(openId){PARSE.steps.forEach(s=>s.open=(s.id===openId));}
+  else{collapseAllSteps();}
+  renderPlist();
+  renderConclusion();
+}
+
+function stepState(id,st,sum){const n=PARSE.steps.find(s=>s.id===id);if(!n)return;n.st=st;if(sum!=null)n.sum=sum;}
+
+function renderPlist(){
+  const host=document.getElementById('plist');
+  const total=PARSE.steps.length;
+  const done=PARSE.steps.filter(s=>s.st==='done').length;
+  const cur=PARSE.steps.find(s=>s.st==='run')||PARSE.steps.find(s=>s.st==='warn');
+  const mini=host.classList.contains('mini');
+  const steps=PARSE.steps.filter(s=>!mini||s.st==='run'||s.st==='warn');
+  host.innerHTML=`<div class="plist-h" onclick="togglePlistMini()">
+    <h3>${mini?('Submit PCR · '+(cur?cur.title:'')):'Submit PCR'}</h3>
+    <span class="pcnt">${mini?((cur&&cur.sum)||''):(done+'/'+total+' 已完成')}</span>
+    <button type="button" class="plist-toggle" title="展开/收起步骤" onclick="event.stopPropagation();toggleAllSteps()">${PARSE.steps.some(s=>s.open)?'▴':'▾'}</button>
+    <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrList',38)">38</span>
+    <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrCount',42)">42</span>
+  </div>`;
+  steps.forEach((s,i)=>{
+    const row=document.createElement('div');
+    const stCls=s.st==='warn'?'warn':s.st;
+    row.className='pstep '+stCls+(s.open?' open':'')+(s.dyn?' warn-step':'')+(i===steps.length-1?' last':'');
+    row.dataset.id=s.id;
+    const icon=s.st==='done'?'✓':(s.st==='warn'||s.dyn)?'!':s.st==='run'?'':'○';
+    row.innerHTML=`<button class="pstep-h" type="button">
+      <span class="pico">${icon}</span><span class="ptt">${s.title}</span>
+      <span class="psum" title="${(s.sum||'').replace(/"/g,'&quot;')}">${s.sum||''}</span>
+      <span class="chev">›</span>
+      <span class="iinfo" data-info="${s.info}">ⓘ</span>
+    </button><div class="pstep-b">${s.body||''}</div>`;
+    row.querySelector('.pstep-h').onclick=()=>clickStep(s.id);
+    row.querySelector('.iinfo').onclick=ev=>{ev.stopPropagation();openStepInfo(s.info);};
+    host.appendChild(row);
+  });
+  if(!PARSE.animating) host.querySelectorAll('.pcheck').forEach(el=>el.classList.add('in'));
+  if(!mini) host.insertAdjacentHTML('beforeend',`<div class="plist-sub" style="padding:4px 0 0"><span class="tipdot" onclick="showTip(event,'pcrRules',39)">39</span> <span class="tipdot" onclick="showTip(event,'pcrDyn',40)">40</span></div>`);
+}
+function toggleAllSteps(){
+  const any=PARSE.steps.some(s=>s.open);
+  if(any) collapseAllSteps();
+  else PARSE.steps.forEach(s=>{if(s.st!=='wait')s.open=true;});
+  if(!PARSE.steps.some(s=>s.body)) fillAllStepBodies(extractFields(PARSE.text));
+  renderPlist();
+}
+
+function togglePlistMini(){
+  const el=document.getElementById('plist');
+  if(el.classList.contains('mini')){collapsePlistToHome();return;}
+  el.classList.add('mini');
+  renderPlist();
+}
+
+function clickStep(id){
+  const s=PARSE.steps.find(x=>x.id===id);if(!s)return;
+  if(s.st==='wait'){toast(s.pre||'需先补全必填信息');return;}
+  const was=s.open;
+  PARSE.steps.forEach(x=>x.open=false);
+  s.open=!was;
+  if(!s.body) fillAllStepBodies(extractFields(PARSE.text));
+  renderPlist();
+}
+
+function openStepInfo(key){
+  const map={
+    s1:{t:'步骤 1 · 理解变更内容',b:'识别 PCR Type、变更对象、变更动作，以及 CP/SP。判定依据：关键词匹配 + 历史同类 PCR 表述。置信度低于阈值时不自动填写。'},
+    s2:{t:'步骤 2 · 识别影响产品',b:'识别产品线/机型、MTM、Geo、CP Team。产品名须匹配主数据；原文未提区域不默认 WW；跨产品线时提示拆分。'},
+    s3:{t:'步骤 3 · 补全必填信息',b:'必须项：Impacted Products、Business Case Reason、Target Implementation Date、Geo Impact、Change Request 完整性。建议项不阻断提交。'},
+    s4:{t:'步骤 4 · 可行性与价值评估',b:'技术/时间/价值三维度。AI 给建议，人做决定。'},
+    s5:{t:'步骤 5 · 提交验证',b:'核对 Type、必填、逻辑一致性、重复性与拆分。提交后在 PACE 创建记录并进入 Review。硬性合规不可绕过。'}
+  };
+  const d=map[key]||map.s1;
+  modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>${d.t}</h3></div><div class="modal-b"><p style="font-size:13px;line-height:1.65;color:var(--ink-2)">${d.b}</p><div class="rule-note">${RULE_FOOT}</div></div><div class="modal-f"><button class="btn btn-primary" data-x>知道了</button></div></div>`;
+  scrim.classList.add('show');modalHost.querySelector('[data-x]').onclick=closeModal;
+}
+
+function skipParse(){
+  if(!PARSE.active||PARSE.skipped)return;
+  PARSE.skipped=true;PARSE.animating=false;clearParseTimers();
+  finishParse(extractFields(PARSE.text));
+}
+
+function runParseAnim(ex){
+  PARSE.animating=true;PARSE.skipped=false;
+  const prod=ex.products[0]||'未识别产品';
+  PARSE.steps=[
+    {id:'u',title:'理解变更内容',st:'run',sum:'识别中',info:'s1',open:true,body:'',pre:''},
+    {id:'p',title:'识别影响产品',st:'wait',sum:'待前置完成',info:'s2',open:false,body:'',pre:'需先理解变更内容'},
+    {id:'f',title:'补全必填信息',st:'wait',sum:'待前置完成',info:'s3',open:false,body:'',pre:'需先识别影响产品'},
+    {id:'v',title:'可行性与价值评估',st:'wait',sum:'待前置完成',info:'s4',open:false,body:'',pre:'需先补全必填信息'},
+    {id:'s',title:'提交验证',st:'wait',sum:'待前置完成',info:'s5',open:false,body:'',pre:'需先补全必填信息'}
+  ];
+  if(PARSE.split){
+    PARSE.steps.splice(3,0,{id:'split',title:'确认是否拆分为两条',st:'wait',sum:'待前置完成',info:'s2',open:false,dyn:true,pre:'需先进入补全步骤'});
+  }
+  PARSE.steps[0].body=ruleBanner('s1')+`<div class="rule-note">${RULE_FOOT}</div>`;
+  renderPlist();
+  later(200,()=>{
+    PARSE.steps[0].body=stepBody('s1',checkHtml([
+      {k:'ok',t:'PCR Type',d:ex.pcrType},
+      {k:'ok',t:'变更对象',d:ex.sku||'CPU SKU'},
+      {k:'ok',t:'变更动作',d:ex.action}
+    ]));
+    renderPlist();inChecks();
+  });
+  later(900,()=>{PARSE.steps[0].st='done';PARSE.steps[0].sum=ex.pcrType;PARSE.steps[0].open=false;
+    PARSE.steps[1].st='run';PARSE.steps[1].open=true;PARSE.steps[1].sum='识别中';
+    PARSE.steps[1].body=ruleBanner('s2')+`<div class="rule-note">${RULE_FOOT}</div>`;
+    renderPlist();
+  });
+  later(1600,()=>{
+    PARSE.steps[1].body=stepBody('s2',checkHtml([
+      {k:'ok',t:'影响产品',d:prod},
+      {k:ex.geo?'ok':'err',t:'Geo Impact',d:ex.geo||'原文未提及区域 · 不默认 WW'}
+    ]));
+    renderPlist();inChecks();
+  });
+  later(2200,()=>{PARSE.steps[1].st='done';PARSE.steps[1].sum=prod;PARSE.steps[1].open=false;
+    const f=stepBy('f');
+    if(f){f.st='run';f.open=true;f.sum='核对中';f.body=ruleBanner('s3')+`<div class="rule-note">${RULE_FOOT}</div>`;}
+    renderPlist();
+  });
+  later(2500,()=>fillStep3(false));
+  later(5800,()=>fillStep4());
+  later(6600,()=>{PARSE.animating=false;finishParse(ex);});
+}
+
+function checkHtml(items){
+  return items.map(i=>`<div class="pcheck ${i.k}"><span class="ck">${i.k==='ok'?'✓':i.k==='warn'?'⚠':i.k==='run'?'◐':i.k==='info'?'ⓘ':i.k==='wait'?'○':'✗'}</span><div><b>${i.t}</b>　${i.d}</div></div>`).join('');
+}
+function inChecks(){document.querySelectorAll('.pstep.open .pcheck').forEach((el,i)=>later(i*300,()=>el.classList.add('in')));}
+function stepBy(id){return PARSE.steps.find(s=>s.id===id);}
+
+function fillStep3Html(){
+  const g=fieldGroups();
+  const mustPct=Math.round(g.mustDone/g.mustTotal*100);
+  const sugPct=Math.round(g.sugDone/g.sugTotal*100);
+  const mid=`
+    <div class="pfill"><span>必须补充　${g.mustDone}/${g.mustTotal} 已完成</span><div class="pbar"><i style="width:${mustPct}%"></i></div></div>
+    <div class="pfill"><span>建议补充　${g.sugDone}/${g.sugTotal} 已完成</span><div class="pbar"><i style="width:${sugPct}%"></i></div></div>
+    <div class="pgrp"><div class="pgrp-h">必须项</div>${checkHtml(g.must)}</div>
+    <div class="pgrp"><div class="pgrp-h">建议项</div>${checkHtml(g.sug)}</div>`;
+  return stepBody('s3',mid);
+}
+
+function fillStep3(instant){
+  const f=stepBy('f');if(!f)return;
+  f.body=fillStep3Html();
+  const miss=missingMustLabels();
+  if(mustAllOk()){f.st='done';f.sum='必填已齐';}
+  else{f.st=PARSE.animating?'run':'warn';f.sum=miss.length?('还差 '+miss.join('、')):'待确认';}
+  renderPlist();
+  const items=document.querySelectorAll('.pstep.open .pcheck');
+  if(instant||!PARSE.animating){items.forEach(x=>x.classList.add('in'));return;}
+  const warn=[...items].filter(x=>x.classList.contains('warn')||x.classList.contains('err')||x.classList.contains('info')||x.classList.contains('wait'));
+  const ok=[...items].filter(x=>x.classList.contains('ok'));
+  ok.forEach((el,i)=>later(300*i,()=>el.classList.add('in')));
+  later(300*ok.length+400,()=>warn.forEach((el,i)=>later(350*i,()=>el.classList.add('in'))));
+}
+
+function fillStep4(){
+  const f=stepBy('f');
+  if(f){f.open=false;const miss=missingMustLabels();f.st=mustAllOk()?'done':'warn';f.sum=mustAllOk()?'必填已齐':(miss.length?('还差 '+miss.join('、')):'待确认');}
+  const sp=stepBy('split');
+  if(sp&&PARSE.splitDecision==null){sp.st='warn';sp.sum='AI 建议拆分';sp.body=splitBody();}
+  const ix=PARSE.steps.findIndex(s=>s.id==='v');
+  PARSE.steps[ix].st='run';PARSE.steps[ix].open=true;PARSE.steps[ix].sum='分析中';
+  PARSE.steps[ix].body=stepBody('s4',checkHtml([
+    {k:'ok',t:'检索相似 PCR',d:'找到 3 条'},
+    {k:'ok',t:'比对历史实施周期',d:'同类平均 18 天'},
+    {k:'run',t:'分析成本影响',d:'进行中…'},
+    {k:'wait',t:'汇总价值判断',d:''}
+  ]));
+  renderPlist();inChecks();
+  later(700,()=>{
+    if(PARSE.skipped)return;
+    PARSE.steps[ix].body=stepBody('s4',checkHtml([
+      {k:'ok',t:'检索相似 PCR',d:'找到 3 条'},
+      {k:'ok',t:'比对历史实施周期',d:'同类平均 18 天'},
+      {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
+      {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
+    ]));
+    PARSE.steps[ix].st='done';PARSE.steps[ix].sum='建议补充后再提';PARSE.steps[ix].open=false;
+    renderPlist();
+  });
+}
+
+function splitBody(){
+  return `<div style="font-size:12.5px;line-height:1.65;color:var(--ink-2)">
+    <div style="font-weight:600;color:var(--ink);margin-bottom:6px">判定依据</div>
+    <p>一条 PCR 应对应一个独立的变更动作。本次描述中识别到可能存在两个独立变更：</p>
+    <div style="margin:10px 0;padding:10px 12px;background:var(--soft);border-radius:8px">
+      <b>① CPU SKU 替换</b><br>MS5 X9 12Xe vPro → T6 X9 12Xe non-vPro<br>变更类型：Hardware/SBB
+    </div>
+    <div style="margin:10px 0;padding:10px 12px;background:var(--soft);border-radius:8px">
+      <b>② CPU List 维护</b><br>原文 "change … on CPU list"<br>可能属于配置清单更新，与硬件替换是不同动作
+    </div>
+    <p>拆分后：主 PCR 处理 SKU 替换，Branch PCR 处理 CPU List 更新，两者可并行推进。</p>
+    <div class="split-acts">
+      <button class="btn btn-primary" type="button" onclick="event.stopPropagation();decideSplit('split')">拆分为两条</button>
+      <button class="btn btn-ghost" type="button" onclick="event.stopPropagation();decideSplit('keep')">不拆分，说明理由</button>
+      <button class="btn btn-ghost" type="button" onclick="event.stopPropagation();decideSplit('later')">稍后决定</button>
+    </div>
+    <div class="rule-note">${RULE_FOOT}</div>
+  </div>`;
+}
+
+function decideSplit(act){
+  if(act==='keep'){
+    modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>确认不拆分</h3><p>请说明为何合并为一条 PCR</p></div>
+      <div class="modal-b"><textarea class="reason" id="splitReason" placeholder="例如：CPU List 更新是本次 SKU 替换的附属动作…"></textarea></div>
+      <div class="modal-f"><button class="btn btn-ghost" data-x>取消</button><button class="btn btn-primary" data-ok>确认</button></div></div>`;
+    scrim.classList.add('show');
+    modalHost.querySelector('[data-x]').onclick=closeModal;
+    modalHost.querySelector('[data-ok]').onclick=()=>{
+      const r=(document.getElementById('splitReason').value||'').trim();
+      if(!r){toast('请填写不拆分理由');return;}
+      PARSE.splitDecision='keep';PARSE.splitReason=r;closeModal();refreshParseUI(true);toast('已确认不拆分');
+    };
+    return;
+  }
+  if(act==='later'){PARSE.splitDecision=null;const sp=stepBy('split');if(sp){sp.st='warn';sp.sum='AI 建议拆分';sp.open=true;sp.body=splitBody();}renderPlist();toast('稍后决定，不阻塞后续步骤');return;}
+  PARSE.splitDecision='split';refreshParseUI(true);toast('已拆分为 2 条 PCR');
+}
+
+function fillStep5Body(){
+  const ready=mustAllOk();
+  const checks=checkHtml([
+    {k:'ok',t:'PCR Type 合理性',d:'Hardware/SBB 与 CPU SKU 替换匹配'},
+    {k:ready?'ok':'warn',t:'必填字段',d:ready?'已齐备':'Geo、目标实施日或 Business Case 待确认'},
+    {k:'ok',t:'重复性检查',d:'未发现相同在途 PCR'}
+  ]);
+  return stepBody('s5',checks,`<div style="font-size:12.5px;margin-top:10px;line-height:1.6;color:var(--ink-2)">提交验证通过后，将在对话区末尾提交至 <b>PACE</b> 并进入 <b>Review</b>。<span class="tipdot" onclick="showTip(event,'pcrPace',43)">43</span></div>`);
+}
+
+function fillAllStepBodies(ex){
+  const prod=ex.products[0]||'未识别产品';
+  const u=stepBy('u');if(u)u.body=stepBody('s1',checkHtml([
+    {k:'ok',t:'PCR Type',d:ex.pcrType},
+    {k:'ok',t:'变更对象',d:ex.sku||'CPU SKU'},
+    {k:'ok',t:'变更动作',d:ex.action}
+  ]));
+  const p=stepBy('p');if(p)p.body=stepBody('s2',checkHtml([
+    {k:'ok',t:'影响产品',d:prod},
+    {k:PARSE.fields.geo.k==='ok'?'ok':'err',t:'Geo Impact',d:PARSE.fields.geo.d}
+  ]));
+  const f=stepBy('f');if(f)f.body=fillStep3Html();
+  const v=stepBy('v');if(v)v.body=stepBody('s4',checkHtml([
+    {k:'ok',t:'检索相似 PCR',d:'找到 3 条'},
+    {k:'ok',t:'比对历史实施周期',d:'同类平均 18 天'},
+    {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
+    {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
+  ]));
+  const sp=stepBy('split');if(sp) sp.body=splitBody();
+  const s=stepBy('s');if(s) s.body=fillStep5Body();
+}
+
+function finishParse(ex){
+  PARSE.animating=false;PARSE.skipped=true;
+  if(!PARSE.fields) initParseFields(ex);
+  if(!PARSE.steps.length){
+    PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
+    PARSE.steps=[
+      {id:'u',title:'理解变更内容',st:'done',sum:ex.pcrType,info:'s1',open:false,body:''},
+      {id:'p',title:'识别影响产品',st:'done',sum:ex.products[0]||'未识别',info:'s2',open:false,body:''},
+      {id:'f',title:'补全必填信息',st:'warn',sum:'',info:'s3',open:false,body:''},
+      {id:'v',title:'可行性与价值评估',st:'done',sum:'建议补充后再提',info:'s4',open:false,body:''},
+      {id:'s',title:'提交验证',st:'wait',sum:'待前置完成',info:'s5',open:false,body:'',pre:'需先补全必填信息'}
+    ];
+    if(PARSE.split) PARSE.steps.splice(3,0,{id:'split',title:'确认是否拆分为两条',st:'warn',sum:'AI 建议拆分',info:'s2',open:false,dyn:true});
+  }
+  syncStepStates();
+  collapseAllSteps();
+  fillAllStepBodies(ex);
+  renderPlist();
+  renderConclusion();
+}
+
+function submitPcr(){
+  if(!mustAllOk()){toast('请先补全必须项');return;}
+  toast('已提交至 PACE · 进入 Review');exitParseMode();
+}
+function openPcrForce(){
+  modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>Force Submit</h3><p>存在警告项时的强制提交，需填写理由并留痕</p></div>
+    <div class="modal-b"><textarea class="reason" id="pcrForceReason" placeholder="说明为何绕过校验项…"></textarea>
+    <div class="modal-note">理由与被绕过的校验项将对 OTM 可见。硬性合规项不可绕过。<span class="tipdot" onclick="showTip(event,'pcrForce',41)">41</span></div></div>
+    <div class="modal-f"><button class="btn btn-ghost" data-x>取消</button><button class="btn btn-primary" data-ok>确认强制提交</button></div></div>`;
+  scrim.classList.add('show');
+  modalHost.querySelector('[data-x]').onclick=closeModal;
+  modalHost.querySelector('[data-ok]').onclick=()=>{
+    const r=(document.getElementById('pcrForceReason').value||'').trim();
+    if(!r){toast('请填写强制提交理由');return;}
+    PARSE.forceReason=r;PARSE.forceAt=new Date().toISOString();
+    closeModal();toast('已 Force Submit · 理由已留痕');exitParseMode();
+  };
+}
+
+plusInit();
+window.PARSE=PARSE;window.extractFields=extractFields;window.startParse=startParse;window.skipParse=skipParse;
+window.DEMO_MAIL=DEMO_MAIL;window.TIPS_HOME=TIPS_HOME;window.tipNum=tipNum;window.togglePlistMini=togglePlistMini;
+window.enterParseMode=enterParseMode;window.exitParseMode=exitParseMode;window.resumeParse=resumeParse;
+window.suspendParse=suspendParse;window.newChatSession=newChatSession;window.backToOverview=backToOverview;
+window.renderPlist=renderPlist;window.openPcrForce=openPcrForce;window.resolveIssue=resolveIssue;window.decideSplit=decideSplit;
+window.mustAllOk=mustAllOk;window.refreshParseUI=refreshParseUI;window.clickStep=clickStep;
+window.toggleIssue=toggleIssue;window.toggleAllIssues=toggleAllIssues;window.toggleThink=toggleThink;window.toggleAllSteps=toggleAllSteps;
+</script>
+</body>
+</html>

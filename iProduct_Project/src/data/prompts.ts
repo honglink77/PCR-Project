@@ -1,0 +1,10 @@
+export const promptTemplates = [
+  { id: 'pt-1', title: 'Market Sizing', description: 'Analyze market size and growth for a specific segment', category: 'Research', template: 'Analyze the current market size for [segment] including TAM, SAM, SOM and growth projections.' },
+  { id: 'pt-2', title: 'Feature RICE Scoring', description: 'Score a feature using the RICE framework', category: 'Product', template: 'Evaluate [feature] using RICE scoring: Reach, Impact, Confidence, Effort. Provide numerical scores and justification.' },
+  { id: 'pt-3', title: 'Competitor Analysis', description: 'Deep dive into a specific competitor', category: 'Research', template: 'Provide a comprehensive analysis of [competitor] including their product, pricing, market position, strengths and weaknesses.' },
+  { id: 'pt-4', title: 'User Story Generation', description: 'Generate user stories from a feature description', category: 'Product', template: 'Generate user stories for [feature] following the format: As a [role], I want [action], so that [benefit].' },
+  { id: 'pt-5', title: 'KPI Dashboard Review', description: 'Review and summarize key metrics', category: 'Analytics', template: 'Pull the latest [timeframe] KPIs and highlight anomalies, trends, and recommended actions.' },
+  { id: 'pt-6', title: 'Technical Feasibility', description: 'Assess feasibility of a proposed feature', category: 'Engineering', template: 'Assess the technical feasibility of [feature] considering architecture impact, dependencies, risks, and estimated effort.' },
+  { id: 'pt-7', title: 'A/B Test Design', description: 'Design a controlled experiment', category: 'Growth', template: 'Design an A/B test for [change] including hypothesis, variants, metrics, sample size, and duration.' },
+  { id: 'pt-8', title: 'Persona Synthesis', description: 'Synthesize user research into personas', category: 'UX', template: 'Synthesize the latest user research data into actionable personas including goals, pain points, and behavioral patterns.' },
+];

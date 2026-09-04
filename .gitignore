@@ -1,0 +1,30 @@
+# Root ignores for PCR Project monorepo
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+!.env.example
+
+# Dependencies & build
+**/node_modules/
+**/dist/
+**/dist-ssr/
+**/.vite/
+**/.turbo/
+**/coverage/
+
+# Local test runtime (keep package.json if any; ignore installed deps)
+PCRworkbench_Project/.pcr-test/node_modules/
+
+# Editor
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+Desktop.ini
