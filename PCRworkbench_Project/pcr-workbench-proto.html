@@ -358,6 +358,8 @@
   .pstep.warn .pico,.pstep.warn-step .pico{background:#EAB308;color:#fff;animation:none;border:none}
   .pstep.pending .pico{background:#EFF6FF;color:#2563EB;animation:none;border:1.5px solid #2563EB}
   .pstep.pending .psum{color:#2563EB}
+  .pstep.err .pico{background:var(--red);color:#fff;animation:none;border:none}
+  .pstep.err .psum{color:var(--red)}
   @keyframes spin{to{transform:rotate(360deg)}}
   .pstep .ptt{font-size:13.5px;color:var(--ink);flex:none;font-weight:500;width:auto;white-space:nowrap}
   .pstep.wait .ptt{color:var(--ink-3);font-weight:400}
@@ -391,7 +393,7 @@
   .pgrp-h{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:8px 0 4px;letter-spacing:.02em}
   .rule-note{font-size:11px;color:var(--amber);margin-top:8px}
   .plist.mini .pstep,.plist.mini .plist-sub{display:none}
-  .plist.mini .pstep.run,.plist.mini .pstep.warn,.plist.mini .pstep.warn-step,.plist.mini .pstep.pending{display:block}
+  .plist.mini .pstep.run,.plist.mini .pstep.warn,.plist.mini .pstep.warn-step,.plist.mini .pstep.pending,.plist.mini .pstep.err{display:block}
   .plist.mini .pstep-b{display:none !important}
 
   .parse-user{padding:4px 0 14px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
@@ -456,6 +458,38 @@
   .type-map ul{margin:6px 0 0;padding-left:16px}
   .type-map li{margin:2px 0;color:var(--ink-2)}
   .type-toast{font-size:12.5px;line-height:1.55}
+  .sim-box{font-size:12.5px;color:var(--ink-2);line-height:1.6}
+  .sim-sec{margin:0 0 14px}
+  .sim-sec-h{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600;color:var(--ink-2);letter-spacing:.02em;margin:0 0 10px}
+  .sim-sec-h::before,.sim-sec-h::after{content:"";flex:1;height:1px;background:var(--border)}
+  .sim-sec-h::before{flex:0;width:0;display:none}
+  .sim-dup{padding:10px 12px;border-radius:8px;background:var(--soft)}
+  .sim-dup.block{background:var(--red-bg);border:1px solid #FECACA}
+  .sim-dup .sd-t{font-weight:600;color:var(--ink);margin-bottom:4px}
+  .sim-dup.block .sd-t{color:var(--red)}
+  .sim-dup .sd-sub{font-size:12px;color:var(--ink-2);margin:2px 0}
+  .sim-dup .sd-hard{margin-top:8px;color:var(--red);font-size:12px;font-weight:600}
+  .sim-card{padding:12px 0;border-bottom:1px solid var(--border)}
+  .sim-card:last-child{border-bottom:none}
+  .sim-card .sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .sim-card .sc-id{font-weight:600;color:var(--ink)}
+  .sim-card .sc-pct{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--green-bg);color:var(--green);font-weight:600}
+  .sim-card .sc-name{margin:4px 0;color:var(--ink)}
+  .sim-card .sc-meta{font-size:12px;color:var(--ink-3)}
+  .sim-card .sc-like{margin-top:4px}
+  .sim-ret{margin:8px 0;padding:8px 10px;border-radius:8px;background:var(--amber-bg);color:var(--amber);font-size:12px;line-height:1.55}
+  .sim-refs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+  .sim-refs .sr-lab{font-size:12px;color:var(--ink-3);margin-right:2px}
+  .sim-ref-body{margin-top:8px;padding:8px 10px;border-radius:8px;background:var(--soft);font-size:12px;line-height:1.55;color:var(--ink-2)}
+  .sim-note{margin:12px 0;padding:8px 10px;border-radius:8px;background:var(--amber-bg);color:var(--amber);font-size:12px;line-height:1.55}
+  .sim-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .sim-cmp{margin-top:12px;border:1px solid var(--border);border-radius:8px;overflow:hidden;font-size:12px}
+  .sim-cmp table{width:100%;border-collapse:collapse}
+  .sim-cmp th,.sim-cmp td{padding:8px 10px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+  .sim-cmp th{background:var(--soft);color:var(--ink-2);font-weight:600}
+  .sim-cmp tr:last-child td{border-bottom:none}
+  .sim-cmp .same{color:var(--green)}
+  .sim-cmp .diff{color:var(--amber)}
   .hitem .hm.live{color:var(--accent-ink)}
   .hitem .d.spin{background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
 
@@ -1550,6 +1584,18 @@ const TIPS_HOME={
    ix:'确认后第 3 步及之后重置重跑，相似 PCR、可行性评估与必填划分随 Type 重算。',
    fn:'必填项、相似案例、历史周期均按 Type 划分，不重跑会导致校验结果与实际类型不符。',
    ref:['PCR-SUB-003','待业务确认']},
+ pcrSimDupVsSim:{t:'Duplicate 与 Similar 的区别',
+   ix:'上半部分是阻断判断（有没有一模一样的在途 PCR），下半部分是决策支持（历史上类似怎么做），用分隔线区分。',
+   fn:'前者回答「能不能提」，后者回答「怎么提更好」，是两件不同的事。',
+   ref:['PCR-SUB-007']},
+ pcrSimReturn:{t:'被 Return 的案例为何最有价值',
+   ix:'突出显示退回次数、原因，并给出本次可操作建议，而不只罗列历史失败。',
+   fn:'成功案例只说明可行，失败案例才说明陷阱在哪；要告诉用户现在该做什么。',
+   ref:['PCR-SUB-007']},
+ pcrSimClosed:{t:'Closed 不等于方案成功',
+   ix:'底部固定显示可比性判断提示：相似度多维度计算，Closed 只说明走完流程。',
+   fn:'禁止仅因产品名称相同就类比；关闭不代表方案最优。',
+   ref:['PCR-SUB-007','AI 边界约束']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -2391,14 +2437,19 @@ const STEP_RULES={
     '必须项：Impacted Products、Business Case、目标实施日、Geo、变更前后描述',
     '建议项不阻断提交；字段间一致性（如成本叙事 vs Business Case）要提示'
   ]},
+  ssim:{lead:'正在按「相似 / 重复 PCR」规则检索：',items:[
+    '重复性检查：相同产品 + 相同变更对象 + 状态非 Closed → 硬阻断',
+    '相似案例：综合产品、Type、变更对象、动作、功能域计算相似度',
+    '展示历史 Comment / Cost / Assessment 与 Return 教训，由用户判断可比性'
+  ]},
   s4:{lead:'正在按「可行性与价值」三维规则评估：',items:[
-    '技术：相似 PCR 先例、硬件/认证/兼容影响',
+    '技术：引用相似 PCR 检查结论、硬件/认证/兼容影响',
     '时间：目标实施日 vs 同类历史周期',
     '价值：成本方向、业务驱动力；AI 给建议，人做决定'
   ]},
   s5:{lead:'正在按「提交验证」规则把关：',items:[
-    'Type 合理性、必填完整性、字段逻辑一致性',
-    '重复性检查、拆分建议；硬性合规项不可 Force Submit 绕过',
+    'Type 合理性、必填完整性、字段逻辑一致性、拆分建议确认',
+    '硬性合规项不可 Force Submit 绕过',
     '提交目标明示：写入 PACE，进入 Review'
   ]}
 };
@@ -2417,7 +2468,9 @@ const PARSE={
   timers:[],steps:[],homeOpen:false,split:false,forceReason:'',suspended:false,
   fields:null,issues:{},splitDecision:null,issueOpen:{},thinkOpen:false,issueExpandAll:false,
   typeConfirmed:false,pcrType:null,typePick:null,preselectedType:null,
-  typeMap:null,typeMapOpen:false,typeMeta:null
+  typeMap:null,typeMapOpen:false,typeMeta:null,
+  simConfirmed:false,simDup:null,simDupHandled:false,simCases:[],
+  simRefOpen:{},simCompareOpen:false,simCompareId:null
 };
 const PH_ASK='问点什么，或让我分析某个产品、项目…';
 const PH_CREATE='描述你的变更需求，或粘贴邮件、会议纪要…';
@@ -2490,6 +2543,181 @@ function applyTypeMeta(type){
     similarHint:t==='Cost Reduction'?'同类成本优化案例':'同类硬件/SKU 变更'
   };
 }
+function buildSimCases(type){
+  const base=[
+    {id:'SP20250612_0031',name:'Change U7 155H to U7 165H on T14p Gen 5',status:'Closed',days:47,pct:91,
+      like:'同产品线、同为 CPU SKU 替换、同为 Intel 平台',
+      returned:{n:1,reason:'未说明是否影响已认证机型',advice:'建议本次提前补充认证影响说明'},
+      refs:{comment:'LM 要求补充认证矩阵后二次 Review 通过；关键评论强调「non-vPro 切分需写清已认证机型范围」。',
+        cost:'NRE 无增加；PCBA 数量不变；无额外 tooling 成本。',
+        assess:'技术可行；认证风险中等；建议与认证职能并行评审。'}},
+    {id:'CP20250408_0117',name:'vPro to non-vPro SKU change on ThinkPad L14',status:'Closed',days:38,pct:84,
+      like:'同为 vPro→non-vPro 变更',
+      costNote:'成本参考：NRE 无增加，PCBA 数量不变（与本次一致）',
+      refs:{comment:'Portfolio 认可成本叙事与 SKU 对齐。',cost:'NRE 0；PCBA 持平；与本次描述一致。'}},
+    {id:'SP20241120_0208',name:'CPU List update on T14p Gen 4',status:'Closed',days:22,pct:72,
+      like:'同为 CPU List 维护类变更',
+      refs:{comment:'作为附属维护单独立项时周期更短；若与 SKU 替换合并需在描述中说明边界。'}}
+  ];
+  if(type==='Software') return base.slice(0,2);
+  if(type==='Cost Reduction'){
+    return base.concat([
+      {id:'SP20250301_0099',name:'Better cost CPU swap on E14 Gen 6',status:'Closed',days:31,pct:68,
+        like:'同为成本导向 CPU 替换',refs:{cost:'Savings 写入 Business Case，OTM 按季度跟踪。'}},
+      {id:'CP20250115_0042',name:'Cost down memory config on M90q',status:'Closed',days:19,pct:61,
+        like:'成本优化类变更、有 NRE/PCBA 表述',refs:{comment:'Cost Reduction 模板字段更完整时审批更快。',cost:'明确年度节省金额后一次通过。'}}
+    ]);
+  }
+  return base;
+}
+function initSimData(keepDupFlag){
+  const t=PARSE.pcrType||PARSE.typePick||'Hardware/SBB';
+  PARSE.simCases=buildSimCases(t);
+  PARSE.simConfirmed=false;
+  PARSE.simDupHandled=false;
+  PARSE.simRefOpen={};
+  PARSE.simCompareOpen=false;
+  PARSE.simCompareId=null;
+  if(!keepDupFlag) PARSE.simDup=null;
+}
+function simStepBody(){
+  const cases=PARSE.simCases||[];
+  const n=cases.length;
+  const tipDots=`<span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrSimDupVsSim',47)">47</span>
+    <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrSimReturn',48)">48</span>
+    <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrSimClosed',49)">49</span>`;
+  let dupHtml='';
+  if(PARSE.simDup && !PARSE.simDupHandled){
+    const d=PARSE.simDup;
+    dupHtml=`<div class="sim-dup block">
+      <div class="sd-t">✗ 发现 ${d.count||1} 条完全重复的在途 PCR</div>
+      <div class="sd-sub"><b>${d.id}</b>　·　状态：${d.status}</div>
+      <div class="sd-sub">${d.same||'相同产品、相同变更对象、相同变更动作'}</div>
+      <div class="sd-hard">⚠ 硬阻断：不可重复提交，请先确认是否为同一需求</div>
+      <div class="sim-acts">
+        <button class="btn btn-ghost" type="button" onclick="event.stopPropagation();viewDupPcr()">查看该 PCR</button>
+        <button class="btn btn-primary" type="button" onclick="event.stopPropagation();explainSimDiff()">说明差异并继续</button>
+      </div>
+    </div>`;
+  } else {
+    dupHtml=`<div class="sim-dup">
+      <div class="sd-t">✓ 未发现完全重复的在途 PCR</div>
+      <div class="sd-sub">检索范围：相同产品 + 相同变更对象 + 状态非 Closed</div>
+      ${PARSE.simDupHandled?`<div class="sd-sub" style="margin-top:6px;color:var(--ink-3)">已说明与 ${PARSE.simDup&&PARSE.simDup.id||'在途 PCR'} 的差异，允许继续</div>`:''}
+    </div>`;
+  }
+  const cards=cases.map(c=>{
+    const openKey=PARSE.simRefOpen[c.id];
+    const ret=c.returned?`<div class="sim-ret">⚠ 该 PCR 曾被 Return ${c.returned.n} 次<br>退回原因：${c.returned.reason}<br>→ ${c.returned.advice}</div>`:'';
+    const costNote=c.costNote?`<div class="sc-like">${c.costNote}</div>`:'';
+    const btns=[];
+    if(c.refs&&c.refs.comment) btns.push(`<button class="btn btn-ghost" type="button" style="padding:2px 8px;font-size:12px" onclick="event.stopPropagation();toggleSimRef('${c.id}','comment')">Comment 参考</button>`);
+    if(c.refs&&c.refs.cost) btns.push(`<button class="btn btn-ghost" type="button" style="padding:2px 8px;font-size:12px" onclick="event.stopPropagation();toggleSimRef('${c.id}','cost')">Cost 参考</button>`);
+    if(c.refs&&c.refs.assess) btns.push(`<button class="btn btn-ghost" type="button" style="padding:2px 8px;font-size:12px" onclick="event.stopPropagation();toggleSimRef('${c.id}','assess')">Assessment</button>`);
+    const refBody=openKey&&c.refs&&c.refs[openKey]?`<div class="sim-ref-body"><b>${openKey==='comment'?'Comment':openKey==='cost'?'Cost':'Assessment'} 参考</b><br>${c.refs[openKey]}</div>`:'';
+    return `<div class="sim-card">
+      <div class="sc-top"><span class="sc-id">● ${c.id}</span><span class="sc-pct">相似度 ${c.pct}%</span></div>
+      <div class="sc-name">${c.name}</div>
+      <div class="sc-meta">状态：${c.status}　·　周期：${c.days} 天</div>
+      <div class="sc-like">相似点：${c.like}</div>
+      ${costNote}${ret}
+      <div class="sim-refs"><span class="sr-lab">可参考内容：</span>${btns.join(' ')}</div>
+      ${refBody}
+    </div>`;
+  }).join('');
+  let cmp='';
+  if(PARSE.simCompareOpen){
+    const sel=cases.find(x=>x.id===PARSE.simCompareId)||cases[0];
+    if(sel){
+      cmp=`<div class="sim-cmp"><table>
+        <tr><th>字段</th><th>本次 PCR</th><th>${sel.id}</th></tr>
+        <tr><td>产品</td><td class="same">ThinkPad T14p Gen 5</td><td class="same">${/T14p/.test(sel.name)?'ThinkPad T14p Gen 5':'ThinkPad L14 / 其他'}</td></tr>
+        <tr><td>PCR Type</td><td class="same">${PARSE.pcrType||PARSE.typePick||'Hardware/SBB'}</td><td class="same">Hardware/SBB</td></tr>
+        <tr><td>变更对象</td><td class="same">CPU SKU</td><td class="same">CPU SKU</td></tr>
+        <tr><td>变更动作</td><td class="same">替换</td><td class="diff">${/List/.test(sel.name)?'清单维护':'替换'}</td></tr>
+        <tr><td>周期参考</td><td class="diff">待定</td><td class="same">${sel.days} 天（Closed）</td></tr>
+      </table></div>`;
+    }
+  }
+  const blocked=PARSE.simDup&&!PARSE.simDupHandled;
+  return ruleBanner('ssim')+`<div class="sim-box">
+    <div class="sim-sec">
+      <div class="sim-sec-h">重复性检查 ${tipDots}</div>
+      ${dupHtml}
+    </div>
+    <div class="sim-sec">
+      <div class="sim-sec-h">相似案例参考</div>
+      ${cards||'<div class="sd-sub">暂无相似案例</div>'}
+    </div>
+    <div class="sim-note">⚠ 相似度综合产品、PCR Type、变更对象、变更动作、功能域计算。<br>Closed 不等于方案成功，请自行判断可比性。</div>
+    <div class="sim-acts">
+      <button class="btn btn-ghost" type="button" onclick="event.stopPropagation();toggleSimCompare()">查看完整对比</button>
+      <button class="btn btn-primary" type="button" ${blocked?'disabled style="opacity:.5"':''} onclick="event.stopPropagation();confirmSimRef()">确认已参考</button>
+    </div>
+    ${cmp}
+  </div><div class="rule-note">${RULE_FOOT}</div>`;
+}
+function toggleSimRef(id,kind){
+  const cur=PARSE.simRefOpen[id];
+  PARSE.simRefOpen[id]=cur===kind?null:kind;
+  const sm=stepBy('sim');if(sm){sm.body=simStepBody();sm.open=true;}
+  renderPlist();
+}
+function toggleSimCompare(){
+  PARSE.simCompareOpen=!PARSE.simCompareOpen;
+  if(PARSE.simCompareOpen) PARSE.simCompareId=(PARSE.simCases[0]&&PARSE.simCases[0].id)||null;
+  const sm=stepBy('sim');if(sm){sm.body=simStepBody();sm.open=true;}
+  renderPlist();
+}
+function confirmSimRef(){
+  if(PARSE.simDup&&!PARSE.simDupHandled){toast('存在完全重复的在途 PCR，请先处理硬阻断');return;}
+  PARSE.simConfirmed=true;
+  const n=(PARSE.simCases||[]).length;
+  const sm=stepBy('sim');
+  if(sm){sm.st='done';sm.sum='已参考 '+n+' 条相似案例';sm.open=true;sm.body=simStepBody();}
+  syncStepStates();
+  fillAllStepBodies(extractFields(PARSE.text));
+  if(sm) sm.open=true;
+  renderPlist();
+  toast('已确认参考 '+n+' 条相似案例');
+}
+function viewDupPcr(){
+  const d=PARSE.simDup;if(!d)return;
+  toast('原型：打开 '+d.id+' 详情（演示）');
+}
+function explainSimDiff(){
+  modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>说明与在途 PCR 的差异</h3><p>硬阻断解除前须说明为何不是同一需求</p></div>
+    <div class="modal-b"><textarea class="reason" id="simDiffReason" placeholder="例如：变更对象不同 / 目标区域不同 / 业务驱动力不同…"></textarea></div>
+    <div class="modal-f"><button class="btn btn-ghost" data-x>取消</button><button class="btn btn-primary" data-ok>确认并继续</button></div></div>`;
+  scrim.classList.add('show');
+  modalHost.querySelector('[data-x]').onclick=closeModal;
+  modalHost.querySelector('[data-ok]').onclick=()=>{
+    const r=(document.getElementById('simDiffReason').value||'').trim();
+    if(!r){toast('请填写差异说明');return;}
+    PARSE.simDupHandled=true;PARSE.simDiffReason=r;closeModal();
+    const sm=stepBy('sim');if(sm){sm.st='pending';sm.sum='找到 '+(PARSE.simCases||[]).length+' 条参考';sm.body=simStepBody();sm.open=true;}
+    renderPlist();toast('已说明差异，可继续确认参考');
+  };
+}
+function setSimDuplicate(on){
+  if(on){
+    PARSE.simDup={id:'SP20260812_0044',status:'Under Review',count:1,same:'相同产品、相同变更对象、相同变更动作'};
+    PARSE.simDupHandled=false;PARSE.simConfirmed=false;
+  } else {
+    PARSE.simDup=null;PARSE.simDupHandled=false;
+  }
+  const sm=stepBy('sim');
+  if(sm){sm.body=simStepBody();syncSimStepState(sm);sm.open=true;}
+  renderPlist();
+}
+function syncSimStepState(sm){
+  if(!sm) sm=stepBy('sim');if(!sm)return;
+  const n=(PARSE.simCases||[]).length;
+  if(PARSE.simDup&&!PARSE.simDupHandled){sm.st='err';sm.sum='发现完全重复';}
+  else if(PARSE.simConfirmed){sm.st='done';sm.sum='已参考 '+n+' 条相似案例';}
+  else{sm.st='pending';sm.sum=n?('找到 '+n+' 条参考'):'待确认';}
+}
+
 function typeMapFor(type){
   if(type==='Cost Reduction'){
     return {
@@ -2602,16 +2830,19 @@ function confirmPcrType(explicit){
 }
 function rerunFromStep3(){
   applyTypeMeta(PARSE.pcrType);
-  const f=stepBy('f'),v=stepBy('v'),s=stepBy('s'),sp=stepBy('split');
+  initSimData(false);
+  const f=stepBy('f'),sm=stepBy('sim'),v=stepBy('v'),s=stepBy('s'),sp=stepBy('split');
   if(f){f.st='run';f.sum='按新模板重核';f.open=false;f.body='';}
   if(sp&&PARSE.splitDecision==null){sp.st='warn';sp.sum='AI 建议拆分';sp.open=false;sp.body='';}
+  if(sm){sm.st='pending';sm.sum='找到 '+(PARSE.simCases||[]).length+' 条参考';sm.open=false;sm.body=simStepBody();}
   if(v){v.st='run';v.sum='按 Type 重算';v.open=false;v.body='';}
   if(s){s.st='wait';s.sum='待前置完成';s.pre='需先补全必填信息';s.body='';}
   fillStep3(true);
   const meta=PARSE.typeMeta||{similar:3,leadDays:18};
+  const n=(PARSE.simCases||[]).length;
   if(v){
     v.body=stepBody('s4',checkHtml([
-      {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条（${meta.similarHint||'同类'}）`},
+      {k:'ok',t:'引用相似 PCR 检查',d:`已检索 ${n} 条参考（${meta.similarHint||'同类'}）`},
       {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
       {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
       {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
@@ -2624,7 +2855,7 @@ function rerunFromStep3(){
 function syncStepStates(){
   const ex=extractFields(PARSE.text);
   const prod=ex.products[0]||'未识别';
-  const u=stepBy('u'),p=stepBy('p'),f=stepBy('f'),v=stepBy('v'),s=stepBy('s'),sp=stepBy('split');
+  const u=stepBy('u'),p=stepBy('p'),f=stepBy('f'),sm=stepBy('sim'),v=stepBy('v'),s=stepBy('s'),sp=stepBy('split');
   if(u){
     if(PARSE.typeConfirmed&&PARSE.pcrType){u.st='done';u.sum=PARSE.pcrType;}
     else{u.st='pending';u.sum='待确认';}
@@ -2640,11 +2871,13 @@ function syncStepStates(){
     else if(PARSE.splitDecision==='keep'){sp.st='done';sp.sum='已确认不拆分';}
     else{sp.st='warn';sp.sum='AI 建议拆分';}
   }
+  syncSimStepState(sm);
   if(v){
     v.st='done';v.sum='建议补充后再提';
   }
   if(s){
-    if(!mustAllOk()){s.st='wait';s.sum='待前置完成';s.pre='需先补全必填信息';}
+    if(PARSE.simDup&&!PARSE.simDupHandled){s.st='wait';s.sum='待前置完成';s.pre='存在完全重复 PCR，请先处理';}
+    else if(!mustAllOk()){s.st='wait';s.sum='待前置完成';s.pre='需先补全必填信息';}
     else{s.st='done';s.sum='→ 提交至 PACE';}
   }
 }
@@ -2731,6 +2964,7 @@ function startParse(text){
   PARSE.typeConfirmed=false;PARSE.pcrType=null;PARSE.typePick='Hardware/SBB';
   PARSE.preselectedType=null;PARSE.typeMap=null;PARSE.typeMapOpen=false;
   applyTypeMeta('Hardware/SBB');
+  initSimData(false);
   initParseFields(extractFields(PARSE.text));
   document.getElementById('detectbar').classList.remove('show');
   document.getElementById('askin').value='';
@@ -2787,6 +3021,8 @@ function exitParseMode(){
   PARSE.text='';PARSE.steps=[];PARSE.fields=null;PARSE.issues={};PARSE.splitDecision=null;PARSE.issueOpen={};
   PARSE.typeConfirmed=false;PARSE.pcrType=null;PARSE.typePick=null;PARSE.preselectedType=null;
   PARSE.typeMap=null;PARSE.typeMapOpen=false;PARSE.typeMeta=null;
+  PARSE.simConfirmed=false;PARSE.simDup=null;PARSE.simDupHandled=false;PARSE.simCases=[];
+  PARSE.simRefOpen={};PARSE.simCompareOpen=false;PARSE.simCompareId=null;
   document.body.classList.remove('parsing','home-open');
   document.getElementById('askin').placeholder=PH_ASK;
   const pl=document.getElementById('plist');if(pl){pl.classList.remove('mini');pl.innerHTML='';}
@@ -2971,9 +3207,9 @@ function renderPlist(){
   const host=document.getElementById('plist');
   const total=PARSE.steps.length;
   const done=PARSE.steps.filter(s=>s.st==='done').length;
-  const cur=PARSE.steps.find(s=>s.st==='run')||PARSE.steps.find(s=>s.st==='warn')||PARSE.steps.find(s=>s.st==='pending');
+  const cur=PARSE.steps.find(s=>s.st==='run')||PARSE.steps.find(s=>s.st==='warn')||PARSE.steps.find(s=>s.st==='err')||PARSE.steps.find(s=>s.st==='pending');
   const mini=host.classList.contains('mini');
-  const steps=PARSE.steps.filter(s=>!mini||s.st==='run'||s.st==='warn'||s.st==='pending');
+  const steps=PARSE.steps.filter(s=>!mini||s.st==='run'||s.st==='warn'||s.st==='pending'||s.st==='err');
   host.innerHTML=`<div class="plist-h" onclick="togglePlistMini()">
     <h3>${mini?('Submit PCR · '+(cur?cur.title:'')):'Submit PCR'}</h3>
     <span class="pcnt">${mini?((cur&&cur.sum)||''):(done+'/'+total+' 已完成')}</span>
@@ -2986,7 +3222,7 @@ function renderPlist(){
     const stCls=s.st==='warn'?'warn':s.st;
     row.className='pstep '+stCls+(s.open?' open':'')+(s.dyn?' warn-step':'')+(i===steps.length-1?' last':'');
     row.dataset.id=s.id;
-    const icon=s.st==='done'?'✓':s.st==='pending'?'◇':(s.st==='warn'||s.dyn)?'!':s.st==='run'?'':'○';
+    const icon=s.st==='done'?'✓':s.st==='pending'?'◇':s.st==='err'?'✗':(s.st==='warn'||s.dyn)?'!':s.st==='run'?'':'○';
     row.innerHTML=`<button class="pstep-h" type="button">
       <span class="pico">${icon}</span><span class="ptt">${s.title}</span>
       <span class="psum" title="${(s.sum||'').replace(/"/g,'&quot;')}">${s.sum||''}</span>
@@ -3030,8 +3266,9 @@ function openStepInfo(key){
     s1:{t:'步骤 1 · 理解变更内容',b:'AI 推荐 PCR Type（至少两个候选，各带依据与置信度），须用户确认后才生效；同时识别变更对象、变更动作与 CP/SP。'},
     s2:{t:'步骤 2 · 识别影响产品',b:'识别产品线/机型、MTM、Geo、CP Team。产品名须匹配主数据；原文未提区域不默认 WW；跨产品线时提示拆分。'},
     s3:{t:'步骤 3 · 补全必填信息',b:'必须项：Impacted Products、Business Case Reason、Target Implementation Date、Geo Impact、Change Request 完整性。建议项不阻断提交。'},
-    s4:{t:'步骤 4 · 可行性与价值评估',b:'技术/时间/价值三维度。AI 给建议，人做决定。'},
-    s5:{t:'步骤 5 · 提交验证',b:'核对 Type、必填、逻辑一致性、重复性与拆分。提交后在 PACE 创建记录并进入 Review。硬性合规不可绕过。'}
+    ssim:{t:'步骤 4 · 相似 PCR 检查',b:'上半：重复性检查（硬阻断）；下半：相似案例参考（Comment/Cost/Assessment 与 Return 教训）。须用户确认已参考。'},
+    s4:{t:'步骤 5 · 可行性与价值评估',b:'技术/时间/价值三维度。引用相似 PCR 检查结论。AI 给建议，人做决定。'},
+    s5:{t:'步骤 6 · 提交验证',b:'核对 Type、必填、逻辑一致性与拆分建议。重复检索已并入相似 PCR 步骤。提交后在 PACE 创建记录并进入 Review。'}
   };
   const d=map[key]||map.s1;
   modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>${d.t}</h3></div><div class="modal-b"><p style="font-size:13px;line-height:1.65;color:var(--ink-2)">${d.b}</p><div class="rule-note">${RULE_FOOT}</div></div><div class="modal-f"><button class="btn btn-primary" data-x>知道了</button></div></div>`;
@@ -3048,11 +3285,13 @@ function runParseAnim(ex){
   PARSE.animating=true;PARSE.skipped=false;
   const prod=ex.products[0]||'未识别产品';
   PARSE.typePick=PARSE.typePick||'Hardware/SBB';
+  if(!PARSE.simCases||!PARSE.simCases.length) initSimData(false);
   PARSE.steps=[
     {id:'u',title:'理解变更内容',st:'run',sum:'识别中',info:'s1',open:true,body:'',pre:''},
     {id:'p',title:'识别影响产品',st:'wait',sum:'待前置完成',info:'s2',open:false,body:'',pre:'需先理解变更内容'},
     {id:'f',title:'补全必填信息',st:'wait',sum:'待前置完成',info:'s3',open:false,body:'',pre:'需先识别影响产品'},
-    {id:'v',title:'可行性与价值评估',st:'wait',sum:'待前置完成',info:'s4',open:false,body:'',pre:'需先补全必填信息'},
+    {id:'sim',title:'相似 PCR 检查',st:'wait',sum:'待前置完成',info:'ssim',open:false,body:'',pre:'需先补全必填信息'},
+    {id:'v',title:'可行性与价值评估',st:'wait',sum:'待前置完成',info:'s4',open:false,body:'',pre:'需先完成相似 PCR 检查'},
     {id:'s',title:'提交验证',st:'wait',sum:'待前置完成',info:'s5',open:false,body:'',pre:'需先补全必填信息'}
   ];
   if(PARSE.split){
@@ -3083,8 +3322,9 @@ function runParseAnim(ex){
     renderPlist();
   });
   later(2500,()=>fillStep3(false));
-  later(5800,()=>fillStep4());
-  later(6600,()=>{PARSE.animating=false;finishParse(ex);});
+  later(5200,()=>fillSimStep(false));
+  later(6200,()=>fillStep4());
+  later(7200,()=>{PARSE.animating=false;finishParse(ex);});
 }
 
 function checkHtml(items){
@@ -3120,17 +3360,40 @@ function fillStep3(instant){
   later(300*ok.length+400,()=>warn.forEach((el,i)=>later(350*i,()=>el.classList.add('in'))));
 }
 
-function fillStep4(){
+function fillSimStep(instant){
   const f=stepBy('f');
   if(f){f.open=false;const miss=missingMustLabels();f.st=mustAllOk()?'done':'warn';f.sum=mustAllOk()?'必填已齐':(miss.length?('还差 '+miss.join('、')):'待确认');}
   const sp=stepBy('split');
   if(sp&&PARSE.splitDecision==null){sp.st='warn';sp.sum='AI 建议拆分';sp.body=splitBody();}
+  if(!PARSE.simCases||!PARSE.simCases.length) initSimData(!!PARSE.simDup);
+  const sm=stepBy('sim');if(!sm)return;
+  sm.st='run';sm.open=true;sm.sum='检索中';
+  sm.body=ruleBanner('ssim')+`<div class="rule-note">${RULE_FOOT}</div>`;
+  renderPlist();
+  const done=()=>{
+    if(PARSE.skipped&&!instant)return;
+    sm.body=simStepBody();
+    syncSimStepState(sm);
+    sm.open=true;
+    renderPlist();
+  };
+  if(instant||!PARSE.animating){done();return;}
+  later(600,done);
+}
+
+function fillStep4(){
+  const sm=stepBy('sim');
+  if(sm){sm.open=false;syncSimStepState(sm);}
+  const sp=stepBy('split');
+  if(sp&&PARSE.splitDecision==null){sp.st='warn';sp.sum='AI 建议拆分';sp.body=splitBody();}
   if(!PARSE.typeMeta) applyTypeMeta(effectiveType());
   const meta=PARSE.typeMeta;
+  const n=(PARSE.simCases||[]).length;
   const ix=PARSE.steps.findIndex(s=>s.id==='v');
+  if(ix<0)return;
   PARSE.steps[ix].st='run';PARSE.steps[ix].open=true;PARSE.steps[ix].sum='分析中';
   PARSE.steps[ix].body=stepBody('s4',checkHtml([
-    {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条`},
+    {k:'ok',t:'引用相似 PCR 检查',d:`已检索 ${n} 条参考`},
     {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
     {k:'run',t:'分析成本影响',d:'进行中…'},
     {k:'wait',t:'汇总价值判断',d:''}
@@ -3139,7 +3402,7 @@ function fillStep4(){
   later(700,()=>{
     if(PARSE.skipped)return;
     PARSE.steps[ix].body=stepBody('s4',checkHtml([
-      {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条（${meta.similarHint||'同类'}）`},
+      {k:'ok',t:'引用相似 PCR 检查',d:`已检索 ${n} 条参考（${meta.similarHint||'同类'}）`},
       {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
       {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
       {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
@@ -3191,10 +3454,12 @@ function fillStep5Body(){
   const ready=mustAllOk();
   const typ=PARSE.typeConfirmed&&PARSE.pcrType?PARSE.pcrType:'（未确认）';
   const typeOk=PARSE.typeConfirmed?'ok':'warn';
+  const splitOk=PARSE.splitDecision==='split'||PARSE.splitDecision==='keep'||!PARSE.split;
   const checks=checkHtml([
     {k:typeOk,t:'PCR Type 合理性',d:PARSE.typeConfirmed?(typ+' 与变更内容匹配'):'类型待用户确认'},
-    {k:ready?'ok':'warn',t:'必填字段',d:ready?'已齐备':'Geo、目标实施日或 Business Case 待确认'},
-    {k:'ok',t:'重复性检查',d:'未发现相同在途 PCR'}
+    {k:ready?'ok':'warn',t:'必填字段完整性',d:ready?'已齐备':'Geo、目标实施日或 Business Case 待确认'},
+    {k:ready?'ok':'warn',t:'字段间逻辑一致性',d:ready?'成本叙事与 Business Case 已对齐或已标注':'待补齐字段后再核'},
+    {k:splitOk?'ok':'warn',t:'拆分建议确认状态',d:PARSE.splitDecision==='split'?'已拆分为 2 条':PARSE.splitDecision==='keep'?'已确认不拆分':(PARSE.split?'待确认是否拆分':'无需拆分')}
   ]);
   return stepBody('s5',checks,`<div style="font-size:12.5px;margin-top:10px;line-height:1.6;color:var(--ink-2)">提交验证通过后，将在对话区末尾提交至 <b>PACE</b> 并进入 <b>Review</b>。<span class="tipdot" onclick="showTip(event,'pcrPace',43)">43</span></div>`);
 }
@@ -3207,10 +3472,13 @@ function fillAllStepBodies(ex){
     {k:PARSE.fields.geo.k==='ok'?'ok':'err',t:'Geo Impact',d:PARSE.fields.geo.d}
   ]));
   const f=stepBy('f');if(f)f.body=fillStep3Html();
+  if(!PARSE.simCases||!PARSE.simCases.length) initSimData(!!PARSE.simDup);
+  const sm=stepBy('sim');if(sm){sm.body=simStepBody();syncSimStepState(sm);}
   if(!PARSE.typeMeta) applyTypeMeta(effectiveType());
   const meta=PARSE.typeMeta;
+  const n=(PARSE.simCases||[]).length;
   const v=stepBy('v');if(v)v.body=stepBody('s4',checkHtml([
-    {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条（${meta.similarHint||'同类'}）`},
+    {k:'ok',t:'引用相似 PCR 检查',d:`已检索 ${n} 条参考（${meta.similarHint||'同类'}）`},
     {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
     {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
     {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
@@ -3223,17 +3491,25 @@ function finishParse(ex){
   PARSE.animating=false;PARSE.skipped=true;
   if(!PARSE.fields) initParseFields(ex);
   if(!PARSE.typeMeta) applyTypeMeta(PARSE.typePick||'Hardware/SBB');
+  if(!PARSE.simCases||!PARSE.simCases.length) initSimData(!!PARSE.simDup);
   if(!PARSE.steps.length){
     PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
     const uDone=PARSE.typeConfirmed&&PARSE.pcrType;
+    const n=(PARSE.simCases||[]).length;
     PARSE.steps=[
       {id:'u',title:'理解变更内容',st:uDone?'done':'pending',sum:uDone?PARSE.pcrType:'待确认',info:'s1',open:false,body:''},
       {id:'p',title:'识别影响产品',st:'done',sum:ex.products[0]||'未识别',info:'s2',open:false,body:''},
       {id:'f',title:'补全必填信息',st:'warn',sum:'',info:'s3',open:false,body:''},
+      {id:'sim',title:'相似 PCR 检查',st:'pending',sum:n?('找到 '+n+' 条参考'):'待确认',info:'ssim',open:false,body:''},
       {id:'v',title:'可行性与价值评估',st:'done',sum:'建议补充后再提',info:'s4',open:false,body:''},
       {id:'s',title:'提交验证',st:'wait',sum:'待前置完成',info:'s5',open:false,body:'',pre:'需先补全必填信息'}
     ];
     if(PARSE.split) PARSE.steps.splice(3,0,{id:'split',title:'确认是否拆分为两条',st:'warn',sum:'AI 建议拆分',info:'s2',open:false,dyn:true});
+  } else if(!stepBy('sim')){
+    const fIdx=PARSE.steps.findIndex(s=>s.id==='f');
+    const insertAt=fIdx>=0?fIdx+1+(PARSE.steps[fIdx+1]&&PARSE.steps[fIdx+1].id==='split'?1:0):3;
+    const n=(PARSE.simCases||[]).length;
+    PARSE.steps.splice(insertAt,0,{id:'sim',title:'相似 PCR 检查',st:'pending',sum:n?('找到 '+n+' 条参考'):'待确认',info:'ssim',open:false,body:''});
   }
   syncStepStates();
   collapseAllSteps();
@@ -3243,6 +3519,7 @@ function finishParse(ex){
 }
 
 function submitPcr(){
+  if(PARSE.simDup&&!PARSE.simDupHandled){toast('存在完全重复的在途 PCR，不可提交');return;}
   if(!mustAllOk()){toast('请先补全必须项');return;}
   toast('已提交至 PACE · 进入 Review');exitParseMode();
 }
@@ -3271,6 +3548,8 @@ window.mustAllOk=mustAllOk;window.refreshParseUI=refreshParseUI;window.clickStep
 window.toggleIssue=toggleIssue;window.toggleAllIssues=toggleAllIssues;window.toggleThink=toggleThink;window.toggleAllSteps=toggleAllSteps;
 window.confirmPcrType=confirmPcrType;window.selectTypeOpt=selectTypeOpt;window.openTypePicker=openTypePicker;
 window.toggleTypeMapDetail=toggleTypeMapDetail;
+window.confirmSimRef=confirmSimRef;window.toggleSimRef=toggleSimRef;window.toggleSimCompare=toggleSimCompare;
+window.setSimDuplicate=setSimDuplicate;window.explainSimDiff=explainSimDiff;window.viewDupPcr=viewDupPcr;
 </script>
 </body>
 </html>

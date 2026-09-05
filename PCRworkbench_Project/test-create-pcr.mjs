@@ -192,7 +192,7 @@ try {
   });
   check('确认后 Type 为 ✓ 并显示名称', afterType.confirmed && afterType.st === 'done' && afterType.sum === 'Hardware/SBB' && afterType.icon === '✓', JSON.stringify(afterType));
   check('确认后提示模板切换影响', afterType.hasMap);
-  check('确认后可行性随 Type 重算', /找到 3 条/.test(afterType.vText) && /18 天/.test(afterType.vText), afterType.vText.slice(0, 120));
+  check('确认后可行性随 Type 重算', /已检索 3 条参考/.test(afterType.vText) && /18 天/.test(afterType.vText), afterType.vText.slice(0, 120));
 
   await page.evaluate(() => { toggleTypeMapDetail(); });
   check('查看详情可展开字段映射', await page.evaluate(() => /字段映射详情/.test(document.querySelector('.pstep[data-id="u"] .pstep-b')?.innerText || '')));
@@ -200,7 +200,9 @@ try {
   await page.evaluate(() => confirmPcrType('Cost Reduction'));
   check('切换 Cost Reduction 后下游重算', await page.evaluate(() => {
     const v = PARSE.steps.find(s => s.id === 'v');
-    return PARSE.pcrType === 'Cost Reduction' && /找到 5 条/.test(v.body) && /12 天/.test(v.body);
+    const sim = PARSE.steps.find(s => s.id === 'sim');
+    return PARSE.pcrType === 'Cost Reduction' && PARSE.simCases.length === 5 &&
+      /已检索 5 条参考/.test(v.body) && /12 天/.test(v.body) && /找到 5 条参考/.test(sim.sum);
   }));
 
   await page.evaluate(() => openTypePicker());
@@ -209,6 +211,66 @@ try {
     return /Hardware\/SBB/.test(txt) && /Software/.test(txt) && /Cost Reduction/.test(txt) && /Certification/.test(txt);
   }));
   await page.evaluate(() => closeModal());
+  await page.evaluate(() => confirmPcrType('Hardware/SBB')); // 恢复默认 Type 便于后续用例
+
+  // A3: 相似 PCR 检查
+  const simStep = await page.evaluate(() => {
+    const ids = PARSE.steps.map(s => s.id);
+    const sm = PARSE.steps.find(s => s.id === 'sim');
+    const fIdx = ids.indexOf('f');
+    const simIdx = ids.indexOf('sim');
+    const vIdx = ids.indexOf('v');
+    clickStep('sim');
+    const body = document.querySelector('.pstep[data-id="sim"] .pstep-b')?.innerText || '';
+    const icon = document.querySelector('.pstep[data-id="sim"] .pico')?.textContent.trim();
+    const sBody = PARSE.steps.find(s => s.id === 's')?.body || '';
+    return {
+      ids, st: sm.st, sum: sm.sum, icon, n: PARSE.simCases.length,
+      orderOk: fIdx >= 0 && simIdx === fIdx + 1 + (ids[fIdx + 1] === 'split' ? 1 : 0) && vIdx > simIdx,
+      hasDupSec: /重复性检查/.test(body) && /检索范围/.test(body),
+      hasSimSec: /相似案例参考/.test(body),
+      hasReturn: /曾被 Return/.test(body) && /退回原因/.test(body) && /建议本次/.test(body),
+      hasRefs: /Comment 参考/.test(body) && /Cost 参考/.test(body) && /Assessment/.test(body),
+      hasNote: /Closed 不等于方案成功/.test(body),
+      hasActs: /查看完整对比/.test(body) && /确认已参考/.test(body),
+      noDupInSubmit: !/<b>重复性检查<\/b>/.test(sBody) && !/未发现相同在途 PCR/.test(sBody),
+      submitHasLogic: /字段间逻辑一致性/.test(sBody) && /拆分建议确认状态/.test(sBody),
+      tipNums: ['pcrSimDupVsSim','pcrSimReturn','pcrSimClosed'].map(k => tipNum(k))
+    };
+  });
+  check('相似 PCR 为独立步骤且位于补全之后', simStep.orderOk && simStep.ids.includes('sim'), JSON.stringify(simStep.ids));
+  check('基础步骤含 sim 且头部按实际步数计数', await page.evaluate(() => {
+    const total = PARSE.steps.length;
+    const head = document.querySelector('.plist-h .pcnt')?.textContent || '';
+    return total >= 6 && head.includes('/' + total) && PARSE.steps.some(s => s.id === 'sim');
+  }));
+  check('相似步骤未确认前为 ◇', simStep.st === 'pending' && simStep.icon === '◇' && simStep.n === 3, JSON.stringify({st:simStep.st,icon:simStep.icon,n:simStep.n,sum:simStep.sum}));
+  check('相似步骤分 Duplicate/Similar 两块', simStep.hasDupSec && simStep.hasSimSec);
+  check('Return 案例含事实原因建议', simStep.hasReturn);
+  check('可参考内容入口齐全', simStep.hasRefs);
+  check('可比性提示与确认动作', simStep.hasNote && simStep.hasActs);
+  check('提交验证已去掉重复性检查', simStep.noDupInSubmit && simStep.submitHasLogic);
+  check('TIP 47–49 编号正确', simStep.tipNums.join(',') === '47,48,49', JSON.stringify(simStep.tipNums));
+
+  await page.evaluate(() => toggleSimRef('SP20250612_0031', 'comment'));
+  check('Comment 参考可就地展开', await page.evaluate(() => /LM 要求补充认证矩阵/.test(document.querySelector('.pstep[data-id="sim"] .pstep-b')?.innerText || '')));
+  await page.evaluate(() => toggleSimCompare());
+  check('查看完整对比可展开', await page.evaluate(() => !!document.querySelector('.sim-cmp table')));
+  await page.evaluate(() => confirmSimRef());
+  check('确认已参考后变 ✓', await page.evaluate(() => {
+    const sm = PARSE.steps.find(s => s.id === 'sim');
+    const icon = document.querySelector('.pstep[data-id="sim"] .pico')?.textContent.trim();
+    return PARSE.simConfirmed && sm.st === 'done' && /已参考 3 条/.test(sm.sum) && icon === '✓';
+  }));
+
+  await page.evaluate(() => { setSimDuplicate(true); });
+  check('发现完全重复时硬阻断 ✗', await page.evaluate(() => {
+    const sm = PARSE.steps.find(s => s.id === 'sim');
+    const body = document.querySelector('.pstep[data-id="sim"] .pstep-b')?.innerText || '';
+    const icon = document.querySelector('.pstep[data-id="sim"] .pico')?.textContent.trim();
+    return sm.st === 'err' && icon === '✗' && /硬阻断/.test(body) && /SP20260812_0044/.test(body);
+  }));
+  await page.evaluate(() => { setSimDuplicate(false); confirmSimRef(); });
 
   // expand split
   await page.evaluate(() => { clickStep('split'); });
@@ -331,7 +393,7 @@ try {
     issues: document.querySelectorAll('.tl-item').length,
     user: !!document.querySelector('#parseUser .bub')
   }));
-  check('点左侧进行中对话可回到提交 PCR', resumed.active && resumed.parsing && resumed.homeHidden && resumed.steps >= 5 && resumed.issues === 4 && resumed.user, JSON.stringify(resumed));
+  check('点左侧进行中对话可回到提交 PCR', resumed.active && resumed.parsing && resumed.homeHidden && resumed.steps >= 6 && resumed.issues === 4 && resumed.user, JSON.stringify(resumed));
 
   await page.click('#parseBar');
   const backOv = await page.evaluate(() => ({
