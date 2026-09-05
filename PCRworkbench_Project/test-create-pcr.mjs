@@ -491,6 +491,84 @@ try {
   check('从 My Tasks 点回可恢复解析', await page.evaluate(() => PARSE.active && document.body.classList.contains('parsing') && !document.body.classList.contains('taskview')));
   await page.click('.navitem[data-view="home"]');
 
+  // ── 顶部栏会话操作（对照 顶部栏会话操作_提示词）──
+  const sess = await page.evaluate(() => {
+    const chip = document.getElementById('sesschip');
+    const caret = document.getElementById('sessCaret');
+    const title = document.getElementById('sessTitle');
+    const wrap = document.getElementById('sesswrap');
+    const afterLogo = chip && chip.closest('.topbar') &&
+      [...document.querySelector('.topbar').children].findIndex(x => x.id === 'sesswrap') >
+      [...document.querySelector('.topbar').children].findIndex(x => x.classList.contains('logo'));
+    const beforeSel = chip && [...document.querySelector('.topbar').children].findIndex(x => x.id === 'sesswrap') <
+      [...document.querySelector('.topbar').querySelectorAll('.sel')].map(s =>
+        [...document.querySelector('.topbar').children].indexOf(s.parentElement || s)
+      )[0];
+    // simpler position: sesswrap appears before .sp
+    const kids = [...document.querySelector('.topbar').children].map(el => el.id || el.className || el.tagName);
+    const iSess = kids.findIndex(k => String(k).includes('sesswrap'));
+    const iSp = kids.findIndex(k => k === 'sp' || String(k).split(/\s+/).includes('sp'));
+    const iSel = [...document.querySelector('.topbar').children].findIndex(el => el.classList?.contains('sel'));
+    return {
+      hasChip: !!chip,
+      empty: chip.classList.contains('empty'),
+      title: title?.textContent,
+      caretHidden: !!caret?.hidden,
+      posOk: iSess >= 0 && iSp >= 0 && iSp < iSess && (iSel < 0 || iSess < iSel),
+      tips: !!(window.TIPS_HOME && TIPS_HOME.sessTop && TIPS_HOME.sessTask && TIPS_HOME.sessDone),
+      tipDots: [...document.querySelectorAll('.tipdot')].some(t => t.textContent.trim() === '50')
+    };
+  });
+  check('顶栏有当前会话区域且靠右紧挨筛选器', sess.hasChip && sess.posOk);
+  // 当前仍在解析会话中
+  check('有会话时显示标题与下拉箭头', await page.evaluate(() => {
+    const chip = document.getElementById('sesschip');
+    return !chip.classList.contains('empty') && !document.getElementById('sessCaret').hidden &&
+      /CPU SKU|解析/.test(document.getElementById('sessTitle').textContent);
+  }));
+  check('TIP 50–52 已写入', sess.tips && sess.tipDots);
+
+  await page.evaluate(() => {
+    document.getElementById('sesschip').click();
+  });
+  check('会话菜单含 Pin/Rename/Delete', await page.evaluate(() => {
+    const m = document.getElementById('sessmenu');
+    const t = m?.innerText || '';
+    return !m.hidden && /Pin/.test(t) && /Rename/.test(t) && /Delete/.test(t);
+  }));
+  await page.evaluate(() => Sessions.closeMenu());
+
+  await page.evaluate(() => newChatSession());
+  check('New Chat 后顶栏回到新会话占位', await page.evaluate(() => {
+    const chip = document.getElementById('sesschip');
+    return chip.classList.contains('empty') && document.getElementById('sessTitle').textContent === '新会话' &&
+      document.getElementById('sessCaret').hidden;
+  }));
+  check('占位无下拉箭头', await page.evaluate(() => document.getElementById('sessCaret').hidden));
+
+  await page.click('.navitem[data-view="task"]');
+  check('My Tasks 仍有会话芯片', await page.evaluate(() => !!document.getElementById('sesschip')));
+  await page.evaluate(() => {
+    state.t1.done = true;
+    cur = 't1';
+    renderTaskAll();
+  });
+  check('任务完成后会话标记已完成且只读', await page.evaluate(() => {
+    const s = Sessions.byId('task-t1');
+    const bar = document.getElementById('actionbar')?.innerText || '';
+    return s && s.status === 'done' && /已完成|只读/.test(bar) && !/确认并写回/.test(bar);
+  }));
+  await page.evaluate(() => {
+    Sessions.upsert({ id: 'ask-pin', kind: 'ask', title: '钉住测试会话', meta: '刚刚', group: 'today', pinned: false });
+    Sessions.setCurrent('ask-pin');
+    Sessions.items.find(x => x.id === 'ask-pin').pinned = true;
+    Sessions.renderHist();
+  });
+  check('Pin 后左栏置顶显示标记', await page.evaluate(() => {
+    const first = document.querySelector('#overview-rail-hist .hitem');
+    return first && first.dataset.sid === 'ask-pin' && !!first.querySelector('.pinmark');
+  }));
+
 } catch (e) {
   check('测试未抛异常', false, e.message);
 } finally {

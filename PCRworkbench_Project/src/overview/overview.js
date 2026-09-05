@@ -535,6 +535,7 @@ function plusInit(){
 }
 
 function newChatSession(){
+  if(window.Sessions) Sessions.onNewChat();
   if(PARSE.active||PARSE.suspended||PARSE.text){
     exitParseMode();
   }
@@ -565,6 +566,7 @@ function startParse(text){
 }
 
 function showParseHist(){
+  if(window.Sessions){ Sessions.syncCreateFromParse(); return; }
   const el=document.getElementById('parseHistItem');
   if(!el)return;
   el.style.display='';
@@ -576,6 +578,7 @@ function showParseHist(){
   updateParseHistMark();
 }
 function updateParseHistMark(){
+  if(window.Sessions){ Sessions.syncCreateFromParse(); return; }
   const el=document.getElementById('parseHistItem');
   if(!el)return;
   const hm=el.querySelector('.hm');
@@ -586,6 +589,10 @@ function updateParseHistMark(){
   else{hm.textContent='进行中';hm.className='hm live';}
 }
 function hideParseHist(){
+  if(window.Sessions){
+    Sessions.markCreateGone(!!(PARSE.submitted || PARSE.histMark==='draft' || PARSE.histMark==='withdrawn'));
+    return;
+  }
   const el=document.getElementById('parseHistItem');
   if(el) el.style.display='none';
   document.body.classList.remove('has-parse-session');
@@ -616,6 +623,7 @@ function suspendParse(){
 
 /** 结束会话（提交成功 / 新建会话）：清空并隐藏历史项 */
 function exitParseMode(){
+  const keepSess = !!(PARSE.submitted || PARSE.histMark==='draft' || PARSE.histMark==='withdrawn');
   clearParseTimers();
   PARSE.active=false;PARSE.createIntent=false;PARSE.homeOpen=false;PARSE.animating=false;PARSE.suspended=false;
   PARSE.text='';PARSE.steps=[];PARSE.fields=null;PARSE.issues={};PARSE.splitDecision=null;PARSE.issueOpen={};
@@ -630,7 +638,8 @@ function exitParseMode(){
   const pl=document.getElementById('plist');if(pl){pl.classList.remove('mini');pl.innerHTML='';}
   const pu=document.getElementById('parseUser');if(pu)pu.innerHTML='';
   const pc=document.getElementById('parseChat');if(pc)pc.innerHTML='';
-  hideParseHist();
+  if(window.Sessions) Sessions.markCreateGone(keepSess);
+  else hideParseHist();
 }
 
 function ensureHomeView(){

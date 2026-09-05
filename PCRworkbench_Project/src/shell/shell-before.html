@@ -6,6 +6,21 @@
   <div class="topbar">
       <div class="logo"><span class="mk">P</span>PCR <small id="crumb">Overview</small></div>
       <div class="sp"></div>
+      <div class="sesswrap" id="sesswrap">
+        <button type="button" class="sesschip empty" id="sesschip" title="新会话">
+          <svg class="i sess-ico" viewBox="0 0 16 16"><path d="M3 4.5h10a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 13 12.5H7l-3 2v-2H3A1.5 1.5 0 0 1 1.5 11V6A1.5 1.5 0 0 1 3 4.5z"/></svg>
+          <span class="sess-title" id="sessTitle">新会话</span>
+          <span class="sess-status" id="sessStatus" hidden></span>
+          <span class="sess-caret" id="sessCaret" hidden>▾</span>
+        </button>
+        <span class="tipdot" onclick="showTip(event,'sessTop',50)">50</span>
+        <div class="sessmenu" id="sessmenu" hidden>
+          <button type="button" class="sm-i" data-act="pin"><span class="sm-ico">📌</span><span class="sm-lab" id="sessPinLab">Pin</span><span class="sm-k">P</span></button>
+          <button type="button" class="sm-i" data-act="rename"><span class="sm-ico">✎</span><span class="sm-lab">Rename</span><span class="sm-k">R</span></button>
+          <div class="sm-div"></div>
+          <button type="button" class="sm-i danger" data-act="delete"><span class="sm-ico">🗑</span><span class="sm-lab">Delete</span><span class="sm-k">D</span></button>
+        </div>
+      </div>
       <span class="tipdot" onclick="showTip(event,'mode',1)">1</span>
       <button class="sel" onclick="toast('切换时间范围')">近 90 天<svg class="i" style="width:13px;height:13px"><path d="M4 6.5L8 10l4-3.5"/></svg></button>
       <button class="sel" onclick="toast('切换 BU')">全部 BU<svg class="i" style="width:13px;height:13px"><path d="M4 6.5L8 10l4-3.5"/></svg></button>

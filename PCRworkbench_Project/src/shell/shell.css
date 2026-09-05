@@ -51,6 +51,47 @@
   .logo .mk{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;
     display:grid;place-items:center;font-size:13px;font-weight:700}
   .logo small{color:var(--ink-3);font-weight:400;font-size:12px;margin-left:2px}
+  .sesswrap{position:relative;display:flex;align-items:center;gap:6px;min-width:0;max-width:min(320px,34vw);margin-right:4px;flex:none}
+  .sesschip{display:flex;align-items:center;gap:7px;min-width:0;max-width:100%;
+    padding:5px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);
+    font-size:12.5px;color:var(--ink-2);transition:.12s;text-align:left}
+  .sesschip:hover{border-color:var(--border-2);color:var(--ink)}
+  .sesschip.empty{color:var(--ink-3)}
+  .sesschip.empty .sess-title{color:var(--ink-3);font-weight:400}
+  .sesschip .sess-ico{width:14px;height:14px;flex:none;color:var(--ink-3)}
+  .sesschip .sess-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}
+  .sesschip .sess-status{flex:none;font-size:10.5px;color:var(--ink-3);padding:1px 6px;border-radius:4px;background:var(--soft)}
+  .sesschip .sess-status.on{color:var(--accent-ink);background:var(--accent-soft)}
+  .sesschip .sess-status.done{color:var(--agree);background:var(--agree-bg)}
+  .sesschip .sess-caret{flex:none;font-size:10px;color:var(--ink-3);margin-left:2px}
+  .sesschip.renaming{padding:0;border-color:var(--accent)}
+  .sesschip.renaming input{width:100%;min-width:140px;border:none;outline:none;background:transparent;
+    font:inherit;color:var(--ink);padding:5px 11px}
+  .sessmenu{position:absolute;top:calc(100% + 6px);left:0;z-index:60;min-width:180px;
+    background:var(--bg);border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 10px 28px rgba(30,41,59,.12);padding:6px;display:flex;flex-direction:column;gap:2px}
+  .sessmenu[hidden]{display:none !important}
+  .sessmenu .sm-i{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:8px;
+    font-size:13px;color:var(--ink-2);text-align:left}
+  .sessmenu .sm-i:hover{background:var(--soft);color:var(--ink)}
+  .sessmenu .sm-i.danger{color:var(--disagree)}
+  .sessmenu .sm-i.danger:hover{background:var(--red-bg);color:var(--disagree)}
+  .sessmenu .sm-ico{width:16px;text-align:center;flex:none;font-size:12px}
+  .sessmenu .sm-lab{flex:1}
+  .sessmenu .sm-k{font-size:11px;color:var(--ink-3);font-weight:400}
+  .sessmenu .sm-div{height:1px;background:var(--border);margin:4px 6px}
+  .hitem .ht-row{display:flex;align-items:center;gap:6px;min-width:0}
+  .hitem .pinmark{flex:none;font-size:10px;opacity:.85}
+  .hitem .stype{flex:none;font-size:9.5px;font-weight:500;padding:0 5px;border-radius:3px;
+    letter-spacing:.03em;background:var(--soft);color:var(--ink-2)}
+  .hitem .stype.vote{background:var(--info-bg);color:var(--info)}
+  .hitem .stype.eval{background:#F3EEFB;color:#6941C6}
+  .hitem .stype.otm{background:var(--accent-soft);color:var(--accent-ink)}
+  .hitem .stype.rev{background:var(--neutral-bg);color:var(--neutral)}
+  .hitem .stype.wi{background:var(--agree-bg);color:var(--agree)}
+  .hitem .stype.create{background:var(--accent-soft);color:var(--accent-ink)}
+  .hitem.on{background:var(--accent-soft)}
+  .hitem .hm.done{color:var(--agree)}
   .topbar .sp{flex:1}
   .sel{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);
     padding:5px 11px;border:1px solid var(--border);border-radius:8px;transition:.12s}

@@ -56,6 +56,18 @@ const TIPS_TASK={
    ix:'点击主操作弹出确认框，列示将写回的内容、目标系统与操作人。写回后返回成功、失败或部分失败状态。',
    fn:'所有向 PACE 或目标系统的写回都必须经用户明确确认。失败时保留用户输入、证据版本与重试信息，不丢失已填内容。',
    ref:['P-05 人在回路','7.4 写回规则']},
+ sessTop:{t:'会话操作为何放在顶部',
+   ix:'顶部栏常驻显示当前会话及操作菜单；左栏可折叠，折叠后将无法操作会话。',
+   fn:'顶部位置保证任何状态下都能访问 Pin / Rename / Delete，且不占用内容区空间。',
+   ref:['少按钮原则']},
+ sessTask:{t:'一个任务的对话即一次会话',
+   ix:'处理任务时的对话会存入会话历史，可重命名、钉住、删除。',
+   fn:'任务处理过程中的追问与 AI 回应是决策依据的一部分，应当可回溯。',
+   ref:['P-06 可解释可追溯']},
+ sessDone:{t:'已完成会话保留而非归档',
+   ix:'提交后标记「已完成」，可回看但只读；不自动隐藏或归档。',
+   fn:'后续需要回看当时的判断依据，是审计与追溯的基础。',
+   ref:['P-06 可解释可追溯']},
 };
 
 
@@ -201,6 +213,18 @@ const TIPS_HOME={
    ix:'底部固定显示可比性判断提示：相似度多维度计算，Closed 只说明走完流程。',
    fn:'禁止仅因产品名称相同就类比；关闭不代表方案最优。',
    ref:['PCR-SUB-007','AI 边界约束']},
+ sessTop:{t:'会话操作为何放在顶部',
+   ix:'顶部栏常驻显示当前会话及操作菜单；左栏可折叠，折叠后将无法操作会话。',
+   fn:'顶部位置保证任何状态下都能访问 Pin / Rename / Delete，且不占用内容区空间。',
+   ref:['少按钮原则']},
+ sessTask:{t:'一个任务的对话即一次会话',
+   ix:'处理任务时的对话会存入会话历史，可重命名、钉住、删除。',
+   fn:'任务处理过程中的追问与 AI 回应是决策依据的一部分，应当可回溯。',
+   ref:['P-06 可解释可追溯']},
+ sessDone:{t:'已完成会话保留而非归档',
+   ix:'提交后标记「已完成」，可回看但只读；不自动隐藏或归档。',
+   fn:'后续需要回看当时的判断依据，是审计与追溯的基础。',
+   ref:['P-06 可解释可追溯']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -406,6 +430,8 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
+  const HARD={sessTop:50,sessTask:51,sessDone:52};
+  if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
   if(VIEW==='task') return i+21;
@@ -541,6 +567,374 @@ function askPreset(q){
   toast('已填入提问，回车即可开始分析');
 }
 function askq(b){document.getElementById('askin').value=b.textContent;document.getElementById('askin').focus();hideGuide();}
+
+/* ══════════ 当前会话（顶栏 + 左栏历史同源） ══════════ */
+const CREATE_SID='create-parse';
+const Sessions=(function(){
+  const GROUP_ORDER=['today','yesterday','earlier'];
+  const GROUP_LABEL={today:'Today',yesterday:'Yesterday',earlier:'Earlier'};
+  let currentId=null;
+  let menuOpen=false;
+  let renaming=false;
+  const items=[
+    {id:'ask-1',kind:'ask',title:'认证延期的影响面分析',meta:'40 分钟前',group:'today',pinned:false,status:null,accent:'var(--red)'},
+    {id:'ask-2',kind:'ask',title:'X1 产品线 PCR 撞期情况',meta:'2 小时前',group:'today',pinned:false,status:null,accent:'var(--accent)'},
+    {id:'ask-3',kind:'ask',title:'按产品看逾期分布',meta:'昨天',group:'yesterday',pinned:false,status:null,accent:'var(--blue)'},
+    {id:'ask-4',kind:'ask',title:'XX 订单交付项目进度',meta:'昨天',group:'yesterday',pinned:false,status:null,accent:'var(--green)'},
+    {id:'ask-5',kind:'ask',title:'M90q 二供成本对比',meta:'3 天前',group:'earlier',pinned:false,status:null,accent:'var(--purple)'},
+    {id:'ask-6',kind:'ask',title:'Vote 环节积压根因',meta:'5 天前',group:'earlier',pinned:false,status:null,accent:'var(--ink-3)'},
+  ];
+  function byId(id){return items.find(x=>x.id===id);}
+  function trunc(t,n){t=String(t||'');return t.length>n?t.slice(0,n)+'…':t;}
+  function statusLabel(s){
+    if(!s||!s.status) return '';
+    const map={active:'进行中',draft:'草稿',submitted:'已提交',withdrawn:'已撤回',done:'已完成'};
+    return map[s.status]||s.status;
+  }
+  function statusClass(s){
+    if(!s||!s.status) return '';
+    if(s.status==='active'||s.status==='submitted') return 'on';
+    if(s.status==='done') return 'done';
+    return '';
+  }
+  function closeMenu(){
+    menuOpen=false;
+    const m=document.getElementById('sessmenu');
+    if(m) m.hidden=true;
+  }
+  function openMenu(){
+    const s=byId(currentId); if(!s) return;
+    const pinLab=document.getElementById('sessPinLab');
+    if(pinLab) pinLab.textContent=s.pinned?'Unpin':'Pin';
+    const m=document.getElementById('sessmenu');
+    if(m) m.hidden=false;
+    menuOpen=true;
+  }
+  function renderChip(){
+    const chip=document.getElementById('sesschip');
+    const titleEl=document.getElementById('sessTitle');
+    const statusEl=document.getElementById('sessStatus');
+    const caret=document.getElementById('sessCaret');
+    if(!chip||!titleEl) return;
+    if(renaming) return;
+    const s=currentId?byId(currentId):null;
+    if(!s){
+      chip.classList.add('empty');
+      chip.classList.remove('renaming');
+      titleEl.textContent='新会话';
+      chip.title='新会话';
+      if(statusEl){statusEl.hidden=true;statusEl.textContent='';}
+      if(caret) caret.hidden=true;
+      closeMenu();
+      return;
+    }
+    chip.classList.remove('empty');
+    const full=s.title+(s.taskType?' · '+s.taskType:'');
+    titleEl.textContent=trunc(full,20);
+    chip.title=full;
+    const st=statusLabel(s);
+    if(statusEl){
+      if(st){statusEl.hidden=false;statusEl.textContent=st;statusEl.className='sess-status '+statusClass(s);}
+      else{statusEl.hidden=true;statusEl.textContent='';}
+    }
+    if(caret) caret.hidden=false;
+  }
+  function sortedItems(){
+    const pinned=items.filter(x=>x.pinned);
+    const rest=items.filter(x=>!x.pinned);
+    const out=[...pinned];
+    GROUP_ORDER.forEach(g=>rest.filter(x=>x.group===g).forEach(x=>out.push(x)));
+    rest.filter(x=>!GROUP_ORDER.includes(x.group)).forEach(x=>out.push(x));
+    return out;
+  }
+  function iconHtml(s){
+    if(s.kind==='create'){
+      return `<svg class="i" style="width:13px;height:13px;flex:none;margin-top:3px;color:var(--accent)"><path d="M4 2.5h6l2 2V13.5H4z"/><path d="M10 2.5V5h2.5M6 8h4M6 10.5h3"/></svg>`;
+    }
+    if(s.kind==='task'){
+      return `<span class="stype ${s.taskType||''}">${(s.taskType||'TASK').toUpperCase()}</span>`;
+    }
+    return `<span class="d" style="background:${s.accent||'var(--ink-3)'}"></span>`;
+  }
+  function renderHist(){
+    const host=document.getElementById('overview-rail-hist');
+    if(!host) return;
+    const list=sortedItems();
+    const hasCreate=!!byId(CREATE_SID);
+    document.body.classList.toggle('has-parse-session', hasCreate && (typeof PARSE!=='undefined') && !!(PARSE.text||PARSE.suspended||PARSE.active||PARSE.submitted));
+    let html='';
+    let lastGroup=null;
+    const showGroupHead=()=>{
+      const pinnedFirst=list.filter(x=>x.pinned);
+      const unpinned=list.filter(x=>!x.pinned);
+      let body='';
+      if(pinnedFirst.length){
+        body+=`<div class="hgroup">Pinned<span class="tipdot" onclick="showTip(event,'sessTop',50)">50</span></div>`;
+        pinnedFirst.forEach(s=>{body+=rowHtml(s);});
+      }
+      GROUP_ORDER.forEach(g=>{
+        const chunk=unpinned.filter(x=>x.group===g);
+        if(!chunk.length) return;
+        const tip=g==='today'?`<span class="tipdot" onclick="showTip(event,'hist',3)">3</span><span class="tipdot" onclick="showTip(event,'sessTask',51)">51</span><span class="tipdot" onclick="showTip(event,'sessDone',52)">52</span>`:'';
+        body+=`<div class="hgroup">${GROUP_LABEL[g]}${tip}</div>`;
+        chunk.forEach(s=>{body+=rowHtml(s);});
+      });
+      return body;
+    };
+    function rowHtml(s){
+      const isCreate=s.id===CREATE_SID;
+      const idAttr=isCreate?' id="parseHistItem"':'';
+      const titleId=isCreate?' id="parseHistTitle"':'';
+      const spin=isCreate && s.status==='active'?' spin':'';
+      const on=s.id===currentId?' on':'';
+      const pin=s.pinned?'<span class="pinmark" title="Pinned">📌</span>':'';
+      const st=statusLabel(s);
+      const hmCls='hm'+(s.status==='active'||s.status==='submitted'?' live':'')+(s.status==='done'?' done':'');
+      const meta=st||s.meta||'';
+      const lead=s.kind==='task'?iconHtml(s):(s.kind==='create'?iconHtml(s):`<span class="d${spin}" style="background:${s.accent||'var(--ink-3)'}"></span>`);
+      return `<button class="hitem${on}"${idAttr} type="button" data-sid="${s.id}">
+        ${s.kind==='task'?`<span style="display:flex;flex-direction:column;gap:4px;padding-top:2px">${lead}</span>`:lead}
+        <span style="min-width:0"><div class="ht-row">${pin}<div class="ht"${titleId}>${esc(s.title)}</div></div>
+        <div class="${hmCls}">${esc(meta)}</div></span></button>`;
+    }
+    host.innerHTML=showGroupHead();
+    host.querySelectorAll('.hitem[data-sid]').forEach(btn=>{
+      btn.onclick=()=>activate(btn.dataset.sid);
+    });
+    renderChip();
+  }
+  function esc(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+  function upsert(partial){
+    let s=byId(partial.id);
+    if(!s){s={pinned:false,group:'today',meta:'刚刚',status:null,accent:'var(--blue)',...partial};items.unshift(s);}
+    else Object.assign(s,partial);
+    renderHist();
+    return s;
+  }
+  function setCurrent(id){
+    currentId=id||null;
+    renderHist();
+  }
+  function clearCurrent(){
+    currentId=null;
+    closeMenu();
+    renderChip();
+    renderHist();
+  }
+  function activate(id){
+    const s=byId(id); if(!s) return;
+    setCurrent(id);
+    if(s.kind==='create'){
+      if(typeof PARSE!=='undefined' && (PARSE.text||PARSE.steps&&PARSE.steps.length)){
+        if(typeof resumeParse==='function') resumeParse();
+      }else{
+        toast('该创建会话已结束（原型保留历史条目）');
+      }
+      return;
+    }
+    if(s.kind==='task'){
+      if(typeof switchView==='function') switchView('task');
+      if(s.taskId && window.MyTasks){
+        if(typeof cur!=='undefined'){ /* fallthrough */ }
+        try{
+          if(typeof ORDER!=='undefined' && ORDER.includes(s.taskId)){
+            cur=s.taskId;
+            if(typeof renderTaskAll==='function') renderTaskAll();
+          }
+        }catch(e){}
+        // MyTasks may expose select
+        if(window.MyTasks.selectTask) window.MyTasks.selectTask(s.taskId);
+      }
+      return;
+    }
+    // ask session: go home, toast restore
+    if(typeof switchView==='function') switchView('home');
+    if(typeof PARSE!=='undefined' && PARSE.active) suspendParse();
+    toast('已打开会话：'+s.title);
+  }
+  function togglePin(){
+    const s=byId(currentId); if(!s) return;
+    s.pinned=!s.pinned;
+    closeMenu();
+    renderHist();
+    toast(s.pinned?'已钉住会话':'已取消钉住');
+  }
+  function startRename(){
+    const s=byId(currentId); if(!s) return;
+    closeMenu();
+    const chip=document.getElementById('sesschip');
+    if(!chip) return;
+    renaming=true;
+    chip.classList.add('renaming');
+    chip.innerHTML=`<input id="sessRenameIn" maxlength="80" value="">`;
+    const inp=document.getElementById('sessRenameIn');
+    inp.value=s.title;
+    inp.focus();inp.select();
+    const finish=(ok)=>{
+      if(!renaming) return;
+      renaming=false;
+      if(ok){
+        const v=inp.value.trim();
+        if(v){ s.title=v; s._renamed=true; }
+      }
+      // restore chip structure
+      chip.classList.remove('renaming');
+      chip.innerHTML=`<svg class="i sess-ico" viewBox="0 0 16 16"><path d="M3 4.5h10a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 13 12.5H7l-3 2v-2H3A1.5 1.5 0 0 1 1.5 11V6A1.5 1.5 0 0 1 3 4.5z"/></svg>
+        <span class="sess-title" id="sessTitle"></span>
+        <span class="sess-status" id="sessStatus" hidden></span>
+        <span class="sess-caret" id="sessCaret" hidden>▾</span>`;
+      bindChipClick();
+      renderHist();
+      if(ok) toast('已重命名');
+    };
+    inp.onkeydown=e=>{
+      if(e.key==='Enter'){e.preventDefault();finish(true);}
+      if(e.key==='Escape'){e.preventDefault();finish(false);}
+    };
+    inp.onblur=()=>finish(true);
+  }
+  function confirmDelete(){
+    const s=byId(currentId); if(!s) return;
+    closeMenu();
+    const host=document.getElementById('modalHost');
+    const scrim=document.getElementById('scrim');
+    if(!host||!scrim){
+      if(confirm(`删除会话「${s.title}」？此操作不可撤销。`)) doDelete(s.id);
+      return;
+    }
+    host.innerHTML=`<div class="modal">
+      <div class="modal-h"><h3>删除会话</h3><p>删除会话「${esc(s.title)}」？此操作不可撤销。</p></div>
+      <div class="modal-f"><button class="btn btn-ghost" data-x>取消</button><button class="btn btn-primary" style="background:var(--disagree)" data-ok>删除</button></div>
+    </div>`;
+    scrim.classList.add('show');
+    host.querySelector('[data-x]').onclick=()=>scrim.classList.remove('show');
+    host.querySelector('[data-ok]').onclick=()=>{scrim.classList.remove('show');doDelete(s.id);};
+  }
+  function doDelete(id){
+    const s=byId(id); if(!s) return;
+    const idx=items.findIndex(x=>x.id===id);
+    if(idx>=0) items.splice(idx,1);
+    if(id===CREATE_SID){
+      currentId=null;
+      // 强制清掉创建会话 UI，不再保留
+      if(typeof PARSE!=='undefined'){
+        PARSE.submitted=false;PARSE.histMark=null;PARSE.text='';
+      }
+      if(typeof exitParseMode==='function') exitParseMode();
+      else renderHist();
+      toast('已删除会话');
+      return;
+    }
+    currentId=null;
+    renderHist();
+    toast('已删除会话');
+  }
+  function onChipClick(e){
+    if(renaming) return;
+    if(!currentId){
+      if(typeof newChatSession==='function') newChatSession();
+      else clearCurrent();
+      return;
+    }
+    if(menuOpen) closeMenu(); else openMenu();
+  }
+  function bindChipClick(){
+    const chip=document.getElementById('sesschip');
+    if(chip) chip.onclick=onChipClick;
+  }
+  function onMenuAct(act){
+    if(act==='pin') togglePin();
+    else if(act==='rename') startRename();
+    else if(act==='delete') confirmDelete();
+  }
+  function bindGlobal(){
+    bindChipClick();
+    const menu=document.getElementById('sessmenu');
+    if(menu){
+      menu.querySelectorAll('[data-act]').forEach(b=>{
+        b.onclick=e=>{e.stopPropagation();onMenuAct(b.dataset.act);};
+      });
+    }
+    document.addEventListener('click',e=>{
+      if(!menuOpen) return;
+      if(e.target.closest('#sesswrap')) return;
+      closeMenu();
+    });
+    document.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){
+        if(menuOpen){closeMenu();return;}
+      }
+      if(!menuOpen||renaming) return;
+      const k=(e.key||'').toLowerCase();
+      if(k==='p'){e.preventDefault();togglePin();}
+      else if(k==='r'){e.preventDefault();startRename();}
+      else if(k==='d'){e.preventDefault();confirmDelete();}
+    });
+  }
+  function syncCreateFromParse(){
+    if(typeof PARSE==='undefined') return;
+    const has=PARSE.text||PARSE.active||PARSE.suspended||PARSE.submitted;
+    if(!has){
+      const idx=items.findIndex(x=>x.id===CREATE_SID);
+      if(idx>=0 && !PARSE.submitted){ /* keep if was submitted already stored */ }
+      return;
+    }
+    const ex=(typeof extractFields==='function')?extractFields(PARSE.text||''):{products:[]};
+    const prod=(ex.products&&ex.products[0]||'变更').replace('ThinkPad ','');
+    let status='active';
+    if(PARSE.submitted) status='submitted';
+    else if(PARSE.histMark==='draft') status='draft';
+    else if(PARSE.histMark==='withdrawn') status='withdrawn';
+    const existing=byId(CREATE_SID);
+    const title=existing&&existing._renamed?existing.title:(prod+' CPU SKU 变更 · 解析中');
+    upsert({id:CREATE_SID,kind:'create',title,meta:statusLabel({status})||'进行中',group:'today',status,accent:'var(--accent)',_renamed:existing&&existing._renamed});
+    if(PARSE.active||PARSE.suspended) setCurrent(CREATE_SID);
+  }
+  function markCreateGone(keepIfSubmitted){
+    const s=byId(CREATE_SID);
+    if(!s){
+      document.body.classList.remove('has-parse-session');
+      if(currentId===CREATE_SID) currentId=null;
+      renderHist();
+      return;
+    }
+    if(keepIfSubmitted && (s.status==='submitted'||s.status==='withdrawn'||s.status==='draft')){
+      if(currentId===CREATE_SID) currentId=null;
+      document.body.classList.remove('has-parse-session');
+      renderHist();
+      return;
+    }
+    const idx=items.findIndex(x=>x.id===CREATE_SID);
+    if(idx>=0) items.splice(idx,1);
+    if(currentId===CREATE_SID) currentId=null;
+    document.body.classList.remove('has-parse-session');
+    renderHist();
+  }
+  function syncTask(taskId,task){
+    if(!taskId||!task) return;
+    const id='task-'+taskId;
+    const done=!!(typeof state!=='undefined' && state[taskId] && state[taskId].done);
+    upsert({
+      id,kind:'task',taskId,taskType:task.type,
+      title:task.ttl||task.name||task.pcr||'任务会话',
+      meta:done?'已完成':(task.due||'进行中'),
+      group:'today',status:done?'done':'active',
+      accent:'var(--accent)'
+    });
+    setCurrent(id);
+  }
+  function onNewChat(){
+    clearCurrent();
+  }
+  return {
+    CREATE_SID,items,byId,upsert,setCurrent,clearCurrent,activate,renderHist,renderChip,
+    syncCreateFromParse,markCreateGone,syncTask,onNewChat,closeMenu,
+    get currentId(){return currentId;},
+    init(){bindGlobal();renderHist();}
+  };
+})();
+window.Sessions=Sessions;
+
 function sendq(){const v=document.getElementById('askin').value.trim();
   if(!v){document.getElementById('askin').focus();return;}
   if(typeof PARSE!=='undefined' && PARSE.active){
@@ -550,6 +944,9 @@ function sendq(){const v=document.getElementById('askin').value.trim();
     toast('已补充信息');return;
   }
   if(typeof PARSE!=='undefined' && PARSE.createIntent){startParse(v);return;}
+  const id='ask-'+Date.now();
+  Sessions.upsert({id,kind:'ask',title:v.length>40?v.slice(0,40)+'…':v,meta:'刚刚',group:'today',pinned:false,status:null,accent:'var(--blue)'});
+  Sessions.setCurrent(id);
   toast('已新建会话：'+(v.length>16?v.slice(0,16)+'…':v));document.getElementById('askin').value='';}
 document.getElementById('askin').addEventListener('keydown',e=>{if(e.key==='Enter')sendq();});
 
@@ -568,4 +965,5 @@ document.getElementById('askin').addEventListener('keydown',e=>{if(e.key==='Ente
     if(c)setTimeout(()=>toast(`本文件携带 ${c} 条讨论结论`),700);
   }
   paintDots();
+  if(window.Sessions) Sessions.init();
 })();

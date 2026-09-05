@@ -240,8 +240,7 @@ function renderActionBar(){
   }[t.type];
   if(s.done){
     bar.style.display='flex';
-    bar.innerHTML=`<span class="ab-note" style="color:var(--agree)"><span style="color:var(--agree)">✓</span> 本任务已提交并写回 PACE</span><div class="ab-spacer"></div><button class="btn btn-ghost" data-act="reopen">重新打开</button>`;
-    bar.querySelector('[data-act=reopen]').onclick=()=>{s.done=false;renderTaskAll();};
+    bar.innerHTML=`<span class="ab-note" style="color:var(--agree)"><span style="color:var(--agree)">✓</span> 已完成 · 只读回看（不可再编辑或提交）</span><div class="ab-spacer"></div><span class="tipdot" onclick="showTip(event,'sessDone',52)">52</span>`;
     return;
   }
   bar.style.display='flex';
@@ -261,6 +260,14 @@ function renderActionBar(){
 /* ---------- wiring center interactions ---------- */
 function wireCenter(){
   const s=state[cur];
+  if(s.done){
+    document.querySelectorAll('[data-votebar] .voteopt,[data-paths] .path,textarea,.cmt-tools button').forEach(el=>{
+      el.setAttribute('disabled','disabled');
+      el.style.pointerEvents='none';
+      el.style.opacity='.72';
+    });
+    return;
+  }
   document.querySelectorAll('[data-votebar] .voteopt').forEach(b=>b.onclick=()=>{
     s.vote=b.dataset.vote;renderCenter();
   });
@@ -452,8 +459,13 @@ function toast(msg){
 })();
 
 /* ---------- render all ---------- */
-function renderTaskAll(){renderTaskList();renderCenter();renderCtx();
-  if(typeof paintDots==='function')paintDots();}
+function renderTaskAll(){
+  renderTaskList();renderCenter();renderCtx();
+  if(typeof paintDots==='function')paintDots();
+  if(window.Sessions && typeof TASKS!=='undefined' && cur && TASKS[cur]){
+    Sessions.syncTask(cur, TASKS[cur]);
+  }
+}
 
 /* MyTasks namespace for parallel ownership */
 window.MyTasks = {
@@ -462,6 +474,11 @@ window.MyTasks = {
       window.__taskInit = 1;
       renderTaskAll();
     }
+  },
+  selectTask(id) {
+    if (!id || !TASKS[id]) return;
+    cur = id;
+    renderTaskAll();
   },
   renderAll: typeof renderTaskAll === 'function' ? renderTaskAll : function () {}
 };
