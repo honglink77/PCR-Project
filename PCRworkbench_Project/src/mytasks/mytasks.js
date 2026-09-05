@@ -127,6 +127,7 @@ function renderCenter(){
   const t=TASKS[cur],s=state[cur];
   document.getElementById('centerHead').innerHTML=`
     <div class="tb-t" title="${escTask(shortTaskTitle(t))}">
+      <span class="tb-pin" title="已钉住">PCR Agent</span>
       <span class="ttype ${t.type}">${escTask(t.tt)}</span>
       <span class="tb-name">${escTask(shortTaskName(t))}</span>
     </div>
