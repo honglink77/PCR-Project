@@ -436,6 +436,45 @@
   .submit-dock .pact{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:0}
   .btn-force{font-size:12.5px;color:var(--ink-3);background:none;border:none;padding:4px 2px;text-decoration:underline;text-underline-offset:3px}
   .btn-force:hover{color:var(--warn)}
+  .submit-dock .sd-done{font-size:13.5px;color:var(--ink);line-height:1.65;margin-bottom:12px}
+  .submit-dock .sd-done .ok{color:var(--green);font-weight:600}
+  .submit-dock .sd-done .meta{font-size:12.5px;color:var(--ink-2);margin-top:4px}
+  .btn-teal-outline{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+  .btn-teal-outline:hover{background:var(--accent-soft)}
+  /* 一键填写确认弹窗（仅本弹窗样式，不影响其他 modal） */
+  .modal.fill-modal{width:min(760px,94vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;box-sizing:border-box}
+  .fill-modal *,.fill-modal *::before,.fill-modal *::after{box-sizing:border-box}
+  .fill-modal .fm-h{display:flex;align-items:flex-start;gap:7px;padding:12px 14px 8px;border-bottom:1px solid var(--border);flex:none}
+  .fill-modal .fm-ico{width:22px;height:22px;flex:none;border-radius:5px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:11px;margin-top:1px}
+  .fill-modal .fm-titles{flex:1;min-width:0}
+  .fill-modal .fm-titles h3{font-size:13.5px;font-weight:650;color:var(--ink);margin:0;letter-spacing:.01em}
+  .fill-modal .fm-titles p{font-size:11px;color:var(--ink-2);margin:2px 0 0;line-height:1.35}
+  .fill-modal .fm-x{width:26px;height:26px;border-radius:5px;color:var(--ink-3);display:grid;place-items:center;font-size:15px;flex:none}
+  .fill-modal .fm-x:hover{background:var(--soft);color:var(--ink)}
+  .fill-modal .fm-b{padding:10px 14px;overflow-x:hidden;overflow-y:auto;flex:1;min-height:0;scrollbar-width:thin}
+  .fill-modal .fm-sec{margin:0 0 10px}
+  .fill-modal .fm-sec:last-child{margin-bottom:0}
+  .fill-modal .fm-sec-t{font-size:11.5px;font-weight:600;color:var(--ink);margin:0 0 5px}
+  .fill-grid-box{border:1px solid var(--border);border-radius:5px;overflow:hidden;background:#fff;max-width:100%}
+  .fill-grid{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;border:none;font-size:11px}
+  .fill-grid td{border:1px solid var(--border);padding:4px 7px;vertical-align:middle;line-height:1.35;word-break:break-word;overflow-wrap:anywhere}
+  .fill-grid .fk{width:16%;background:#F8FAFC;color:var(--ink-2);font-weight:500;white-space:normal;font-size:10.5px}
+  .fill-grid .fv{color:#475569;background:#fff;width:auto;font-weight:400}
+  .fill-grid.fill-grid-2 .fk{width:17%}
+  .fill-grid.fill-grid-3 .fk{width:13.5%}
+  .fill-grid input,.fill-grid select,.fill-grid textarea{width:100%;max-width:100%;border:1px solid var(--border);border-radius:4px;padding:3px 6px;font:inherit;font-size:11px;color:#475569;background:#fff}
+  .fill-grid textarea{min-height:44px;resize:vertical}
+  .fill-cr{border:1px solid #99E6DE;border-radius:5px;overflow:hidden;background:#F0FDFA;max-width:100%}
+  .fill-cr table{width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px}
+  .fill-cr td{border-bottom:1px solid #C5F0EA;padding:5px 8px;vertical-align:top;line-height:1.4;word-break:break-word;overflow-wrap:anywhere}
+  .fill-cr tr:last-child td{border-bottom:none}
+  .fill-cr .crk{width:64px;color:var(--accent-ink);font-weight:600;white-space:nowrap;background:#E6FAF7;font-size:10.5px}
+  .fill-cr .crv{color:#475569;background:#F0FDFA;font-weight:400}
+  .fill-cr ul{margin:2px 0 0;padding-left:14px}
+  .fill-cr li{margin:1px 0}
+  .fill-cr textarea{width:100%;max-width:100%;min-height:48px;border:1px solid #99E6DE;border-radius:4px;padding:5px 6px;font:inherit;font-size:11px;color:#475569;background:#fff;resize:vertical}
+  .fill-modal .fm-f{padding:8px 14px 10px;display:flex;gap:7px;justify-content:flex-end;border-top:1px solid var(--border);flex:none;background:#fff;flex-wrap:nowrap}
+  .fill-modal .fm-f .btn{font-size:11.5px;padding:5px 12px;white-space:nowrap;border-radius:6px}
   .type-box{font-size:12.5px;color:var(--ink-2);line-height:1.6}
   .type-box .tb-pre{margin-bottom:10px}
   .type-box .tb-h{font-weight:600;color:var(--ink);margin:0 0 8px}
@@ -2339,7 +2378,11 @@ document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
 
 /* ---------- modals ---------- */
 const scrim=document.getElementById('scrim'),modalHost=document.getElementById('modalHost');
-function closeModal(){if(scrim)scrim.classList.remove('show');}
+function closeModal(){
+  if(scrim)scrim.classList.remove('show');
+  PARSE.fillEditing=false;
+  if(PARSE._fillEsc){document.removeEventListener('keydown',PARSE._fillEsc);PARSE._fillEsc=null;}
+}
 if(scrim)scrim.onclick=e=>{if(e.target===scrim)closeModal();};
 
 function openWriteback(alt){
@@ -2470,7 +2513,9 @@ const PARSE={
   typeConfirmed:false,pcrType:null,typePick:null,preselectedType:null,
   typeMap:null,typeMapOpen:false,typeMeta:null,
   simConfirmed:false,simDup:null,simDupHandled:false,simCases:[],
-  simRefOpen:{},simCompareOpen:false,simCompareId:null
+  simRefOpen:{},simCompareOpen:false,simCompareId:null,
+  submitted:false,pcrNumber:null,submitAt:null,histMark:null,
+  fillEditing:false,fillSnapshot:null,withdrawLog:null
 };
 const PH_ASK='问点什么，或让我分析某个产品、项目…';
 const PH_CREATE='描述你的变更需求，或粘贴邮件、会议纪要…';
@@ -2963,6 +3008,8 @@ function startParse(text){
   PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
   PARSE.typeConfirmed=false;PARSE.pcrType=null;PARSE.typePick='Hardware/SBB';
   PARSE.preselectedType=null;PARSE.typeMap=null;PARSE.typeMapOpen=false;
+  PARSE.submitted=false;PARSE.pcrNumber=null;PARSE.submitAt=null;PARSE.histMark=null;
+  PARSE.fillEditing=false;PARSE.fillSnapshot=null;PARSE.withdrawLog=null;
   applyTypeMeta('Hardware/SBB');
   initSimData(false);
   initParseFields(extractFields(PARSE.text));
@@ -2984,6 +3031,17 @@ function showParseHist(){
   const prod=(ex.products[0]||'变更').replace('ThinkPad ','');
   const title=document.getElementById('parseHistTitle');
   if(title) title.textContent=prod+' CPU SKU 变更 · 解析中';
+  updateParseHistMark();
+}
+function updateParseHistMark(){
+  const el=document.getElementById('parseHistItem');
+  if(!el)return;
+  const hm=el.querySelector('.hm');
+  if(!hm)return;
+  if(PARSE.submitted){hm.textContent='已提交';hm.className='hm live';}
+  else if(PARSE.histMark==='draft'){hm.textContent='草稿';hm.className='hm';}
+  else if(PARSE.histMark==='withdrawn'){hm.textContent='已撤回';hm.className='hm';}
+  else{hm.textContent='进行中';hm.className='hm live';}
 }
 function hideParseHist(){
   const el=document.getElementById('parseHistItem');
@@ -3023,6 +3081,8 @@ function exitParseMode(){
   PARSE.typeMap=null;PARSE.typeMapOpen=false;PARSE.typeMeta=null;
   PARSE.simConfirmed=false;PARSE.simDup=null;PARSE.simDupHandled=false;PARSE.simCases=[];
   PARSE.simRefOpen={};PARSE.simCompareOpen=false;PARSE.simCompareId=null;
+  PARSE.submitted=false;PARSE.pcrNumber=null;PARSE.submitAt=null;PARSE.histMark=null;
+  PARSE.fillEditing=false;PARSE.fillSnapshot=null;PARSE.withdrawLog=null;
   document.body.classList.remove('parsing','home-open');
   document.getElementById('askin').placeholder=PH_ASK;
   const pl=document.getElementById('plist');if(pl){pl.classList.remove('mini');pl.innerHTML='';}
@@ -3152,14 +3212,7 @@ function renderConclusion(){
   });
   html+=`</div></div>`;
   if(mustAllOk()){
-    html+=`<div class="submit-dock" id="submitDock">
-      <div class="sd-note">提交后将在 <b>PACE</b> 中创建 PCR 记录，进入 <b>Review</b> 阶段，由 LM / Portfolio / Sponsor 审核。你将在「My Tasks」中跟踪后续状态。<span class="tipdot" onclick="showTip(event,'pcrPace',43)">43</span></div>
-      <div class="pact">
-        <button class="btn btn-primary" type="button" onclick="submitPcr()">提交至 PACE</button>
-        <button class="btn-force" type="button" onclick="openPcrForce()">Force Submit</button>
-        <span class="tipdot" onclick="showTip(event,'pcrForce',41)">41</span>
-      </div>
-    </div>`;
+    html+=renderSubmitDockHtml();
   }else{
     html+=`<div class="submit-dock" style="opacity:.85"><div class="sd-note">必须项全部通过后，将在此处显示「提交至 PACE」。当前还差：${missingMustLabels().join('、')||'待确认项'}。</div></div>`;
   }
@@ -3518,10 +3571,247 @@ function finishParse(ex){
   renderConclusion();
 }
 
-function submitPcr(){
+function renderSubmitDockHtml(){
+  if(PARSE.submitted){
+    const no=PARSE.pcrNumber||'SP20260825_0002';
+    const at=PARSE.submitAt||'';
+    return `<div class="submit-dock" id="submitDock">
+      <div class="sd-done">
+        <div class="ok">✓ 已提交至 PACE · ${no}</div>
+        <div class="meta">状态：Under Review</div>
+        <div class="meta">提交时间：${at}</div>
+      </div>
+      <div class="pact">
+        <button class="btn btn-ghost" type="button" onclick="viewInMyTasks()">在 My Tasks 中查看</button>
+        <button class="btn-force" type="button" onclick="openWithdrawModal()">撤销提交</button>
+      </div>
+    </div>`;
+  }
+  return `<div class="submit-dock" id="submitDock">
+    <div class="sd-note">提交后将在 <b>PACE</b> 中创建 PCR 记录，进入 <b>Review</b> 阶段，由 LM / Portfolio / Sponsor 审核。你将在「My Tasks」中跟踪后续状态。<span class="tipdot" onclick="showTip(event,'pcrPace',43)">43</span></div>
+    <div class="pact">
+      <button class="btn btn-ghost" type="button" onclick="savePcrDraft()">存草稿</button>
+      <button class="btn btn-primary" type="button" onclick="openFillModal()">一键填写</button>
+      <button class="btn-force" type="button" onclick="openPcrForce()">Force Submit</button>
+      <span class="tipdot" onclick="showTip(event,'pcrForce',41)">41</span>
+    </div>
+  </div>`;
+}
+
+function defaultFillData(){
+  const ex=extractFields(PARSE.text||'');
+  const prod=ex.products[0]||'ThinkPad T14p Gen 5';
+  const typ=PARSE.pcrType||PARSE.typePick||'Hardware/SBB';
+  const geo=(PARSE.fields&&PARSE.fields.geo&&PARSE.fields.geo.val)||'PRC';
+  const bc=(PARSE.fields&&PARSE.fields.bc&&PARSE.fields.bc.val)||'Marketing Request';
+  const target=(PARSE.fields&&PARSE.fields.target&&PARSE.fields.target.val)||'2026-08-25';
+  return {
+    pcrNumber:'SP20260825_0002',
+    pcrName:'Change X9 12Xe vPro (MS5) to X9 12Xe non-vPro (T6) on T14p',
+    proposer:'test@lenovo.com',
+    products:prod,
+    pcrType:typ,
+    bg:'Intel 已确认，Nova Lake 产品范围内将提供一款 X9 12Xe non-vPro 处理器。',
+    reason:'与原规划的 X9 12Xe vPro（MS5）相比，新处理器：\n• 成本更低；\n• 性能保持一致。',
+    request:'请在 CPU 清单中：\n• 移除原有的 X9 12Xe vPro（MS5）SKU；\n• 替换为 X9 12Xe non-vPro（T6）SKU。',
+    impact:'本次替换：\n• 不增加 PCBA 总数量；\n• 不产生额外 NRE 费用。',
+    createdOn:'2026-08-25 10:49:13',
+    otm:'test@lenovo.com',
+    sponsor:'test29@lenovo.com',
+    pm:'test@lenovo.com',
+    cpTeam:prod,
+    category:'ThinkPad_Commercial',
+    businessCase:bc,
+    geo:geo,
+    targetDate:target
+  };
+}
+function getFillData(){return PARSE.fillSnapshot?JSON.parse(JSON.stringify(PARSE.fillSnapshot)):defaultFillData();}
+function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function formatCrHtml(text){
+  const lines=String(text||'').split(/\n/).map(l=>l.trim()).filter(Boolean);
+  if(!lines.length) return '';
+  const bullets=lines.filter(l=>/^•|^-/.test(l));
+  const lead=lines.filter(l=>!/^•|^-/.test(l));
+  let h=lead.map(l=>escHtml(l)).join('<br>');
+  if(bullets.length) h+=(h?'<br>':'')+'<ul>'+bullets.map(l=>`<li>${escHtml(l.replace(/^[•\-]\s*/,''))}</li>`).join('')+'</ul>';
+  return h;
+}
+
+function openFillModal(){
+  if(PARSE.simDup&&!PARSE.simDupHandled){toast('存在完全重复的在途 PCR，请先处理');return;}
+  PARSE.fillEditing=false;
+  if(!PARSE.fillSnapshot) PARSE.fillSnapshot=defaultFillData();
+  renderFillModal();
+}
+function renderFillModal(){
+  const d=getFillData();
+  const edit=PARSE.fillEditing;
+  const body=edit?fillModalEditHtml(d):fillModalReadHtml(d);
+  const foot=edit
+    ? `<button class="btn btn-ghost" type="button" data-cancel-edit>取消修改</button>
+       <button class="btn btn-primary" type="button" data-save-submit>保存并提交</button>`
+    : `<button class="btn btn-ghost" type="button" data-draft>存草稿</button>
+       <button class="btn btn-primary" type="button" data-submit>提交至 PACE</button>
+       <button class="btn btn-teal-outline" type="button" data-edit>修改并提交</button>`;
+  modalHost.innerHTML=`<div class="modal fill-modal" role="dialog" aria-modal="true">
+    <div class="fm-h">
+      <div class="fm-ico">✦</div>
+      <div class="fm-titles"><h3>Confirm Content</h3><p>请确认以下信息，提交前可修改</p></div>
+      <button type="button" class="fm-x" data-x title="关闭">×</button>
+    </div>
+    <div class="fm-b">${body}</div>
+    <div class="fm-f">${foot}</div>
+  </div>`;
+  scrim.classList.add('show');
+  const root=modalHost.querySelector('.fill-modal');
+  root.querySelector('[data-x]').onclick=closeModal;
+  const draftBtn=root.querySelector('[data-draft]');
+  if(draftBtn) draftBtn.onclick=()=>savePcrDraft(true);
+  const subBtn=root.querySelector('[data-submit]');
+  if(subBtn) subBtn.onclick=()=>submitFromFill(false);
+  const editBtn=root.querySelector('[data-edit]');
+  if(editBtn) editBtn.onclick=()=>{PARSE.fillEditing=true;renderFillModal();};
+  const cancelBtn=root.querySelector('[data-cancel-edit]');
+  if(cancelBtn) cancelBtn.onclick=()=>{PARSE.fillEditing=false;renderFillModal();toast('已取消修改');};
+  const saveBtn=root.querySelector('[data-save-submit]');
+  if(saveBtn) saveBtn.onclick=()=>submitFromFill(true);
+  if(PARSE._fillEsc) document.removeEventListener('keydown',PARSE._fillEsc);
+  PARSE._fillEsc=e=>{if(e.key==='Escape') closeModal();};
+  document.addEventListener('keydown',PARSE._fillEsc);
+}
+function fillModalReadHtml(d){
+  return `<div class="fm-sec"><div class="fm-sec-t">基础信息</div>
+    <div class="fill-grid-box"><table class="fill-grid fill-grid-2">
+      <tr><td class="fk">PCR Number</td><td class="fv">${escHtml(d.pcrNumber)}</td><td class="fk">PCR Name</td><td class="fv">${escHtml(d.pcrName)}</td></tr>
+      <tr><td class="fk">Proposer</td><td class="fv">${escHtml(d.proposer)}</td><td class="fk">Impacted Products</td><td class="fv">${escHtml(d.products)}</td></tr>
+      <tr><td class="fk">PCR Type</td><td class="fv" colspan="3">${escHtml(d.pcrType)}</td></tr>
+    </table></div></div>
+    <div class="fm-sec"><div class="fm-sec-t">Change Request</div>
+    <div class="fill-cr"><table>
+      <tr><td class="crk">背景</td><td class="crv">${formatCrHtml(d.bg)}</td></tr>
+      <tr><td class="crk">变更原因</td><td class="crv">${formatCrHtml(d.reason)}</td></tr>
+      <tr><td class="crk">变更请求</td><td class="crv">${formatCrHtml(d.request)}</td></tr>
+      <tr><td class="crk">影响说明</td><td class="crv">${formatCrHtml(d.impact)}</td></tr>
+    </table></div></div>
+    <div class="fm-sec"><div class="fm-sec-t">其他信息</div>
+    <div class="fill-grid-box"><table class="fill-grid fill-grid-3">
+      <tr><td class="fk">Created On</td><td class="fv">${escHtml(d.createdOn)}</td><td class="fk">OTM</td><td class="fv">${escHtml(d.otm)}</td><td class="fk">Sponsor</td><td class="fv">${escHtml(d.sponsor)}</td></tr>
+      <tr><td class="fk">Product Manager</td><td class="fv">${escHtml(d.pm)}</td><td class="fk">CP Team</td><td class="fv">${escHtml(d.cpTeam)}</td><td class="fk">Product Category</td><td class="fv">${escHtml(d.category)}</td></tr>
+      <tr><td class="fk">Business Case Reason</td><td class="fv">${escHtml(d.businessCase)}</td><td class="fk">Geo Impact</td><td class="fv">${escHtml(d.geo)}</td><td class="fk">Target Implementation Date</td><td class="fv">${escHtml(d.targetDate)}</td></tr>
+    </table></div></div>`;
+}
+function fillModalEditHtml(d){
+  const types=PCR_TYPES.map(t=>`<option value="${t}" ${t===d.pcrType?'selected':''}>${t}</option>`).join('');
+  const bcs=['Marketing Request','Cost Saving','Quality','Customer Request','Other'].map(t=>`<option value="${t}" ${t===d.businessCase?'selected':''}>${t}</option>`).join('');
+  const geos=['PRC','WW','EMEA','NA','LA','AP'].map(t=>`<option value="${t}" ${t===d.geo?'selected':''}>${t}</option>`).join('');
+  return `<div class="fm-sec"><div class="fm-sec-t">基础信息</div>
+    <div class="fill-grid-box"><table class="fill-grid fill-grid-2">
+      <tr><td class="fk">PCR Number</td><td class="fv"><input data-f="pcrNumber" value="${escHtml(d.pcrNumber)}"></td>
+          <td class="fk">PCR Name</td><td class="fv"><input data-f="pcrName" value="${escHtml(d.pcrName)}"></td></tr>
+      <tr><td class="fk">Proposer</td><td class="fv"><input data-f="proposer" value="${escHtml(d.proposer)}"></td>
+          <td class="fk">Impacted Products</td><td class="fv"><input data-f="products" value="${escHtml(d.products)}"></td></tr>
+      <tr><td class="fk">PCR Type</td><td class="fv" colspan="3"><select data-f="pcrType">${types}</select></td></tr>
+    </table></div></div>
+    <div class="fm-sec"><div class="fm-sec-t">Change Request</div>
+    <div class="fill-cr"><table>
+      <tr><td class="crk">背景</td><td class="crv"><textarea data-f="bg">${escHtml(d.bg)}</textarea></td></tr>
+      <tr><td class="crk">变更原因</td><td class="crv"><textarea data-f="reason">${escHtml(d.reason)}</textarea></td></tr>
+      <tr><td class="crk">变更请求</td><td class="crv"><textarea data-f="request">${escHtml(d.request)}</textarea></td></tr>
+      <tr><td class="crk">影响说明</td><td class="crv"><textarea data-f="impact">${escHtml(d.impact)}</textarea></td></tr>
+    </table></div></div>
+    <div class="fm-sec"><div class="fm-sec-t">其他信息</div>
+    <div class="fill-grid-box"><table class="fill-grid fill-grid-3">
+      <tr><td class="fk">Created On</td><td class="fv"><input data-f="createdOn" value="${escHtml(d.createdOn)}"></td>
+          <td class="fk">OTM</td><td class="fv"><input data-f="otm" value="${escHtml(d.otm)}"></td>
+          <td class="fk">Sponsor</td><td class="fv"><input data-f="sponsor" value="${escHtml(d.sponsor)}"></td></tr>
+      <tr><td class="fk">Product Manager</td><td class="fv"><input data-f="pm" value="${escHtml(d.pm)}"></td>
+          <td class="fk">CP Team</td><td class="fv"><input data-f="cpTeam" value="${escHtml(d.cpTeam)}"></td>
+          <td class="fk">Product Category</td><td class="fv"><input data-f="category" value="${escHtml(d.category)}"></td></tr>
+      <tr><td class="fk">Business Case Reason</td><td class="fv"><select data-f="businessCase">${bcs}</select></td>
+          <td class="fk">Geo Impact</td><td class="fv"><select data-f="geo">${geos}</select></td>
+          <td class="fk">Target Implementation Date</td><td class="fv"><input type="date" data-f="targetDate" value="${escHtml(String(d.targetDate||'').slice(0,10))}"></td></tr>
+    </table></div></div>`;
+}
+function collectFillForm(){
+  const root=modalHost.querySelector('.fill-modal');
+  if(!root) return getFillData();
+  const d=getFillData();
+  root.querySelectorAll('[data-f]').forEach(el=>{d[el.getAttribute('data-f')]=el.value;});
+  return d;
+}
+function savePcrDraft(fromModal){
+  if(fromModal&&PARSE.fillEditing) PARSE.fillSnapshot=collectFillForm();
+  else if(fromModal) PARSE.fillSnapshot=getFillData();
+  else if(!PARSE.fillSnapshot) PARSE.fillSnapshot=defaultFillData();
+  PARSE.histMark='draft';
+  PARSE.submitted=false;
+  updateParseHistMark();
+  closeModal();
+  renderConclusion();
+  toast('草稿已保存');
+}
+function submitFromFill(fromEdit){
   if(PARSE.simDup&&!PARSE.simDupHandled){toast('存在完全重复的在途 PCR，不可提交');return;}
-  if(!mustAllOk()){toast('请先补全必须项');return;}
-  toast('已提交至 PACE · 进入 Review');exitParseMode();
+  let d=fromEdit?collectFillForm():getFillData();
+  if(fromEdit){
+    const prev=PARSE.fillSnapshot||defaultFillData();
+    if(d.pcrType!==prev.pcrType||d.targetDate!==prev.targetDate){
+      toast('已修改关键字段（Type / 目标日），请确认后提交');
+    }
+  }
+  PARSE.fillSnapshot=d;
+  PARSE.pcrNumber=d.pcrNumber||'SP20260825_0002';
+  PARSE.submitAt=new Date().toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}).replace(/\//g,'-');
+  PARSE.submitted=true;
+  PARSE.histMark='submitted';
+  PARSE.fillEditing=false;
+  if(PARSE.fields){
+    if(d.geo){PARSE.fields.geo.val=d.geo;PARSE.fields.geo.k='ok';PARSE.fields.geo.d=d.geo;}
+    if(d.businessCase){PARSE.fields.bc.val=d.businessCase;PARSE.fields.bc.k='ok';PARSE.fields.bc.d=d.businessCase;}
+    if(d.targetDate){PARSE.fields.target.val=d.targetDate;PARSE.fields.target.k='ok';PARSE.fields.target.d=d.targetDate;}
+  }
+  if(d.pcrType){PARSE.pcrType=d.pcrType;PARSE.typeConfirmed=true;PARSE.typePick=d.pcrType;}
+  updateParseHistMark();
+  closeModal();
+  renderConclusion();
+  toast('已提交至 PACE · '+PARSE.pcrNumber);
+}
+function viewInMyTasks(){
+  switchView('task');
+  toast('已切换到 My Tasks');
+}
+function openWithdrawModal(){
+  modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>撤销提交？</h3>
+    <p>PCR ${PARSE.pcrNumber||''} 将从 Review 流程中撤回，状态回退为 Draft，已通知的审核人将收到撤回通知。</p></div>
+    <div class="modal-b">
+      <div class="modal-note" style="color:var(--amber);margin:0 0 10px">⚠ 若已有审核人开始处理，撤销可能失败。</div>
+      <label style="font-size:12.5px;font-weight:600;color:var(--ink)">撤销原因（必填）</label>
+      <textarea class="reason" id="withdrawReason" placeholder="请说明撤销原因…"></textarea>
+    </div>
+    <div class="modal-f">
+      <button class="btn btn-ghost" data-x>取消</button>
+      <button class="btn btn-primary" data-ok disabled>确认撤销</button>
+    </div></div>`;
+  scrim.classList.add('show');
+  const ta=modalHost.querySelector('#withdrawReason');
+  const ok=modalHost.querySelector('[data-ok]');
+  modalHost.querySelector('[data-x]').onclick=closeModal;
+  ta.oninput=()=>{ok.disabled=!ta.value.trim();};
+  ok.onclick=()=>{
+    const r=ta.value.trim();if(!r)return;
+    PARSE.withdrawLog={by:'test@lenovo.com',at:new Date().toISOString(),reason:r,pcr:PARSE.pcrNumber};
+    PARSE.submitted=false;PARSE.histMark='withdrawn';
+    updateParseHistMark();
+    closeModal();
+    renderConclusion();
+    toast('流程已撤回，状态回退为 Draft');
+  };
+}
+
+function submitPcr(){
+  /* 兼容旧调用：改为打开一键填写弹窗 */
+  openFillModal();
 }
 function openPcrForce(){
   modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>Force Submit</h3><p>存在警告项时的强制提交，需填写理由并留痕</p></div>
@@ -3550,6 +3840,9 @@ window.confirmPcrType=confirmPcrType;window.selectTypeOpt=selectTypeOpt;window.o
 window.toggleTypeMapDetail=toggleTypeMapDetail;
 window.confirmSimRef=confirmSimRef;window.toggleSimRef=toggleSimRef;window.toggleSimCompare=toggleSimCompare;
 window.setSimDuplicate=setSimDuplicate;window.explainSimDiff=explainSimDiff;window.viewDupPcr=viewDupPcr;
+window.openFillModal=openFillModal;window.savePcrDraft=savePcrDraft;window.submitFromFill=submitFromFill;
+window.openWithdrawModal=openWithdrawModal;window.viewInMyTasks=viewInMyTasks;window.closeModal=closeModal;
+window.submitPcr=submitPcr;
 </script>
 </body>
 </html>

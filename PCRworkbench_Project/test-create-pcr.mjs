@@ -349,8 +349,77 @@ try {
   });
   check('操作后字段与清单同步', afterFix.mustOk && afterFix.bc === 'ok' && afterFix.geo === 'WW', JSON.stringify(afterFix));
   check('补全后步骤 3 变为 ✓ 结论摘要', afterFix.fSt === 'done' && !/还差/.test(afterFix.fSum), afterFix.fSum);
-  check('提交按钮出现在对话区末尾', afterFix.hasDock && afterFix.dockInChat && !afterFix.dockInSticky);
+  check('提交区在对话末尾且主按钮为一键填写', await page.evaluate(() => {
+    const dock = document.querySelector('#parseChat #submitDock');
+    const primary = dock?.querySelector('.btn-primary');
+    return !!(dock && primary && /一键填写/.test(primary.textContent) &&
+      /存草稿/.test(dock.innerText) && dock.querySelector('.btn-force') &&
+      !/提交至 PACE/.test([...dock.querySelectorAll('.pact .btn')].map(b => b.textContent).join('|')));
+  }));
   check('Force Submit 弱化为文字链', afterFix.forceIsLink);
+
+  // 一键填写弹窗
+  await page.evaluate(() => openFillModal());
+  const fillUi = await page.evaluate(() => {
+    const m = document.querySelector('.fill-modal');
+    const txt = m?.innerText || '';
+    return {
+      open: !!m && document.getElementById('scrim').classList.contains('show'),
+      hasBasic: /基础信息/.test(txt) && /PCR Number/.test(txt),
+      hasCr: /Change Request/.test(txt) && /背景/.test(txt) && /变更原因/.test(txt) && /变更请求/.test(txt) && /影响说明/.test(txt),
+      hasOther: /其他信息/.test(txt) && /Geo Impact/.test(txt),
+      hasBtns: /存草稿/.test(txt) && /提交至 PACE/.test(txt) && /修改并提交/.test(txt),
+      crStyled: !!document.querySelector('.fill-cr')
+    };
+  });
+  check('一键填写弹窗结构完整', fillUi.open && fillUi.hasBasic && fillUi.hasCr && fillUi.hasOther && fillUi.hasBtns && fillUi.crStyled, JSON.stringify(fillUi));
+  check('弹窗标题为 Confirm Content 且无横向溢出', await page.evaluate(() => {
+    const m = document.querySelector('.fill-modal');
+    const b = m?.querySelector('.fm-b');
+    if (!m || !b) return false;
+    const titleOk = /Confirm Content/.test(m.querySelector('h3')?.textContent || '');
+    const noHScroll = b.scrollWidth <= b.clientWidth + 1;
+    return titleOk && noHScroll;
+  }));
+
+  await page.evaluate(() => {
+    document.querySelector('.fill-modal [data-edit]')?.click();
+  });
+  check('修改并提交进入可编辑态', await page.evaluate(() => {
+    const m = document.querySelector('.fill-modal');
+    return PARSE.fillEditing && !!m?.querySelector('textarea[data-f="bg"]') &&
+      /取消修改/.test(m.innerText) && /保存并提交/.test(m.innerText);
+  }));
+  await page.evaluate(() => {
+    document.querySelector('.fill-modal [data-cancel-edit]')?.click();
+  });
+  check('取消修改退回只读预览', await page.evaluate(() => !PARSE.fillEditing && !!document.querySelector('.fill-modal [data-submit]')));
+
+  await page.evaluate(() => submitFromFill(false));
+  const afterSubmit = await page.evaluate(() => {
+    const dock = document.getElementById('submitDock');
+    const hist = document.getElementById('parseHistItem')?.innerText || '';
+    return {
+      submitted: PARSE.submitted,
+      parsing: document.body.classList.contains('parsing'),
+      hasDone: /已提交至 PACE/.test(dock?.innerText || ''),
+      hasWithdraw: /撤销提交/.test(dock?.innerText || ''),
+      histOk: /已提交/.test(hist)
+    };
+  });
+  check('提交后底部显示状态且可撤销', afterSubmit.submitted && afterSubmit.parsing && afterSubmit.hasDone && afterSubmit.hasWithdraw && afterSubmit.histOk, JSON.stringify(afterSubmit));
+
+  await page.evaluate(() => openWithdrawModal());
+  check('撤销原因未填时确认禁用', await page.evaluate(() => {
+    const ok = document.querySelector('#modalHost [data-ok]');
+    return ok && ok.disabled;
+  }));
+  await page.type('#withdrawReason', '演示撤回');
+  await page.click('#modalHost [data-ok]');
+  check('撤销后恢复按钮区', await page.evaluate(() => {
+    const dock = document.getElementById('submitDock');
+    return !PARSE.submitted && /一键填写/.test(dock?.innerText || '') && /已撤回/.test(document.getElementById('parseHistItem')?.innerText || '');
+  }));
 
   // Force Submit requires reason
   await page.evaluate(() => openPcrForce());
