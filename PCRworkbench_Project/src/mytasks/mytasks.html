@@ -1,10 +1,41 @@
 <div id="view-task" class="view-task" style="display:none">
 <div class="cols">
-    <!-- CENTER -->
+    <!-- CENTER：对话形态（与 Create PCR 一致） -->
     <main class="center">
-      <div id="centerHead"></div>
+      <div class="task-bar" id="centerHead"></div>
       <div class="center-body" id="centerBody"></div>
-      <div class="actionbar" id="actionbar" style="display:none"></div>
+      <div class="askwrap task-askwrap" id="taskAskwrap">
+        <div class="ask">
+          <div style="position:relative">
+            <span class="tipdot abs" onclick="showTip(event,'taskChat',53)">53</span>
+            <span class="tipdot abs" style="right:14px" onclick="showTip(event,'askOne',56)">56</span>
+          </div>
+          <div class="guide" id="taskGuide">
+            <div class="guide-g">提问与分析 <span>围绕当前任务追问</span></div>
+            <button class="guide-i" type="button" data-tq="为什么参考 X1 Carbon G12 那条案例">为什么参考 X1 Carbon G12 那条案例</button>
+            <button class="guide-i" type="button" data-tq="如果我投 Disagree，后续会怎么走">如果我投 Disagree，后续会怎么走</button>
+            <button class="guide-i" type="button" data-tq="Schedule 影响这条校验具体要补什么">Schedule 影响这条校验具体要补什么</button>
+            <button class="guide-i" type="button" data-tq="历史上同类换代有没有出过 BIOS 兼容问题">历史上同类换代有没有出过 BIOS 兼容问题</button>
+          </div>
+          <div class="ask-stack">
+            <div class="plusmenu" id="taskPlusmenu">
+              <button type="button" data-tp="comment"><span class="pm-t">✎ 修改 Comment 草稿</span><span class="pm-s">让 AI 改写上方草稿</span></button>
+              <div class="pm-div"></div>
+              <button type="button" data-tp="sim"><span class="pm-t">🔍 查询相似案例</span><span class="pm-s">补充可比 PCR</span></button>
+              <div class="pm-div"></div>
+              <button type="button" data-tp="valid"><span class="pm-t">ⓘ 解释校验项</span><span class="pm-s">Schedule / Evidence 等</span></button>
+              <div class="pm-div"></div>
+              <button type="button" data-tp="file"><span class="pm-t">📎 上传附件</span><span class="pm-s">证据 / 邮件 / 截图</span></button>
+            </div>
+            <div class="askbox" id="taskAskbox">
+              <button class="plusbtn" id="taskPlusbtn" type="button" title="更多">+</button>
+              <textarea class="askin" id="taskAskin" rows="1" placeholder="补充信息…"></textarea>
+              <button class="send" id="taskSend" type="button"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
+            </div>
+          </div>
+          <input type="file" id="taskfile" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.eml,.msg,.txt" style="display:none">
+        </div>
+      </div>
     </main>
 
     <!-- RIGHT -->

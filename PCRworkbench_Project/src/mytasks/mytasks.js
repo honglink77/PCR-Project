@@ -51,15 +51,55 @@ const EVI={
 };
 
 /* ---------- state ---------- */
-let cur='t1', filter='all';
-const state={}; // per task: {vote, path, done}
-ORDER.forEach(id=>state[id]={vote:null,path:null,done:false});
+let cur='t1', filter='all', taskQ='';
+const state={}; // per task: {vote, path, done, chat, comment}
+ORDER.forEach(id=>state[id]={vote:null,path:null,done:false,chat:[],comment:null});
+
+const DEFAULT_COMMENT={
+  vote:`开发侧确认：本次由 Ultra 155U 换代至 165U 为同封装、同供电 pin-to-pin 替代，主板无硬件改动。已核对参考机型 X1 Carbon G12（PCR-2025-07612）同类换代结论为无影响。
+
+需补充：① BIOS microcode 版本与兼容性验证计划；② 换代后满载功耗与散热余量的验证数据。`,
+  eval:`巴西（ANATEL）与印度（BIS）认证均需本地实验室送测。基于同平台历史记录，ANATEL 约 4–6 周、BIS 约 6–8 周，存在并行送测可能。
+
+结论建议：可行，但目标实施日 2026-12-20 偏紧，建议将认证列为关键路径并预留缓冲。`,
+  rev:`方向认可：三风扇方案对旗舰游戏本的满载散热与噪声有实质收益。建议明确：① 相对现方案的成本增量区间；② 是否影响整机厚度与重量指标。`,
+  otm:'',
+  wi:''
+};
+
+function shortTaskName(t){
+  const raw=(t.name||t.ttl||'').replace(/^ThinkPad\s+/i,'').replace(/^ThinkCentre\s+/i,'').replace(/^ThinkSystem\s+/i,'');
+  return raw.length>28?raw.slice(0,28)+'…':raw;
+}
+function shortTaskTitle(t){
+  return `${t.tt} · ${shortTaskName(t)}`;
+}
+function commentText(t,s){
+  if(s.comment!=null && s.comment!=='') return s.comment;
+  return DEFAULT_COMMENT[t.type]||'';
+}
+function escTask(t){return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');}
+
+function matchTaskQuery(id,q){
+  if(!q) return true;
+  const t=TASKS[id];
+  const hay=[t.ttl,t.name,t.pcr,t.product,t.tt,t.type].join(' ').toLowerCase();
+  return hay.includes(q);
+}
+function filteredTaskIds(){
+  const q=taskQ.trim().toLowerCase();
+  return ORDER.filter(id=>{
+    if(filter!=='all' && TASKS[id].type!==filter) return false;
+    return matchTaskQuery(id,q);
+  });
+}
 
 /* ---------- render left ---------- */
 function renderTaskList(){
   const host=document.getElementById('tasklist');
-  const items=ORDER.filter(id=>filter==='all'||TASKS[id].type===filter);
-  document.getElementById('taskCount').textContent=items.length;
+  const items=filteredTaskIds();
+  const countEl=document.getElementById('taskCount');
+  if(countEl) countEl.textContent=items.length;
   host.innerHTML=items.map(id=>{
     const t=TASKS[id],s=state[id];
     return `<div class="task ${id===cur?'active':''} ${s.done?'done':''}" data-id="${id}">
@@ -78,49 +118,97 @@ function renderTaskList(){
         <span class="due ${t.late?'late':''}">${s.done?'已完成':t.due}</span>
       </div>
     </div>`;
-  }).join('');
+  }).join('') || `<div class="task-empty">无匹配任务</div>`;
   host.querySelectorAll('.task').forEach(el=>el.onclick=()=>{cur=el.dataset.id;renderTaskAll();});
 }
 
-/* ---------- render center ---------- */
+/* ---------- render center（对话形态） ---------- */
 function renderCenter(){
   const t=TASKS[cur],s=state[cur];
   document.getElementById('centerHead').innerHTML=`
-    <div class="center-head">
-      <div class="ch-row1"><span class="pcr mono">${t.pcr}</span><span class="stat">${t.status}</span></div>
-      <h1>${t.name}</h1>
-      <div class="ch-sub"><span>${t.tt} Task</span>·<span>${t.func}</span>·<span>目标实施日 ${t.date}</span></div>
+    <div class="tb-t" title="${escTask(shortTaskTitle(t))}">
+      <span class="ttype ${t.type}">${escTask(t.tt)}</span>
+      <span class="tb-name">${escTask(shortTaskName(t))}</span>
+    </div>
+    <button type="button" class="tb-more" id="taskFlowBtn" title="流程操作">▾</button>
+    <span class="tipdot" onclick="showTip(event,'flowVsSess',57)">57</span>
+    <div class="task-flowmenu" id="taskFlowMenu">
+      <button type="button" data-flow="pace">↗  在 PACE 中打开</button>
+      <button type="button" data-flow="reassign">⇄  转派他人</button>
+      <button type="button" data-flow="pending">⏸  标记 Pending</button>
+      <button type="button" data-flow="full">▤  查看完整 PCR</button>
     </div>`;
-  const body=document.getElementById('centerBody');
-  body.innerHTML={vote:voteView,eval:evalView,otm:otmView,rev:revView,wi:wiView}[t.type](t,s);
+  const cards={vote:voteCards,eval:evalCards,otm:otmCards,rev:revCards,wi:wiCards}[t.type](t,s);
+  const lead={
+    vote:`我已读取该 PCR 的变更详情与产品范围，并按 <b>${t.func} 的 Vote 输入标准</b>做了完整性检查。下方是我生成的 Comment 草稿——<span class="muted">你可以直接编辑，确认后才会写回 PACE。</span><span class="tipdot" onclick="showTip(event,'agent',23)">23</span>`,
+    eval:`这是一个 <b>Evaluation Task</b>——以专项分析与证据为主。我整理了关键评估点与历史周期数据供你填写结论。`,
+    otm:`5 个职能的评估已基本回收。我按 PCR Type 模板汇总了 Vote 分布、成本、风险与未决项——<b>处理路径由你决定</b>。`,
+    rev:`我把这条 PCR 的变更详情、产品范围与附件做了摘要。<b>Approve / Return / Reject 由你决定</b>。`,
+    wi:`这条 PCR 有 3 项已下发的 Work Item。我按 Target Date 与回写状态做了异常识别——<b>1 项已逾期</b>。`
+  }[t.type];
+  const dock=taskDockHtml(t,s);
+  const follow=(s.chat||[]).map(m=>{
+    if(m.role==='user') return `<div class="bub me">${escTask(m.text)}</div>`;
+    return `<div class="ai-lead task-follow"><div class="ai">AI</div><div class="txt">${m.html||escTask(m.text)}</div></div>`;
+  }).join('');
+  document.getElementById('centerBody').innerHTML=`
+    <div class="task-thread" id="taskThread">
+      <div class="task-ai">
+        <div class="ai-lead"><div class="ai">AI</div><div class="txt">${lead}</div></div>
+        ${cards}
+        ${dock}
+      </div>
+      ${follow}
+    </div>`;
   wireCenter();
-  renderActionBar();
+  bindTaskAskOnce();
+  const body=document.getElementById('centerBody');
+  if(body) body.scrollTop=body.scrollHeight;
 }
 
-function voteView(t,s){return `
-  <div class="agent"><div class="ai">AI</div><div class="txt"><span class="tipdot" onclick="showTip(event,'agent',23)">23</span>
-    我已读取该 PCR 的变更详情与产品范围，并按 <b>${t.func} 的 Vote 输入标准</b>做了完整性检查。下方是我生成的 Comment 草稿——<span class="muted">你可以直接编辑，确认后才会写回 PACE。</span>
-  </div></div>
+function taskDockHtml(t,s){
+  const cfg={
+    vote:{note:'AI 建议仅为草稿，确认后写回 PACE',primary:'确认并写回 Vote',ready:!!s.vote,force:true},
+    eval:{note:'存在阻断性校验项，需补充 Evidence',primary:'提交评估结论',ready:false,force:true},
+    otm:{note:'处理路径与 Work Item 需你确认后才在 PACE 生效',primary:'确认处理决策',ready:!!s.path,force:false},
+    rev:{note:'最终审核动作由你决定',primary:'Approve',ready:true,force:false,extra:['Return','Reject']},
+    wi:{note:'升级动作将通知 Assignee 及其负责人',primary:'升级逾期项',ready:true,force:false},
+  }[t.type];
+  if(s.done){
+    return `<div class="submit-dock"><div class="sd-done"><div class="ok">✓ 已完成 · 只读回看（不可再编辑或提交）</div></div>
+      <span class="tipdot" onclick="showTip(event,'sessDone',52)">52</span>
+      <span class="tipdot" onclick="showTip(event,'taskActs',54)">54</span></div>`;
+  }
+  const extra=(cfg.extra||[]).map(x=>`<button class="btn btn-ghost" type="button" data-act="alt">${x}</button>`).join('');
+  return `<div class="submit-dock">
+    <div class="sd-note">${cfg.note}<span class="tipdot" onclick="showTip(event,'taskActs',54)">54</span></div>
+    <div class="pact">
+      <button class="btn btn-primary" type="button" data-act="primary" ${cfg.ready?'':'disabled'}>${cfg.primary}</button>
+      ${extra}
+      ${cfg.force?`<button class="btn-force" type="button" data-act="force">Force Submit</button><span class="tipdot" onclick="showTip(event,'force',27)">27</span>`:''}
+      <span class="tipdot" onclick="showTip(event,'write',34)">34</span>
+    </div>
+  </div>`;
+}
 
+function voteCards(t,s){
+  const cmt=commentText(t,s);
+  return `
   <div class="block">
     <div class="block-h"><h4>Comment 草稿</h4><span class="tipdot" onclick="showTip(event,'draft',24)">24</span><span class="draft">AI 草稿 · 未提交</span>
-      <div class="right"><button class="minibtn" data-act="regen">重新生成</button></div></div>
-    <div class="block-b"><div class="comment edit" contenteditable="true">开发侧确认：本次由 Ultra 155U 换代至 165U 为同封装、同供电 pin-to-pin 替代，主板无硬件改动。已核对参考机型 X1 Carbon G12（PCR-2025-07612）同类换代结论为无影响。
-
-需补充：① BIOS microcode 版本与兼容性验证计划；② 换代后满载功耗与散热余量的验证数据。</div></div>
+      <div class="right"><button class="minibtn" data-act="regen" type="button">重新生成</button></div></div>
+    <div class="block-b"><div class="comment edit" contenteditable="${s.done?'false':'true'}">${escTask(cmt).replace(/\n/g,'<br>')}</div></div>
   </div>
-
   <div class="block">
     <div class="block-h"><h4>你的 Vote 立场</h4><span class="tipdot" onclick="showTip(event,'vote',25)">25</span></div>
     <div class="block-b">
       <div class="votebar" data-votebar>
-        <button class="voteopt ${s.vote==='agree'?'sel-agree':''}" data-vote="agree"><div class="vt">Agree</div><div class="vd">同意变更</div></button>
-        <button class="voteopt ${s.vote==='dis'?'sel-dis':''}" data-vote="dis"><div class="vt">Disagree</div><div class="vd">存在阻碍</div></button>
-        <button class="voteopt ${s.vote==='ni'?'sel-ni':''}" data-vote="ni"><div class="vt">No Impact</div><div class="vd">无影响</div></button>
+        <button class="voteopt ${s.vote==='agree'?'sel-agree':''}" data-vote="agree" type="button"><div class="vt">Agree</div><div class="vd">同意变更</div></button>
+        <button class="voteopt ${s.vote==='dis'?'sel-dis':''}" data-vote="dis" type="button"><div class="vt">Disagree</div><div class="vd">存在阻碍</div></button>
+        <button class="voteopt ${s.vote==='ni'?'sel-ni':''}" data-vote="ni" type="button"><div class="vt">No Impact</div><div class="vd">无影响</div></button>
       </div>
     </div>
   </div>
-
   <div class="block">
     <div class="block-h"><h4>提交前校验</h4><span class="tipdot" onclick="showTip(event,'valid',26)">26</span><span class="tag ${s.vote?'':'ni'}" style="margin-left:auto">${s.vote?'2 通过 · 1 警告':'待投票'}</span></div>
     <div class="block-b"><div class="valid">
@@ -131,15 +219,12 @@ function voteView(t,s){return `
   </div>`;
 }
 
-function evalView(t,s){return `
-  <div class="agent"><div class="ai">AI</div><div class="txt">
-    这是一个 <b>Evaluation Task</b>——以专项分析与证据为主，不套用 Agree/Disagree 选项。我整理了认证范围扩展的关键评估点与历史周期数据供你填写结论。
-  </div></div>
+function evalCards(t,s){
+  const cmt=commentText(t,s);
+  return `
   <div class="block">
     <div class="block-h"><h4>专项分析草稿</h4><span class="draft">AI 草稿</span></div>
-    <div class="block-b"><div class="comment edit" contenteditable="true">巴西（ANATEL）与印度（BIS）认证均需本地实验室送测。基于同平台历史记录，ANATEL 约 4–6 周、BIS 约 6–8 周，存在并行送测可能。
-
-结论建议：可行，但目标实施日 2026-12-20 偏紧，建议将认证列为关键路径并预留缓冲。</div></div>
+    <div class="block-b"><div class="comment edit" contenteditable="${s.done?'false':'true'}">${escTask(cmt).replace(/\n/g,'<br>')}</div></div>
   </div>
   <div class="block">
     <div class="block-h"><h4>评估要点检查</h4></div>
@@ -151,11 +236,7 @@ function evalView(t,s){return `
   </div>`;
 }
 
-function otmView(t,s){return `
-  <div class="agent"><div class="ai">AI</div><div class="txt">
-    5 个职能的评估已基本回收。我按 PCR Type 模板汇总了 Vote 分布、成本、风险与未决项——<b>处理路径由你决定</b>，我只解释每条路径的条件与后果。
-  </div></div>
-
+function otmCards(t,s){return `
   <div class="block">
     <div class="block-h"><h4>职能评估汇总</h4><span class="tipdot" onclick="showTip(event,'otm',28)">28</span><span class="tag ni" style="margin-left:auto">Mandatory 4/5 完成</span></div>
     <div class="block-b" style="padding:0">
@@ -168,15 +249,13 @@ function otmView(t,s){return `
       </tbody></table>
     </div>
   </div>
-
   <div class="block">
     <div class="block-h"><h4>风险与未决项</h4><span class="tag dis" style="margin-left:auto">2 项</span></div>
     <div class="block-b">
-      <div class="risk"><span class="lv high">高</span><div class="rt"><b>认证周期威胁目标实施日</b> <span>— Certification 评估 +3 周，11/15 目标日存在逾期风险</span></div></div>
-      <div class="risk"><span class="lv mid">中</span><div class="rt"><b>Cost 成本记录未维护</b> <span>— Approve to Close 前需补齐或转 Work Item</span></div></div>
+      <div class="risk"><span class="lv high">高</span><div class="rt"><b>认证周期威胁目标实施日</b> <span>— Certification 评估 +3 周</span></div></div>
+      <div class="risk"><span class="lv mid">中</span><div class="rt"><b>Cost 成本记录未维护</b> <span>— Approve to Close 前需补齐</span></div></div>
     </div>
   </div>
-
   <div class="block">
     <div class="block-h"><h4>AI 推荐 Work Item 草稿</h4><span class="tipdot" onclick="showTip(event,'wi',30)">30</span><span class="draft">待 OTM 确认</span></div>
     <div class="block-b"><div class="wi">
@@ -184,39 +263,34 @@ function otmView(t,s){return `
       <dl class="wi-grid">
         <dt>Function Team</dt><dd>Certification</dd>
         <dt>Owner</dt><dd>依职能配置 · 待确认</dd>
-        <dt>Target Date</dt><dd>2026-10-20（按 Lead Time 反推）</dd>
+        <dt>Target Date</dt><dd>2026-10-20</dd>
         <dt>来源 Comment</dt><dd>Certification Evaluation</dd>
       </dl>
     </div></div>
   </div>
-
   <div class="block">
     <div class="block-h"><h4>选择处理路径</h4><span class="tipdot" onclick="showTip(event,'path',29)">29</span></div>
     <div class="block-b"><div class="paths" data-paths>
-      <button class="path ${s.path==='awi'?'on':''}" data-path="awi"><div class="pt">Approve with Work Item</div><div class="pd">带工作项批准 · 需 ≥1 有效 Work Item</div></button>
-      <button class="path ${s.path==='close'?'on':''}" data-path="close"><div class="pt">Approve to Close</div><div class="pd">直接关闭 · 当前有未决成本项</div></button>
-      <button class="path ${s.path==='return'?'on':''}" data-path="return"><div class="pt">Return</div><div class="pd">退回补充材料</div></button>
-      <button class="path ${s.path==='pending'?'on':''}" data-path="pending"><div class="pt">Pending</div><div class="pd">挂起等待认证结论</div></button>
+      <button class="path ${s.path==='awi'?'on':''}" data-path="awi" type="button"><div class="pt">Approve with Work Item</div><div class="pd">带工作项批准</div></button>
+      <button class="path ${s.path==='close'?'on':''}" data-path="close" type="button"><div class="pt">Approve to Close</div><div class="pd">直接关闭</div></button>
+      <button class="path ${s.path==='return'?'on':''}" data-path="return" type="button"><div class="pt">Return</div><div class="pd">退回补充材料</div></button>
+      <button class="path ${s.path==='pending'?'on':''}" data-path="pending" type="button"><div class="pt">Pending</div><div class="pd">挂起等待</div></button>
     </div></div>
   </div>`;
 }
 
-function revView(t,s){return `
-  <div class="agent"><div class="ai">AI</div><div class="txt">
-    我把这条 PCR 的变更详情、产品范围与附件做了摘要，方便你快速判断。<b>Approve / Return / Reject 由你决定</b>，Comment 我可以帮你起草。
-  </div></div>
+function revCards(t,s){
+  const cmt=commentText(t,s);
+  return `
   <div class="block"><div class="block-h"><h4>PCR 摘要</h4></div>
-    <div class="block-b"><div class="comment">Legion Pro 7i Gen10 拟将双风扇散热升级为三风扇方案，目标是提升 CPU+GPU 满载散热能力与降噪表现。变更涉及风扇模组、导风罩与 BIOS 风扇曲线，不改动主板与结构件。</div></div>
+    <div class="block-b"><div class="comment">Legion Pro 7i Gen10 拟将双风扇散热升级为三风扇方案，目标是提升 CPU+GPU 满载散热能力与降噪表现。</div></div>
   </div>
   <div class="block"><div class="block-h"><h4>Review Comment 草稿</h4><span class="draft">AI 草稿</span></div>
-    <div class="block-b"><div class="comment edit" contenteditable="true">方向认可：三风扇方案对旗舰游戏本的满载散热与噪声有实质收益。建议明确：① 相对现方案的成本增量区间；② 是否影响整机厚度与重量指标。</div></div>
+    <div class="block-b"><div class="comment edit" contenteditable="${s.done?'false':'true'}">${escTask(cmt).replace(/\n/g,'<br>')}</div></div>
   </div>`;
 }
 
-function wiView(t,s){return `
-  <div class="agent"><div class="ai">AI</div><div class="txt">
-    这条 PCR 有 3 项已下发的 Work Item。我按 Target Date 与回写状态做了异常识别——<b>1 项已逾期</b>，可一键升级至负责人。
-  </div></div>
+function wiCards(t,s){return `
   <div class="block"><div class="block-h"><h4>Work Item 执行状态</h4><span class="tag dis" style="margin-left:auto">1 逾期</span></div>
     <div class="block-b" style="padding:0">
       <table class="sum"><thead><tr><th>Work Item</th><th>系统</th><th>Owner</th><th>状态</th></tr></thead><tbody>
@@ -228,56 +302,129 @@ function wiView(t,s){return `
   </div>`;
 }
 
-/* ---------- action bar ---------- */
-function renderActionBar(){
-  const t=TASKS[cur],s=state[cur],bar=document.getElementById('actionbar');
-  const cfg={
-    vote:{note:'AI 建议仅为草稿，确认后写回 PACE',primary:'确认并写回 Vote',ready:!!s.vote,force:true},
-    eval:{note:'存在阻断性校验项，需补充 Evidence',primary:'提交评估结论',ready:false,force:true},
-    otm:{note:'处理路径与 Work Item 需你确认后才在 PACE 生效',primary:'确认处理决策',ready:!!s.path,force:false},
-    rev:{note:'最终审核动作由你决定',primary:'Approve',ready:true,force:false,extra:['Return','Reject']},
-    wi:{note:'升级动作将通知 Assignee 及其负责人',primary:'升级逾期项',ready:true,force:false},
-  }[t.type];
-  if(s.done){
-    bar.style.display='flex';
-    bar.innerHTML=`<span class="ab-note" style="color:var(--agree)"><span style="color:var(--agree)">✓</span> 已完成 · 只读回看（不可再编辑或提交）</span><div class="ab-spacer"></div><span class="tipdot" onclick="showTip(event,'sessDone',52)">52</span>`;
-    return;
-  }
-  bar.style.display='flex';
-  let extra=(cfg.extra||[]).map(x=>`<button class="btn btn-ghost" data-act="alt">${x}</button>`).join('');
-  bar.innerHTML=`
-    <span class="ab-note"><svg class="i" style="width:13px;height:13px"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1z"/><path d="M8 5v4M8 11h.01"/></svg>${cfg.note}</span>
-    <div class="ab-spacer"></div>
-    ${cfg.force?'<button class="btn btn-warnghost" data-act="force">Force Submit</button><span class="tipdot" onclick="showTip(event,\'force\',27)">27</span>':''}
-    ${extra}
-    <button class="btn btn-primary" data-act="primary" ${cfg.ready?'':'disabled'}>${cfg.primary}</button>
-    <span class="tipdot" onclick="showTip(event,'write',34)">34</span>`;
-  bar.querySelector('[data-act=primary]')?.addEventListener('click',()=>openWriteback());
-  bar.querySelector('[data-act=force]')?.addEventListener('click',()=>openForce());
-  bar.querySelectorAll('[data-act=alt]').forEach(b=>b.onclick=()=>openWriteback(b.textContent));
-}
-
-/* ---------- wiring center interactions ---------- */
 function wireCenter(){
   const s=state[cur];
+  const flowBtn=document.getElementById('taskFlowBtn');
+  const flowMenu=document.getElementById('taskFlowMenu');
+  flowBtn?.addEventListener('click',e=>{
+    e.stopPropagation();
+    flowMenu?.classList.toggle('show');
+  });
+  flowMenu?.querySelectorAll('[data-flow]').forEach(b=>{
+    b.onclick=()=>{flowMenu.classList.remove('show');toast(b.textContent.trim());};
+  });
+  document.getElementById('centerBody')?.querySelectorAll('[data-act=primary]').forEach(b=>b.onclick=()=>openWriteback());
+  document.getElementById('centerBody')?.querySelectorAll('[data-act=force]').forEach(b=>b.onclick=()=>openForce());
+  document.getElementById('centerBody')?.querySelectorAll('[data-act=alt]').forEach(b=>b.onclick=()=>openWriteback(b.textContent));
+
+  const cmt=document.querySelector('#centerBody .comment.edit');
+  if(cmt && !s.done){
+    cmt.oninput=()=>{s.comment=cmt.innerText;};
+  }
   if(s.done){
-    document.querySelectorAll('[data-votebar] .voteopt,[data-paths] .path,textarea,.cmt-tools button').forEach(el=>{
-      el.setAttribute('disabled','disabled');
-      el.style.pointerEvents='none';
-      el.style.opacity='.72';
+    document.querySelectorAll('#centerBody [data-votebar] .voteopt,#centerBody [data-paths] .path').forEach(el=>{
+      el.style.pointerEvents='none';el.style.opacity='.72';
     });
     return;
   }
-  document.querySelectorAll('[data-votebar] .voteopt').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#centerBody [data-votebar] .voteopt').forEach(b=>b.onclick=()=>{
     s.vote=b.dataset.vote;renderCenter();
   });
-  document.querySelectorAll('[data-paths] .path').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#centerBody [data-paths] .path').forEach(b=>b.onclick=()=>{
     s.path=b.dataset.path;renderCenter();
   });
-  document.querySelector('[data-act=regen]')?.addEventListener('click',e=>{
-    e.target.textContent='生成中…';setTimeout(()=>e.target.textContent='重新生成',700);
+  document.querySelector('#centerBody [data-act=regen]')?.addEventListener('click',e=>{
+    e.target.textContent='生成中…';setTimeout(()=>{e.target.textContent='重新生成';toast('已重新生成草稿');},700);
   });
 }
+
+function sendTaskAsk(){
+  const inp=document.getElementById('taskAskin');
+  const v=(inp?.value||'').trim();
+  if(!v){inp?.focus();return;}
+  const s=state[cur];
+  if(s.done){toast('已完成任务为只读');return;}
+  s.chat=s.chat||[];
+  s.chat.push({role:'user',text:v});
+  let reply='已记录你的补充。你可以继续完善 Comment，或选择 Vote 立场后写回。';
+  let html=null;
+  if(/Comment|严谨|改写|修改草稿/i.test(v)){
+    s.comment=`开发侧确认：Ultra 155U→165U 为同封装 pin-to-pin 替代，主板无硬件改动。参考 X1 Carbon G12（PCR-2025-07612）结论为无影响。
+
+补充说明：① BIOS microcode 兼容性验证计划（含回归范围）；② 满载功耗与散热余量的量化验证数据与窗口。结论：建议 Agree，并在 Comment 中保留上述两项跟踪项。`;
+    reply='已把上方 Comment 草稿改得更严谨：补强了验证范围表述，并明确建议 Agree。';
+    html=reply+`<span class="tipdot" onclick="showTip(event,'taskUpdate',55)">55</span>`;
+  }else if(/Disagree|不同意/i.test(v)){
+    reply='若投 Disagree：任务将回到提出方补充材料，OTM 可见你的 Comment 与阻碍点；不会直接写回 Agree。建议在 Comment 中写清阻断原因（如认证窗口）。';
+  }else if(/Schedule|校验|补什么/i.test(v)){
+    reply='Schedule 警告要求明确 BIOS / 认证验证周期对目标实施日的影响天数。可在 Comment 中补一句「预计 BIOS 验证 X 天，不冲击 11/15」或 Force Submit 并填写理由。';
+  }else if(/G12|相似|案例|BIOS/i.test(v)){
+    reply='参考 G12（PCR-2025-07612）是因为同产品线、同类 CPU 换代且已 Closed。右侧 Similar PCR 还有 T14s 案例（含 BIOS Return 记录），可一并对照。';
+  }
+  s.chat.push({role:'ai',text:reply,html:html||escTask(reply)});
+  if(inp){inp.value='';if(window.AskComposer) AskComposer.autoGrow(inp);}
+  hideTaskGuide();closeTaskPlus();
+  renderCenter();
+}
+
+function showTaskGuide(){document.getElementById('taskGuide')?.classList.add('show');}
+function hideTaskGuide(){document.getElementById('taskGuide')?.classList.remove('show');}
+function closeTaskPlus(){
+  document.getElementById('taskPlusmenu')?.classList.remove('show');
+  document.getElementById('taskPlusbtn')?.classList.remove('on');
+}
+function bindTaskAskOnce(){
+  if(window.__taskAskBound) return;
+  window.__taskAskBound=1;
+  const inp=document.getElementById('taskAskin');
+  const box=document.getElementById('taskAskbox');
+  const file=document.getElementById('taskfile');
+  if(inp && window.AskComposer) AskComposer.bindTextarea(inp,{onSend:sendTaskAsk});
+  document.getElementById('taskSend')?.addEventListener('click',sendTaskAsk);
+  document.getElementById('taskPlusbtn')?.addEventListener('click',e=>{
+    e.stopPropagation();
+    const m=document.getElementById('taskPlusmenu');
+    const on=!m.classList.contains('show');
+    closeTaskPlus();hideTaskGuide();
+    if(on){m.classList.add('show');document.getElementById('taskPlusbtn').classList.add('on');}
+  });
+  file?.addEventListener('change',()=>{if(file.files?.length) toast('已添加 '+file.files.length+' 个附件');});
+  document.getElementById('taskPlusmenu')?.querySelectorAll('[data-tp]').forEach(b=>{
+    b.onclick=()=>{
+      closeTaskPlus();
+      const k=b.dataset.tp;
+      if(k==='file'){file?.click();return;}
+      const map={comment:'把 Comment 改得更严谨一点',sim:'为什么参考 G12 那条？还有别的案例吗',valid:'Schedule 那条校验具体要补什么'};
+      const inp2=document.getElementById('taskAskin');
+      if(inp2){inp2.value=map[k]||'';inp2.focus();if(window.AskComposer) AskComposer.autoGrow(inp2);}
+    };
+  });
+  document.getElementById('taskGuide')?.querySelectorAll('[data-tq]').forEach(b=>{
+    b.onclick=()=>{
+      const inp2=document.getElementById('taskAskin');
+      if(inp2){inp2.value=b.dataset.tq;hideTaskGuide();sendTaskAsk();}
+    };
+  });
+  inp?.addEventListener('focus',()=>{if(!state[cur].done) showTaskGuide();});
+  inp?.addEventListener('blur',()=>setTimeout(hideTaskGuide,180));
+  ;['dragenter','dragover'].forEach(ev=>box?.addEventListener(ev,e=>{e.preventDefault();box.classList.add('drop-on');}));
+  ;['dragleave','drop'].forEach(ev=>box?.addEventListener(ev,e=>{e.preventDefault();box.classList.remove('drop-on');}));
+  box?.addEventListener('drop',e=>{
+    const fs=[...e.dataTransfer.files];if(!fs.length)return;
+    toast('已添加 '+fs.length+' 个附件');
+  });
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#taskPlusmenu')&&!e.target.closest('#taskPlusbtn')) closeTaskPlus();
+    if(!e.target.closest('#taskFlowMenu')&&!e.target.closest('#taskFlowBtn'))
+      document.getElementById('taskFlowMenu')?.classList.remove('show');
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape') document.getElementById('taskFlowMenu')?.classList.remove('show');
+  });
+}
+
+function renderActionBar(){ /* 动作已并入对话内容 */ }
+
 
 /* ---------- right panel ---------- */
 let ctxTab='detail';
@@ -452,9 +599,19 @@ function toast(msg){
   host.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{
     filter=c.dataset.f;
     host.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x===c));
-    const items=ORDER.filter(id=>filter==='all'||TASKS[id].type===filter);
+    const items=filteredTaskIds();
     if(items.length&&!items.includes(cur)){cur=items[0];}
     renderTaskAll();
+  });
+})();
+(function bindTaskSearch(){
+  const inp=document.getElementById('taskq');
+  if(!inp) return;
+  inp.addEventListener('input',()=>{
+    taskQ=inp.value||'';
+    const items=filteredTaskIds();
+    if(items.length&&!items.includes(cur)){cur=items[0];}
+    renderTaskList();
   });
 })();
 
@@ -483,3 +640,5 @@ window.MyTasks = {
   renderAll: typeof renderTaskAll === 'function' ? renderTaskAll : function () {}
 };
 window.renderTaskAll = renderTaskAll;
+window.sendTaskAsk = sendTaskAsk;
+window.state = state;

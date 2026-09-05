@@ -555,8 +555,8 @@ try {
   });
   check('任务完成后会话标记已完成且只读', await page.evaluate(() => {
     const s = Sessions.byId('task-t1');
-    const bar = document.getElementById('actionbar')?.innerText || '';
-    return s && s.status === 'done' && /已完成|只读/.test(bar) && !/确认并写回/.test(bar);
+    const body = document.getElementById('centerBody')?.innerText || '';
+    return s && s.status === 'done' && /已完成|只读/.test(body) && !/确认并写回/.test(body);
   }));
   await page.evaluate(() => {
     Sessions.upsert({ id: 'ask-pin', kind: 'ask', title: '钉住测试会话', meta: '刚刚', group: 'today', pinned: false });
@@ -567,6 +567,56 @@ try {
   check('Pin 后左栏置顶显示标记', await page.evaluate(() => {
     const first = document.querySelector('#overview-rail-hist .hitem');
     return first && first.dataset.sid === 'ask-pin' && !!first.querySelector('.pinmark');
+  }));
+
+  // My Tasks 中间区对话化
+  await page.click('.navitem[data-view="task"]');
+  await page.evaluate(() => {
+    state.t1.done = false;
+    state.t1.chat = [];
+    state.t1.comment = null;
+    state.t1.vote = null;
+    cur = 't1';
+    if (window.MyTasks) MyTasks.ensureInit();
+    renderTaskAll();
+  });
+  const taskUi = await page.evaluate(() => {
+    const bar = document.querySelector('.task-bar .tb-t');
+    const askHome = document.getElementById('askbox');
+    const askTask = document.getElementById('taskAskbox');
+    const action = document.getElementById('actionbar');
+    const dock = document.querySelector('#centerBody .submit-dock');
+    const force = document.querySelector('#centerBody .btn-force');
+    const primary = document.querySelector('#centerBody .btn-primary');
+    const thread = document.getElementById('taskThread');
+    const sameAsk = askHome && askTask &&
+      getComputedStyle(askHome).borderRadius === getComputedStyle(askTask).borderRadius &&
+      getComputedStyle(askHome.querySelector('.plusbtn')).backgroundColor === getComputedStyle(askTask.querySelector('.plusbtn')).backgroundColor;
+    return {
+      narrowBar: !!bar && /VOTE|EVAL|OTM|REVIEW|WORK/i.test(bar.textContent) && !/目标实施日/.test(document.getElementById('centerHead').innerText),
+      noActionbar: !action || getComputedStyle(action).display === 'none',
+      dockInChat: !!dock && !!primary,
+      forceLink: !!force && getComputedStyle(force).textDecorationLine.includes('underline'),
+      hasTaskAsk: !!document.getElementById('taskAskin'),
+      sameAsk,
+      hasThread: !!thread,
+      tips: !!(TIPS_TASK.taskChat && TIPS_TASK.askOne && TIPS_TASK.flowVsSess)
+    };
+  });
+  check('任务标题收为窄条', taskUi.narrowBar);
+  check('无底部固定动作条', taskUi.noActionbar);
+  check('动作按钮在对话内容中', taskUi.dockInChat, JSON.stringify(taskUi));
+  check('Force Submit 为文字链', taskUi.forceLink);
+  check('任务区有共用样式输入框', taskUi.hasTaskAsk && taskUi.sameAsk);
+  check('TIP 53+ 任务对话说明存在', taskUi.tips);
+  await page.evaluate(() => {
+    const inp = document.getElementById('taskAskin');
+    inp.value = '把 Comment 改得更严谨一点';
+    sendTaskAsk();
+  });
+  check('追问可更新 Comment 草稿', await page.evaluate(() => {
+    const s = state[cur];
+    return /建议 Agree|验证范围/.test(s.comment || '') && (s.chat || []).some(m => m.role === 'user');
   }));
 
 } catch (e) {

@@ -68,6 +68,26 @@ const TIPS_TASK={
    ix:'提交后标记「已完成」，可回看但只读；不自动隐藏或归档。',
    fn:'后续需要回看当时的判断依据，是审计与追溯的基础。',
    ref:['P-06 可解释可追溯']},
+ taskChat:{t:'任务处理也是对话',
+   ix:'任务内容以 AI 消息呈现，用户可随时追问，底部只有输入框。',
+   fn:'同一产品不应有两种交互范式；处理任务时的追问是真实需求，纯表单无法承载。',
+   ref:['P-02 对话优先']},
+ taskActs:{t:'动作按钮属于对话内容',
+   ix:'按钮跟在 AI 说明之后，随内容滚动，不再固定在底部动作条。',
+   fn:'固定动作条会让提交按钮始终悬浮，用户尚在补充信息时就面对提交，容易误操作。',
+   ref:['少按钮原则']},
+ taskUpdate:{t:'追问能直接改变上方内容',
+   ix:'用户说「把 Comment 改严谨点」，AI 直接更新上方草稿卡片并说明改动。',
+   fn:'与 Create PCR「采纳建议后字段更新」同一逻辑：AI 帮用户干活，不只是回答。',
+   ref:['P-05 人在回路']},
+ askOne:{t:'两处输入框必须是同一组件',
+   ix:'Overview 与 My Tasks 的对话输入框共用同一套样式与行为，仅 placeholder 与菜单项按场景配置。',
+   fn:'复制样式再各自微调，后续任何修改都会产生不一致。',
+   ref:['设计一致性']},
+ flowVsSess:{t:'流程操作与会话操作是两个菜单',
+   ix:'任务标题条 ▾ 是流程操作（PACE / 转派 / Pending）；顶栏 ▾ 是会话操作（Pin / Rename / Delete）。',
+   fn:'前者作用于 PCR 任务本身，后者作用于这次对话记录，层级不同不可混淆。',
+   ref:['信息架构']},
 };
 
 
@@ -430,7 +450,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -941,14 +961,45 @@ function sendq(){const v=document.getElementById('askin').value.trim();
     const host=document.getElementById('parseUser');
     const el=document.createElement('div');el.className='bub me';el.textContent=v;
     host.appendChild(el);document.getElementById('askin').value='';
+    if(window.AskComposer) AskComposer.autoGrow(document.getElementById('askin'));
     toast('已补充信息');return;
   }
   if(typeof PARSE!=='undefined' && PARSE.createIntent){startParse(v);return;}
   const id='ask-'+Date.now();
   Sessions.upsert({id,kind:'ask',title:v.length>40?v.slice(0,40)+'…':v,meta:'刚刚',group:'today',pinned:false,status:null,accent:'var(--blue)'});
   Sessions.setCurrent(id);
-  toast('已新建会话：'+(v.length>16?v.slice(0,16)+'…':v));document.getElementById('askin').value='';}
-document.getElementById('askin').addEventListener('keydown',e=>{if(e.key==='Enter')sendq();});
+  toast('已新建会话：'+(v.length>16?v.slice(0,16)+'…':v));document.getElementById('askin').value='';
+  if(window.AskComposer) AskComposer.autoGrow(document.getElementById('askin'));
+}
+/* 共用输入框：自动增高（Overview / My Tasks 同一套行为） */
+const AskComposer={
+  autoGrow(el){
+    if(!el) return;
+    el.style.height='auto';
+    const max=Math.round(parseFloat(getComputedStyle(el).lineHeight||'20')*7);
+    const next=Math.min(el.scrollHeight, max||140);
+    el.style.height=Math.max(22, next)+'px';
+  },
+  bindTextarea(el,{onSend}={}){
+    if(!el||el.dataset.askBound) return;
+    el.dataset.askBound='1';
+    const grow=()=>AskComposer.autoGrow(el);
+    el.addEventListener('input',grow);
+    el.addEventListener('paste',()=>setTimeout(grow,0));
+    el.addEventListener('keydown',e=>{
+      if(e.key==='Enter' && !e.shiftKey){
+        e.preventDefault();
+        if(typeof onSend==='function') onSend();
+      }
+    });
+    grow();
+  }
+};
+window.AskComposer=AskComposer;
+(function bindHomeAsk(){
+  const el=document.getElementById('askin');
+  if(el) AskComposer.bindTextarea(el,{onSend:()=>sendq()});
+})();
 
 /* ══════════ 启动初始化 ══════════ */
 (function init(){

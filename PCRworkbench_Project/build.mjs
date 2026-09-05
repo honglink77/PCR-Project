@@ -13,8 +13,12 @@ function read(rel) {
   return fs.readFileSync(path.join(root, rel), 'utf8');
 }
 
+const logoB64 = fs.readFileSync(path.join(root, 'src/shared/pcr-agent-logo-h.png')).toString('base64');
+const logoDataUri = `data:image/png;base64,${logoB64}`;
+
 let shellBefore = read('src/shell/shell-before.html');
 shellBefore = shellBefore
+  .replace('{{PCR_AGENT_LOGO}}', logoDataUri)
   .replace('<!--RAIL_MYTASKS-->', read('src/mytasks/mytasks-rail.html').trimEnd())
   .replace('<!--RAIL_OVERVIEW-->', read('src/overview/overview-rail.html').trimEnd());
 

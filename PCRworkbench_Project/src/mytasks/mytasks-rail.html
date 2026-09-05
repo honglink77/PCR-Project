@@ -1,7 +1,11 @@
     <div class="taskwrap" id="mytasks-rail">
       <div class="rail-head">
-        <h2>我的任务 <span class="pill" id="taskCount">6</span><span class="tipdot" onclick="showTip(event,'rail',21)">21</span></h2>
-        <div class="rail-sub">按 PACE 主流程组织 · 单击任务直接进入执行</div>
+        <div class="task-search">
+          <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M10.8 10.8L14 14"/></svg>
+          <input id="taskq" type="search" placeholder="搜索任务、PCR 或产品…" autocomplete="off">
+          <span class="tipdot" onclick="showTip(event,'rail',21)">21</span>
+        </div>
+        <span id="taskCount" hidden>6</span>
       </div>
       <div class="filters" id="filters">
         <button class="chip on" data-f="all">全部</button>

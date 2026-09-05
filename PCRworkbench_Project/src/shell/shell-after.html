@@ -35,12 +35,9 @@
             <button onclick="menuFill('分析产品或项目')"><span class="pm-t">📊 分析产品或项目</span></button>
             <button onclick="menuFill('查询 PCR 状态')"><span class="pm-t">🔍 查询 PCR 状态</span></button>
           </div>
-          <div class="askbox" id="askbox">
+            <div class="askbox" id="askbox">
             <button class="plusbtn" id="plusbtn" title="创建与更多" onclick="togglePlus(event)">+</button>
-            <button class="clipbtn" title="上传附件" onclick="menuUpload()">
-              <svg class="i"><path d="M14 7.5l-6.2 6.2a3 3 0 0 1-4.2-4.2L9.5 3.6a2 2 0 0 1 2.8 2.8L6.4 12.3"/></svg>
-            </button>
-            <input id="askin" placeholder="问点什么，或让我分析某个产品、项目…">
+            <textarea class="askin" id="askin" rows="1" placeholder="问点什么，或让我分析某个产品、项目…"></textarea>
             <button class="send" onclick="sendq()"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
           </div>
         </div>
