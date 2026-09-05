@@ -153,6 +153,63 @@ try {
   check('头部计数分母=实际步骤数', status.head.includes('/' + status.total), status.head);
   check('含动态拆分步骤', status.steps.some(s => s.id === 'split'));
 
+  // A2: PCR Type 推荐与确认
+  const typePending = await page.evaluate(() => {
+    const u = PARSE.steps.find(s => s.id === 'u');
+    const icon = document.querySelector('.pstep[data-id="u"] .pico')?.textContent.trim();
+    clickStep('u');
+    const body = document.querySelector('.pstep[data-id="u"] .pstep-b')?.innerText || '';
+    const opts = document.querySelectorAll('.pstep[data-id="u"] .type-opt').length;
+    return {
+      st: u.st, sum: u.sum, icon, opts,
+      hasPre: /预选的类型/.test(body) && /未预选/.test(body),
+      hasWarn: /加载对应模板并重新执行校验/.test(body),
+      hasConfirm: /确认为/.test(body),
+      hasOther: /选择其他类型/.test(body),
+      hasBasis: /依据：/.test(body),
+      hasConf: /置信度/.test(body),
+      tipKeys: ['pcrTypeConfirm','pcrTypeCandidates','pcrTypeRerun'].every(k => !!TIPS_HOME[k]),
+      tipNums: ['pcrTypeConfirm','pcrTypeCandidates','pcrTypeRerun'].map(k => tipNum(k))
+    };
+  });
+  check('Type 确认前为 ◇ 待确认', typePending.st === 'pending' && typePending.sum === '待确认' && typePending.icon === '◇', JSON.stringify(typePending));
+  check('Type 至少 2 候选+依据+置信度', typePending.opts >= 2 && typePending.hasBasis && typePending.hasConf, JSON.stringify(typePending));
+  check('Type 含预选对照与切换预警', typePending.hasPre && typePending.hasWarn && typePending.hasConfirm && typePending.hasOther);
+  check('TIP 44–46 存在且编号正确', typePending.tipKeys && typePending.tipNums.join(',') === '44,45,46', JSON.stringify(typePending.tipNums));
+
+  const afterType = await page.evaluate(() => {
+    confirmPcrType('Hardware/SBB');
+    const u = PARSE.steps.find(s => s.id === 'u');
+    const icon = document.querySelector('.pstep[data-id="u"] .pico')?.textContent.trim();
+    const body = document.querySelector('.pstep[data-id="u"] .pstep-b')?.innerText || '';
+    const v = PARSE.steps.find(s => s.id === 'v');
+    return {
+      confirmed: PARSE.typeConfirmed, type: PARSE.pcrType,
+      st: u.st, sum: u.sum, icon,
+      hasMap: /保留 \d+ 个可映射字段/.test(body) && /不兼容/.test(body),
+      vText: v?.body || ''
+    };
+  });
+  check('确认后 Type 为 ✓ 并显示名称', afterType.confirmed && afterType.st === 'done' && afterType.sum === 'Hardware/SBB' && afterType.icon === '✓', JSON.stringify(afterType));
+  check('确认后提示模板切换影响', afterType.hasMap);
+  check('确认后可行性随 Type 重算', /找到 3 条/.test(afterType.vText) && /18 天/.test(afterType.vText), afterType.vText.slice(0, 120));
+
+  await page.evaluate(() => { toggleTypeMapDetail(); });
+  check('查看详情可展开字段映射', await page.evaluate(() => /字段映射详情/.test(document.querySelector('.pstep[data-id="u"] .pstep-b')?.innerText || '')));
+
+  await page.evaluate(() => confirmPcrType('Cost Reduction'));
+  check('切换 Cost Reduction 后下游重算', await page.evaluate(() => {
+    const v = PARSE.steps.find(s => s.id === 'v');
+    return PARSE.pcrType === 'Cost Reduction' && /找到 5 条/.test(v.body) && /12 天/.test(v.body);
+  }));
+
+  await page.evaluate(() => openTypePicker());
+  check('选择其他类型弹出完整列表', await page.evaluate(() => {
+    const txt = document.getElementById('modalHost')?.innerText || '';
+    return /Hardware\/SBB/.test(txt) && /Software/.test(txt) && /Cost Reduction/.test(txt) && /Certification/.test(txt);
+  }));
+  await page.evaluate(() => closeModal());
+
   // expand split
   await page.evaluate(() => { clickStep('split'); });
   const splitOpen = await page.evaluate(() => {

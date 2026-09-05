@@ -354,8 +354,10 @@
   .pstep.done .pico{background:var(--green);color:#fff}
   .pstep.run .pico{background:var(--accent-soft);color:var(--accent);animation:spin 1s linear infinite;border:1.5px solid var(--accent);border-top-color:transparent}
   .pstep.wait .pico{background:#EEF2F6;color:var(--ink-3)}
-  /* 提示态用黄底「!」，红色仅留给严重错误（×） */
+  /* 提示态用黄底「!」，红色仅留给严重错误（×）；待确认用蓝底 ◇ */
   .pstep.warn .pico,.pstep.warn-step .pico{background:#EAB308;color:#fff;animation:none;border:none}
+  .pstep.pending .pico{background:#EFF6FF;color:#2563EB;animation:none;border:1.5px solid #2563EB}
+  .pstep.pending .psum{color:#2563EB}
   @keyframes spin{to{transform:rotate(360deg)}}
   .pstep .ptt{font-size:13.5px;color:var(--ink);flex:none;font-weight:500;width:auto;white-space:nowrap}
   .pstep.wait .ptt{color:var(--ink-3);font-weight:400}
@@ -389,7 +391,7 @@
   .pgrp-h{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:8px 0 4px;letter-spacing:.02em}
   .rule-note{font-size:11px;color:var(--amber);margin-top:8px}
   .plist.mini .pstep,.plist.mini .plist-sub{display:none}
-  .plist.mini .pstep.run,.plist.mini .pstep.warn,.plist.mini .pstep.warn-step{display:block}
+  .plist.mini .pstep.run,.plist.mini .pstep.warn,.plist.mini .pstep.warn-step,.plist.mini .pstep.pending{display:block}
   .plist.mini .pstep-b{display:none !important}
 
   .parse-user{padding:4px 0 14px;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
@@ -432,7 +434,28 @@
   .submit-dock .pact{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:0}
   .btn-force{font-size:12.5px;color:var(--ink-3);background:none;border:none;padding:4px 2px;text-decoration:underline;text-underline-offset:3px}
   .btn-force:hover{color:var(--warn)}
-  .split-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .type-box{font-size:12.5px;color:var(--ink-2);line-height:1.6}
+  .type-box .tb-pre{margin-bottom:10px}
+  .type-box .tb-h{font-weight:600;color:var(--ink);margin:0 0 8px}
+  .type-opt{display:flex;gap:10px;align-items:flex-start;padding:10px 10px;border:1px solid var(--border);border-radius:8px;margin:0 0 8px;cursor:pointer;background:#fff;text-align:left;width:100%}
+  .type-opt:hover{border-color:var(--border-2)}
+  .type-opt.on{border-color:var(--accent);background:var(--accent-soft)}
+  .type-opt .to-radio{flex:none;margin-top:2px;color:var(--accent-ink)}
+  .type-opt .to-main{flex:1;min-width:0}
+  .type-opt .to-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .type-opt .to-name{font-weight:600;color:var(--ink)}
+  .type-opt .to-conf{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--soft);color:var(--ink-2)}
+  .type-opt .to-conf.hi{background:var(--green-bg);color:var(--green)}
+  .type-opt .to-conf.mid{background:var(--amber-bg);color:var(--amber)}
+  .type-opt .to-conf.lo{background:var(--red-bg);color:var(--red);font-weight:600}
+  .type-opt .to-basis{font-size:12px;color:var(--ink-2);margin-top:4px;line-height:1.55}
+  .type-warn{margin:10px 0;padding:8px 10px;border-radius:8px;background:var(--amber-bg);color:var(--amber);font-size:12px}
+  .type-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .type-map{margin-top:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--soft);font-size:12px}
+  .type-map b{color:var(--ink)}
+  .type-map ul{margin:6px 0 0;padding-left:16px}
+  .type-map li{margin:2px 0;color:var(--ink-2)}
+  .type-toast{font-size:12.5px;line-height:1.55}
   .hitem .hm.live{color:var(--accent-ink)}
   .hitem .d.spin{background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
 
@@ -1515,6 +1538,18 @@ const TIPS_HOME={
    ix:'提交验证步骤明确告知：将在 PACE 中创建 PCR，进入 Review，由 LM / Portfolio / Sponsor 审核，随后可在 My Tasks 跟踪。',
    fn:'避免用户以为提交只发生在本工具内部。写回目标系统必须可见。',
    ref:['P-05 人在回路','7.4 写回规则']},
+ pcrTypeConfirm:{t:'AI 只推荐不自动更改 Type',
+   ix:'AI 给出候选与依据，用户确认前类型不生效；步骤显示「待确认 ◇」，不是 ✓。',
+   fn:'PCR Type 决定模板、必填项与审批路径，定错则整条 PCR 皆错，因此必须人工确认。',
+   ref:['PCR-SUB-003','P-05 人在回路']},
+ pcrTypeCandidates:{t:'为何给两个候选而非一个',
+   ix:'候选列表至少 2 项，各带依据与置信度；默认选中置信度最高项。',
+   fn:'单一答案会让用户失去判断意识，两个候选促使用户主动比较。',
+   ref:['PCR-SUB-003']},
+ pcrTypeRerun:{t:'Type 切换后需重跑校验',
+   ix:'确认后第 3 步及之后重置重跑，相似 PCR、可行性评估与必填划分随 Type 重算。',
+   fn:'必填项、相似案例、历史周期均按 Type 划分，不重跑会导致校验结果与实际类型不符。',
+   ref:['PCR-SUB-003','待业务确认']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -2339,9 +2374,11 @@ Processor in Nova Lake scope, with better cost and same performance.
 Please help to change the orginal MS5 X9 12Xe vPro to this T6 non-vPro
 SKU on CPU list, no increase to total number of PCBA or NRE, thanks.`;
 const RULE_FOOT='⚠ 原型阶段规则示例，实际规则待业务确认';
+const TYPE_RULE_FOOT='⚠ 原型阶段规则示例，实际类型判定规则待业务确认';
+const PCR_TYPES=['Hardware/SBB','Software','Cost Reduction','Certification','Process','Other'];
 const STEP_RULES={
   s1:{lead:'正在按「变更内容识别」规则核对：',items:[
-    '识别 PCR Type（Hardware/SBB、Software、Cost Reduction 等）',
+    '识别 PCR Type（Hardware/SBB、Software、Cost Reduction 等）——仅推荐，须用户确认',
     '识别变更对象与动作（替换 / 新增 / 移除 / 升级）',
     '判定 CP（root+branch）或 SP（单条）；置信度不足时不自动填写'
   ]},
@@ -2350,7 +2387,7 @@ const STEP_RULES={
     '原文未提区域时不默认填 WW，标为缺失并追问',
     '同一变更跨多个产品线时，提示是否拆分'
   ]},
-  s3:{lead:'正在按 Hardware/SBB 的必填规则核对：',items:[
+  s3:{lead:'正在按当前 PCR Type 的必填规则核对：',items:[
     '必须项：Impacted Products、Business Case、目标实施日、Geo、变更前后描述',
     '建议项不阻断提交；字段间一致性（如成本叙事 vs Business Case）要提示'
   ]},
@@ -2368,7 +2405,9 @@ const STEP_RULES={
 
 function ruleBanner(key){
   const r=STEP_RULES[key]||STEP_RULES.s1;
-  return `<div class="prule"><div class="prule-t">${r.lead}</div><ul>${r.items.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
+  let lead=r.lead;
+  if(key==='s3'&&PARSE.pcrType) lead=`正在按 ${PARSE.pcrType} 的必填规则核对：`;
+  return `<div class="prule"><div class="prule-t">${lead}</div><ul>${r.items.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
 }
 function stepBody(key,checks,extra=''){
   return ruleBanner(key)+checks+(extra||'')+`<div class="rule-note">${RULE_FOOT}</div>`;
@@ -2376,7 +2415,9 @@ function stepBody(key,checks,extra=''){
 const PARSE={
   active:false,createIntent:false,text:'',files:[],skipped:false,animating:false,
   timers:[],steps:[],homeOpen:false,split:false,forceReason:'',suspended:false,
-  fields:null,issues:{},splitDecision:null,issueOpen:{},thinkOpen:false,issueExpandAll:false
+  fields:null,issues:{},splitDecision:null,issueOpen:{},thinkOpen:false,issueExpandAll:false,
+  typeConfirmed:false,pcrType:null,typePick:null,preselectedType:null,
+  typeMap:null,typeMapOpen:false,typeMeta:null
 };
 const PH_ASK='问点什么，或让我分析某个产品、项目…';
 const PH_CREATE='描述你的变更需求，或粘贴邮件、会议纪要…';
@@ -2433,11 +2474,161 @@ function missingMustLabels(){
 
 function mustAllOk(){const g=fieldGroups();return g.mustDone===g.mustTotal;}
 
+function typeCandidates(ex){
+  return [
+    {id:'Hardware/SBB',conf:'hi',confLabel:'高',basis:'变更对象为 CPU SKU，动作为替换，涉及 CPU List 维护'},
+    {id:'Cost Reduction',conf:'mid',confLabel:'中',basis:'原文强调 "better cost"，可能属于成本优化类变更'}
+  ];
+}
+function effectiveType(){return PARSE.typeConfirmed&&PARSE.pcrType?PARSE.pcrType:(PARSE.typePick||'Hardware/SBB');}
+function applyTypeMeta(type){
+  const t=type||effectiveType();
+  PARSE.typeMeta={
+    type:t,
+    similar:t==='Cost Reduction'?5:t==='Software'?2:3,
+    leadDays:t==='Cost Reduction'?12:t==='Certification'?28:18,
+    similarHint:t==='Cost Reduction'?'同类成本优化案例':'同类硬件/SKU 变更'
+  };
+}
+function typeMapFor(type){
+  if(type==='Cost Reduction'){
+    return {
+      keep:4,drop:3,
+      keepList:['Impacted Products','Change Request','Geo Impact','Business Case Reason'],
+      dropList:['CPU List 关联','认证影响矩阵','SBB 结构字段']
+    };
+  }
+  return {
+    keep:5,drop:2,
+    keepList:['Impacted Products','Change Request','Geo Impact','Business Case Reason','NRE / Profit Impact'],
+    dropList:['成本节省金额','ROI 测算字段']
+  };
+}
+function typeStepBody(){
+  const ex=extractFields(PARSE.text);
+  const cands=typeCandidates(ex);
+  const pick=PARSE.typePick||cands[0].id;
+  const pre=PARSE.preselectedType||'（未预选）';
+  const tipDots=`<span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrTypeConfirm',44)">44</span>
+    <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrTypeCandidates',45)">45</span>
+    <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrTypeRerun',46)">46</span>`;
+  if(PARSE.typeConfirmed&&PARSE.pcrType){
+    const map=PARSE.typeMap||typeMapFor(PARSE.pcrType);
+    const detail=PARSE.typeMapOpen?`<div class="type-map">
+      <b>字段映射详情</b>
+      <ul>${(map.keepList||[]).map(x=>`<li>✓ 保留：${x}</li>`).join('')}
+      ${(map.dropList||[]).map(x=>`<li>✗ 不兼容：${x}</li>`).join('')}</ul>
+    </div>`:'';
+    return ruleBanner('s1')+`<div class="type-box">
+      ${checkHtml([
+        {k:'ok',t:'PCR Type（已确认）',d:PARSE.pcrType},
+        {k:'ok',t:'变更对象',d:ex.sku||'CPU SKU'},
+        {k:'ok',t:'变更动作',d:ex.action}
+      ])}
+      <div class="type-toast" style="margin-top:10px">已切换至 <b>${PARSE.pcrType}</b> 模板<br>
+        保留 ${map.keep} 个可映射字段 · ${map.drop} 个字段不兼容，已标注
+        <button class="btn btn-ghost" type="button" style="margin-left:6px;padding:2px 8px;font-size:12px"
+          onclick="event.stopPropagation();toggleTypeMapDetail()">查看详情</button>
+      </div>
+      ${detail}
+      <div style="margin-top:8px">${tipDots}</div>
+    </div><div class="rule-note">${TYPE_RULE_FOOT}</div>`;
+  }
+  const opts=cands.map(c=>{
+    const on=c.id===pick?' on':'';
+    return `<button class="type-opt${on}" type="button" onclick="event.stopPropagation();selectTypeOpt('${c.id}')">
+      <span class="to-radio">${c.id===pick?'●':'○'}</span>
+      <span class="to-main">
+        <span class="to-row"><span class="to-name">${c.id}</span>
+          <span class="to-conf ${c.conf}">置信度 ${c.confLabel}</span></span>
+        <div class="to-basis">依据：${c.basis}</div>
+      </span>
+    </button>`;
+  }).join('');
+  return ruleBanner('s1')+`<div class="type-box">
+    <div class="tb-pre">你预选的类型：<b>${pre}</b> ${tipDots}</div>
+    <div class="tb-h">AI 推荐类型</div>
+    ${opts}
+    <div class="type-warn">⚠ 确认类型后将加载对应模板并重新执行校验</div>
+    <div class="type-acts">
+      <button class="btn btn-primary" type="button" onclick="event.stopPropagation();confirmPcrType()">确认为 ${pick}</button>
+      <button class="btn btn-ghost" type="button" onclick="event.stopPropagation();openTypePicker()">选择其他类型</button>
+    </div>
+  </div><div class="rule-note">${TYPE_RULE_FOOT}</div>`;
+}
+function selectTypeOpt(id){
+  PARSE.typePick=id;
+  const u=stepBy('u');if(u){u.body=typeStepBody();u.open=true;}
+  renderPlist();
+}
+function toggleTypeMapDetail(){
+  PARSE.typeMapOpen=!PARSE.typeMapOpen;
+  const u=stepBy('u');if(u){u.body=typeStepBody();u.open=true;}
+  renderPlist();
+}
+function openTypePicker(){
+  const cur=PARSE.typePick||'Hardware/SBB';
+  modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>选择 PCR Type</h3><p>AI 推荐可能都不正确时，可从完整列表自行选定</p></div>
+    <div class="modal-b">${PCR_TYPES.map(t=>`<label style="display:flex;align-items:center;gap:8px;padding:8px 4px;cursor:pointer;font-size:13px">
+      <input type="radio" name="pcrTypePick" value="${t}" ${t===cur?'checked':''}/> ${t}
+    </label>`).join('')}</div>
+    <div class="modal-f"><button class="btn btn-ghost" data-x>取消</button><button class="btn btn-primary" data-ok>确认</button></div></div>`;
+  scrim.classList.add('show');
+  modalHost.querySelector('[data-x]').onclick=closeModal;
+  modalHost.querySelector('[data-ok]').onclick=()=>{
+    const sel=modalHost.querySelector('input[name=pcrTypePick]:checked');
+    if(!sel){toast('请选择类型');return;}
+    closeModal();
+    confirmPcrType(sel.value);
+  };
+}
+function confirmPcrType(explicit){
+  const type=explicit||PARSE.typePick||'Hardware/SBB';
+  PARSE.typeConfirmed=true;
+  PARSE.pcrType=type;
+  PARSE.typePick=type;
+  PARSE.typeMap=typeMapFor(type);
+  PARSE.typeMapOpen=false;
+  applyTypeMeta(type);
+  toast(`已切换至 ${type} 模板 · 保留 ${PARSE.typeMap.keep} 个可映射字段 · ${PARSE.typeMap.drop} 个不兼容`);
+  rerunFromStep3();
+  const u=stepBy('u');
+  if(u){u.st='done';u.sum=type;u.open=true;u.body=typeStepBody();}
+  syncStepStates();
+  fillAllStepBodies(extractFields(PARSE.text));
+  if(u) u.open=true;
+  renderPlist();
+  renderConclusion();
+}
+function rerunFromStep3(){
+  applyTypeMeta(PARSE.pcrType);
+  const f=stepBy('f'),v=stepBy('v'),s=stepBy('s'),sp=stepBy('split');
+  if(f){f.st='run';f.sum='按新模板重核';f.open=false;f.body='';}
+  if(sp&&PARSE.splitDecision==null){sp.st='warn';sp.sum='AI 建议拆分';sp.open=false;sp.body='';}
+  if(v){v.st='run';v.sum='按 Type 重算';v.open=false;v.body='';}
+  if(s){s.st='wait';s.sum='待前置完成';s.pre='需先补全必填信息';s.body='';}
+  fillStep3(true);
+  const meta=PARSE.typeMeta||{similar:3,leadDays:18};
+  if(v){
+    v.body=stepBody('s4',checkHtml([
+      {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条（${meta.similarHint||'同类'}）`},
+      {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
+      {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
+      {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
+    ]));
+    v.st='done';v.sum='建议补充后再提';
+  }
+  if(s) s.body=fillStep5Body();
+}
+
 function syncStepStates(){
   const ex=extractFields(PARSE.text);
   const prod=ex.products[0]||'未识别';
   const u=stepBy('u'),p=stepBy('p'),f=stepBy('f'),v=stepBy('v'),s=stepBy('s'),sp=stepBy('split');
-  if(u){u.st='done';u.sum=ex.pcrType;}
+  if(u){
+    if(PARSE.typeConfirmed&&PARSE.pcrType){u.st='done';u.sum=PARSE.pcrType;}
+    else{u.st='pending';u.sum='待确认';}
+  }
   if(p){p.st='done';p.sum=prod;}
   const miss=missingMustLabels();
   if(f){
@@ -2449,7 +2640,9 @@ function syncStepStates(){
     else if(PARSE.splitDecision==='keep'){sp.st='done';sp.sum='已确认不拆分';}
     else{sp.st='warn';sp.sum='AI 建议拆分';}
   }
-  if(v){v.st='done';v.sum='建议补充后再提';}
+  if(v){
+    v.st='done';v.sum='建议补充后再提';
+  }
   if(s){
     if(!mustAllOk()){s.st='wait';s.sum='待前置完成';s.pre='需先补全必填信息';}
     else{s.st='done';s.sum='→ 提交至 PACE';}
@@ -2535,6 +2728,9 @@ function later(ms,fn){PARSE.timers.push(setTimeout(fn,ms));}
 function startParse(text){
   PARSE.text=text||DEMO_MAIL;PARSE.createIntent=false;PARSE.skipped=false;
   PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
+  PARSE.typeConfirmed=false;PARSE.pcrType=null;PARSE.typePick='Hardware/SBB';
+  PARSE.preselectedType=null;PARSE.typeMap=null;PARSE.typeMapOpen=false;
+  applyTypeMeta('Hardware/SBB');
   initParseFields(extractFields(PARSE.text));
   document.getElementById('detectbar').classList.remove('show');
   document.getElementById('askin').value='';
@@ -2589,6 +2785,8 @@ function exitParseMode(){
   clearParseTimers();
   PARSE.active=false;PARSE.createIntent=false;PARSE.homeOpen=false;PARSE.animating=false;PARSE.suspended=false;
   PARSE.text='';PARSE.steps=[];PARSE.fields=null;PARSE.issues={};PARSE.splitDecision=null;PARSE.issueOpen={};
+  PARSE.typeConfirmed=false;PARSE.pcrType=null;PARSE.typePick=null;PARSE.preselectedType=null;
+  PARSE.typeMap=null;PARSE.typeMapOpen=false;PARSE.typeMeta=null;
   document.body.classList.remove('parsing','home-open');
   document.getElementById('askin').placeholder=PH_ASK;
   const pl=document.getElementById('plist');if(pl){pl.classList.remove('mini');pl.innerHTML='';}
@@ -2773,9 +2971,9 @@ function renderPlist(){
   const host=document.getElementById('plist');
   const total=PARSE.steps.length;
   const done=PARSE.steps.filter(s=>s.st==='done').length;
-  const cur=PARSE.steps.find(s=>s.st==='run')||PARSE.steps.find(s=>s.st==='warn');
+  const cur=PARSE.steps.find(s=>s.st==='run')||PARSE.steps.find(s=>s.st==='warn')||PARSE.steps.find(s=>s.st==='pending');
   const mini=host.classList.contains('mini');
-  const steps=PARSE.steps.filter(s=>!mini||s.st==='run'||s.st==='warn');
+  const steps=PARSE.steps.filter(s=>!mini||s.st==='run'||s.st==='warn'||s.st==='pending');
   host.innerHTML=`<div class="plist-h" onclick="togglePlistMini()">
     <h3>${mini?('Submit PCR · '+(cur?cur.title:'')):'Submit PCR'}</h3>
     <span class="pcnt">${mini?((cur&&cur.sum)||''):(done+'/'+total+' 已完成')}</span>
@@ -2788,7 +2986,7 @@ function renderPlist(){
     const stCls=s.st==='warn'?'warn':s.st;
     row.className='pstep '+stCls+(s.open?' open':'')+(s.dyn?' warn-step':'')+(i===steps.length-1?' last':'');
     row.dataset.id=s.id;
-    const icon=s.st==='done'?'✓':(s.st==='warn'||s.dyn)?'!':s.st==='run'?'':'○';
+    const icon=s.st==='done'?'✓':s.st==='pending'?'◇':(s.st==='warn'||s.dyn)?'!':s.st==='run'?'':'○';
     row.innerHTML=`<button class="pstep-h" type="button">
       <span class="pico">${icon}</span><span class="ptt">${s.title}</span>
       <span class="psum" title="${(s.sum||'').replace(/"/g,'&quot;')}">${s.sum||''}</span>
@@ -2829,7 +3027,7 @@ function clickStep(id){
 
 function openStepInfo(key){
   const map={
-    s1:{t:'步骤 1 · 理解变更内容',b:'识别 PCR Type、变更对象、变更动作，以及 CP/SP。判定依据：关键词匹配 + 历史同类 PCR 表述。置信度低于阈值时不自动填写。'},
+    s1:{t:'步骤 1 · 理解变更内容',b:'AI 推荐 PCR Type（至少两个候选，各带依据与置信度），须用户确认后才生效；同时识别变更对象、变更动作与 CP/SP。'},
     s2:{t:'步骤 2 · 识别影响产品',b:'识别产品线/机型、MTM、Geo、CP Team。产品名须匹配主数据；原文未提区域不默认 WW；跨产品线时提示拆分。'},
     s3:{t:'步骤 3 · 补全必填信息',b:'必须项：Impacted Products、Business Case Reason、Target Implementation Date、Geo Impact、Change Request 完整性。建议项不阻断提交。'},
     s4:{t:'步骤 4 · 可行性与价值评估',b:'技术/时间/价值三维度。AI 给建议，人做决定。'},
@@ -2849,6 +3047,7 @@ function skipParse(){
 function runParseAnim(ex){
   PARSE.animating=true;PARSE.skipped=false;
   const prod=ex.products[0]||'未识别产品';
+  PARSE.typePick=PARSE.typePick||'Hardware/SBB';
   PARSE.steps=[
     {id:'u',title:'理解变更内容',st:'run',sum:'识别中',info:'s1',open:true,body:'',pre:''},
     {id:'p',title:'识别影响产品',st:'wait',sum:'待前置完成',info:'s2',open:false,body:'',pre:'需先理解变更内容'},
@@ -2859,17 +3058,14 @@ function runParseAnim(ex){
   if(PARSE.split){
     PARSE.steps.splice(3,0,{id:'split',title:'确认是否拆分为两条',st:'wait',sum:'待前置完成',info:'s2',open:false,dyn:true,pre:'需先进入补全步骤'});
   }
-  PARSE.steps[0].body=ruleBanner('s1')+`<div class="rule-note">${RULE_FOOT}</div>`;
+  PARSE.steps[0].body=ruleBanner('s1')+`<div class="rule-note">${TYPE_RULE_FOOT}</div>`;
   renderPlist();
   later(200,()=>{
-    PARSE.steps[0].body=stepBody('s1',checkHtml([
-      {k:'ok',t:'PCR Type',d:ex.pcrType},
-      {k:'ok',t:'变更对象',d:ex.sku||'CPU SKU'},
-      {k:'ok',t:'变更动作',d:ex.action}
-    ]));
-    renderPlist();inChecks();
+    PARSE.steps[0].body=typeStepBody();
+    renderPlist();
   });
-  later(900,()=>{PARSE.steps[0].st='done';PARSE.steps[0].sum=ex.pcrType;PARSE.steps[0].open=false;
+  later(900,()=>{PARSE.steps[0].st='pending';PARSE.steps[0].sum='待确认';PARSE.steps[0].open=false;
+    PARSE.steps[0].body=typeStepBody();
     PARSE.steps[1].st='run';PARSE.steps[1].open=true;PARSE.steps[1].sum='识别中';
     PARSE.steps[1].body=ruleBanner('s2')+`<div class="rule-note">${RULE_FOOT}</div>`;
     renderPlist();
@@ -2929,11 +3125,13 @@ function fillStep4(){
   if(f){f.open=false;const miss=missingMustLabels();f.st=mustAllOk()?'done':'warn';f.sum=mustAllOk()?'必填已齐':(miss.length?('还差 '+miss.join('、')):'待确认');}
   const sp=stepBy('split');
   if(sp&&PARSE.splitDecision==null){sp.st='warn';sp.sum='AI 建议拆分';sp.body=splitBody();}
+  if(!PARSE.typeMeta) applyTypeMeta(effectiveType());
+  const meta=PARSE.typeMeta;
   const ix=PARSE.steps.findIndex(s=>s.id==='v');
   PARSE.steps[ix].st='run';PARSE.steps[ix].open=true;PARSE.steps[ix].sum='分析中';
   PARSE.steps[ix].body=stepBody('s4',checkHtml([
-    {k:'ok',t:'检索相似 PCR',d:'找到 3 条'},
-    {k:'ok',t:'比对历史实施周期',d:'同类平均 18 天'},
+    {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条`},
+    {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
     {k:'run',t:'分析成本影响',d:'进行中…'},
     {k:'wait',t:'汇总价值判断',d:''}
   ]));
@@ -2941,8 +3139,8 @@ function fillStep4(){
   later(700,()=>{
     if(PARSE.skipped)return;
     PARSE.steps[ix].body=stepBody('s4',checkHtml([
-      {k:'ok',t:'检索相似 PCR',d:'找到 3 条'},
-      {k:'ok',t:'比对历史实施周期',d:'同类平均 18 天'},
+      {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条（${meta.similarHint||'同类'}）`},
+      {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
       {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
       {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
     ]));
@@ -2991,8 +3189,10 @@ function decideSplit(act){
 
 function fillStep5Body(){
   const ready=mustAllOk();
+  const typ=PARSE.typeConfirmed&&PARSE.pcrType?PARSE.pcrType:'（未确认）';
+  const typeOk=PARSE.typeConfirmed?'ok':'warn';
   const checks=checkHtml([
-    {k:'ok',t:'PCR Type 合理性',d:'Hardware/SBB 与 CPU SKU 替换匹配'},
+    {k:typeOk,t:'PCR Type 合理性',d:PARSE.typeConfirmed?(typ+' 与变更内容匹配'):'类型待用户确认'},
     {k:ready?'ok':'warn',t:'必填字段',d:ready?'已齐备':'Geo、目标实施日或 Business Case 待确认'},
     {k:'ok',t:'重复性检查',d:'未发现相同在途 PCR'}
   ]);
@@ -3001,19 +3201,17 @@ function fillStep5Body(){
 
 function fillAllStepBodies(ex){
   const prod=ex.products[0]||'未识别产品';
-  const u=stepBy('u');if(u)u.body=stepBody('s1',checkHtml([
-    {k:'ok',t:'PCR Type',d:ex.pcrType},
-    {k:'ok',t:'变更对象',d:ex.sku||'CPU SKU'},
-    {k:'ok',t:'变更动作',d:ex.action}
-  ]));
+  const u=stepBy('u');if(u)u.body=typeStepBody();
   const p=stepBy('p');if(p)p.body=stepBody('s2',checkHtml([
     {k:'ok',t:'影响产品',d:prod},
     {k:PARSE.fields.geo.k==='ok'?'ok':'err',t:'Geo Impact',d:PARSE.fields.geo.d}
   ]));
   const f=stepBy('f');if(f)f.body=fillStep3Html();
+  if(!PARSE.typeMeta) applyTypeMeta(effectiveType());
+  const meta=PARSE.typeMeta;
   const v=stepBy('v');if(v)v.body=stepBody('s4',checkHtml([
-    {k:'ok',t:'检索相似 PCR',d:'找到 3 条'},
-    {k:'ok',t:'比对历史实施周期',d:'同类平均 18 天'},
+    {k:'ok',t:'检索相似 PCR',d:`找到 ${meta.similar} 条（${meta.similarHint||'同类'}）`},
+    {k:'ok',t:'比对历史实施周期',d:`同类平均 ${meta.leadDays} 天`},
     {k:'ok',t:'分析成本影响',d:'成本叙事与 Business Case 不一致'},
     {k:'ok',t:'汇总价值判断',d:'建议补充后再提'}
   ]));
@@ -3024,10 +3222,12 @@ function fillAllStepBodies(ex){
 function finishParse(ex){
   PARSE.animating=false;PARSE.skipped=true;
   if(!PARSE.fields) initParseFields(ex);
+  if(!PARSE.typeMeta) applyTypeMeta(PARSE.typePick||'Hardware/SBB');
   if(!PARSE.steps.length){
     PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
+    const uDone=PARSE.typeConfirmed&&PARSE.pcrType;
     PARSE.steps=[
-      {id:'u',title:'理解变更内容',st:'done',sum:ex.pcrType,info:'s1',open:false,body:''},
+      {id:'u',title:'理解变更内容',st:uDone?'done':'pending',sum:uDone?PARSE.pcrType:'待确认',info:'s1',open:false,body:''},
       {id:'p',title:'识别影响产品',st:'done',sum:ex.products[0]||'未识别',info:'s2',open:false,body:''},
       {id:'f',title:'补全必填信息',st:'warn',sum:'',info:'s3',open:false,body:''},
       {id:'v',title:'可行性与价值评估',st:'done',sum:'建议补充后再提',info:'s4',open:false,body:''},
@@ -3069,6 +3269,8 @@ window.suspendParse=suspendParse;window.newChatSession=newChatSession;window.bac
 window.renderPlist=renderPlist;window.openPcrForce=openPcrForce;window.resolveIssue=resolveIssue;window.decideSplit=decideSplit;
 window.mustAllOk=mustAllOk;window.refreshParseUI=refreshParseUI;window.clickStep=clickStep;
 window.toggleIssue=toggleIssue;window.toggleAllIssues=toggleAllIssues;window.toggleThink=toggleThink;window.toggleAllSteps=toggleAllSteps;
+window.confirmPcrType=confirmPcrType;window.selectTypeOpt=selectTypeOpt;window.openTypePicker=openTypePicker;
+window.toggleTypeMapDetail=toggleTypeMapDetail;
 </script>
 </body>
 </html>
