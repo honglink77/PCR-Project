@@ -1,0 +1,262 @@
+<div id="view-home">
+      <div class="parse-bar" id="parseBar" onclick="backToOverview()" title="返回总览">
+        <span>←</span>
+        <div class="pb-t">Overview · 148 in progress, 12 overdue</div>
+        <span id="parseBarCaret">▾</span>
+        <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrFold',37)">37</span>
+      </div>
+      <div class="page" id="homeStack">
+
+        <div class="greet">
+          <h1>下午好，Jordan</h1>
+          <p>OTM · 全盘 148 条 PCR 在途，其中 12 条已逾期</p>
+        </div>
+        <div style="display:none">
+        </div>
+
+        <!-- AI BRIEFING -->
+        <div class="brief">
+          <div class="brief-h">
+            <span class="ai">AI</span><span class="bt">现在需要你定的三件事</span><span class="tipdot" onclick="showTip(event,'brief',4)">4</span>
+            <span class="live"><span class="pulse"></span>数据更新至 2 分钟前</span>
+          </div>
+
+          <div class="bitem r">
+            <span class="n">1</span>
+            <div style="flex:1">
+              <div class="bc"><span class="ent" onclick="jump('X1 G13')">ThinkPad X1 G13 CPU 换代</span> 的认证周期增加 3 周，11/15 量产目标<b>已不可达</b>。需本周决定改期或缩减 GEO 范围。</div>
+              <div class="why" onclick="ev(this)"><svg class="i" style="width:12px;height:12px"><path d="M4 6.5L8 10l4-3.5"/></svg>依据 3 条证据</div><span class="tipdot" onclick="showTip(event,'evi',25)">25</span>
+              <div class="evbox">
+                <div class="er"><span class="src">Evaluation</span><span>Certification 职能提出 ANATEL/BIS 送测需额外 3 周，且不可并行。</span></div>
+                <div class="er"><span class="src">Target Date</span><span>目标实施日 2026-11-15，反推认证须在 10/20 前启动，现已超期。</span></div>
+                <div class="er"><span class="src">Similar PCR</span><span>CP-2024-09815 同类延期最终采用分批发布方式处理。</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bitem a">
+            <span class="n">2</span>
+            <div style="flex:1">
+              <div class="bc"><span class="ent" onclick="jump('XX 订单交付')">XX 客户订单交付</span><span class="tipdot" onclick="showTip(event,'ent',6)">6</span> 项目下 8 条 PCR，整体进度 61%，<b>落后计划 9 天</b>，瓶颈在 ODM 侧 BOM 建立未回写。</div>
+              <div class="why" onclick="ev(this)"><svg class="i" style="width:12px;height:12px"><path d="M4 6.5L8 10l4-3.5"/></svg>依据 2 条证据</div>
+              <div class="evbox">
+                <div class="er"><span class="src">Work Item</span><span>3 项 PLM BOM 建立任务超过 Target Date 未回写，ODM 侧未更新状态。</span></div>
+                <div class="er"><span class="src">项目汇总</span><span>8 条 PCR 中 5 条处于 Implementation，平均滞后 9 天。</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bitem a">
+            <span class="n">3</span>
+            <div style="flex:1">
+              <div class="bc">3 条 PCR 的成本影响已超出评估区间，但 <b>Cost 记录仍未维护</b>，将阻塞 Approve to Close。</div>
+              <div class="why" onclick="ev(this)"><svg class="i" style="width:12px;height:12px"><path d="M4 6.5L8 10l4-3.5"/></svg>依据 2 条证据</div>
+              <div class="evbox">
+                <div class="er"><span class="src">Cost Record</span><span>M90q 二供等 3 条 PCR 未建立成本记录，成本影响已由开发 Vote 识别。</span></div>
+                <div class="er"><span class="src">规则</span><span>Approve to Close 前需完成成本维护，当前为阻断项。</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPI -->
+        <div style="position:relative"><span class="tipdot abs" onclick="showTip(event,'kpi',7)">7</span></div>
+        <div class="kpis">
+          <button class="kpi"><div class="kl">WIP PCR</div><div class="kv">148<span class="kd up">▲12</span></div></button>
+          <button class="kpi"><div class="kl">Overdue</div><div class="kv">12<span class="kd up">▲3</span></div></button>
+          <button class="kpi" onclick="switchView('task')"><div class="kl">Pending Decision</div><div class="kv">3<span class="kd fl">●</span></div></button>
+          <button class="kpi"><div class="kl">Avg Cycle</div><div class="kv">23<span class="kd dn">▼2d</span></div></button>
+          <button class="kpi"><div class="kl">Closed This Month</div><div class="kv">34<span class="kd dn">▲6</span></div></button>
+          <button class="kpi"><div class="kl">Critical</div><div class="kv">9<span class="kd fl">●</span></div></button>
+        </div>
+
+        <!-- MODULES -->
+        <div class="sechead"><h2>工作区</h2><span class="tipdot" onclick="showTip(event,'mods',8)">8</span><span class="cn">点击进入完整视图</span></div>
+        <div class="mods">
+          <button class="mod" onclick="switchView('task')">
+            <div class="mh"><span class="mi t"><svg class="i" style="width:17px;height:17px"><path d="M5.5 2h5a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 10.5 14h-5A1.5 1.5 0 0 1 4 12.5v-9A1.5 1.5 0 0 1 5.5 2z"/><path d="M6.5 6h3M6.5 9h3"/></svg></span>
+              <div><div class="mt">我的任务</div><div class="ms">Task Workbench</div></div></div>
+            <div class="md">按 PACE 主流程处理单条 PCR：投票、评估、审核与 OTM 决策。</div>
+            <div class="tags"><span class="tg">待办 12</span><span class="tg hot">待决策 3</span><span class="tg">批量 Vote</span></div>
+          </button>
+
+          <button class="mod" onclick="askPreset('按产品和项目维度分析 PCR 分布与瓶颈')">
+            <div class="mh"><span class="mi p"><svg class="i" style="width:17px;height:17px"><path d="M2.5 13.5V9M6.5 13.5V4M10.5 13.5V6.5M14 13.5V2.5"/></svg></span>
+              <div><div class="mt">统计分析</div><div class="ms">Portfolio Analytics</div></div></div>
+            <div class="md">按产品、项目、职能与 GEO 透视 PCR 分布、周期与瓶颈，可逐层钻取。</div>
+            <div class="tags"><span class="tg">产品维度</span><span class="tg">项目维度</span><span class="tg">趋势与周期</span></div>
+          </button>
+
+          <button class="mod" onclick="askPreset('查看进行中的 ODM 执行项目健康度')">
+            <div class="mh"><span class="mi o"><svg class="i" style="width:17px;height:17px"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg></span>
+              <div><div class="mt">执行管理</div><div class="ms">ODM Execution</div></div></div>
+            <div class="md">把每条进入实施的 PCR 当作小项目管理：进度、里程碑、风险与 Work Item。</div>
+            <div class="tags"><span class="tg">进行中 9</span><span class="tg hot">风险 2</span><span class="tg">ODM 回写</span></div>
+          </button>
+        </div>
+
+        <!-- WATCH + HEALTH -->
+        <div class="sechead"><h2>我关注的 PCR</h2><span class="tipdot" onclick="showTip(event,'watch',9)">9</span><span class="cn">12 条 · 按需要注意的程度排序</span>
+          <button class="lk" onclick="toast('管理订阅规则')">管理订阅<svg class="i" style="width:13px;height:13px"><path d="M6 4l3.5 4L6 12"/></svg></button></div>
+        <div class="cards">
+          <div class="card">
+            <div class="ai-line"><span class="sp">AI</span><span>3 条关注中的 PCR 都卡在认证或 ODM 回写，属于同一类瓶颈；建议优先处理 X1 G13。</span></div>
+
+            <div class="wrow" onclick="tog(this,'p1')">
+              <span class="dot r"></span>
+              <div class="wn"><div class="wt">X1 Carbon G13 CPU Ultra 165U 换代</div><div class="wp mono">PCR-2026-08871 · OTM Assessment</div></div>
+              <div class="prog"><div class="bar"><div class="fil" style="width:72%;background:var(--amber)"></div></div><div class="pt">72%</div></div>
+              <div class="sig risk">风险 2</div><div class="cost flat">● 持平</div><span class="tipdot" onclick="showTip(event,'signals',10)">10</span>
+            </div>
+            <div class="inline" id="p1">
+              <div class="inl-in">
+                <div class="inl-h"><span class="tt">OTM ASSESSMENT</span><h4>待你决策</h4><span class="tipdot" onclick="showTip(event,'inline',12)">12</span>
+                  <button class="cl" onclick="event.stopPropagation();tog(document.querySelector('[onclick*=p1]'),'p1')">收起 ▴</button></div>
+                <div class="agent"><span class="ai">AI</span><div class="tx">5 个职能已回收 4 个。<b>Certification 提出 Disagree</b>（认证 +3 周），Cost 尚未维护记录。处理路径由你决定，我只说明每条路径的条件与后果。</div></div>
+                <table class="sumtab">
+                  <thead><tr><th>职能</th><th>立场</th><th>关键结论</th></tr></thead>
+                  <tbody>
+                    <tr><td>Development</td><td><span class="vt ag">Agree</span></td><td>pin-to-pin 换代，无硬件影响</td></tr>
+                    <tr><td>Quality</td><td><span class="vt ag">Agree</span></td><td>沿用现有可靠性矩阵</td></tr>
+                    <tr><td>Supply Chain</td><td><span class="vt ni">No Impact</span></td><td>供货无变化</td></tr>
+                    <tr><td>Certification</td><td><span class="vt dg">Disagree</span></td><td>认证 +3 周，威胁 11/15 目标</td></tr>
+                    <tr><td>Cost</td><td><span class="vt pd">待维护</span></td><td>成本记录尚未建立</td></tr>
+                  </tbody>
+                </table>
+                <div style="position:relative"><span class="tipdot abs" onclick="showTip(event,'paths',13)">13</span></div>
+                <div class="paths">
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Approve with Work Item</div><div class="pd">带工作项批准 · 需 ≥1 有效 Work Item</div></button>
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Approve to Close</div><div class="pd">当前有未决成本项，暂不可用</div></button>
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Return</div><div class="pd">退回补充认证与成本材料</div></button>
+                  <button class="path" onclick="event.stopPropagation();pick(this)"><div class="pt">Pending</div><div class="pd">挂起等待认证最终结论</div></button>
+                </div>
+                <div class="inl-f">
+                  <span class="nt">决策与 Work Item 经你确认后才在 PACE 生效</span><span class="tipdot" onclick="showTip(event,'writeback',14)">14</span><span class="sp"></span>
+                  <button class="btn btn-g" onclick="event.stopPropagation();switchView('task')">完整视图</button>
+                  <button class="btn btn-p" id="p1btn" disabled onclick="event.stopPropagation();done('p1')">确认决策</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="wrow" onclick="tog(this,'p2')">
+              <span class="dot a"></span>
+              <div class="wn"><div class="wt">M90q G6 DDR5 颗粒二供导入</div><div class="wp mono">CP-2026-04412 · Implementation</div></div>
+              <div class="prog"><div class="bar"><div class="fil" style="width:45%;background:var(--amber)"></div></div><div class="pt">45%</div></div>
+              <div class="sig risk">风险 1</div><div class="cost up">▲ +2.1%</div>
+            </div>
+            <div class="inline" id="p2">
+              <div class="inl-in">
+                <div class="inl-h"><span class="tt">EXECUTION</span><h4>执行情况</h4>
+                  <button class="cl" onclick="event.stopPropagation();tog(document.querySelector('[onclick*=p2]'),'p2')">收起 ▴</button></div>
+                <div class="agent"><span class="ai">AI</span><div class="tx">4 项 Work Item 中 <b>1 项逾期</b>（ODM 侧 BOM 建立）。成本较评估基线上浮 2.1%，尚在可接受区间但需 Cost 确认。</div></div>
+                <table class="sumtab">
+                  <thead><tr><th>Work Item</th><th>系统 / ODM</th><th>状态</th></tr></thead>
+                  <tbody>
+                    <tr><td>二供 BOM 建立</td><td>PLM · ODM-A</td><td><span class="vt dg">逾期 3 天</span></td></tr>
+                    <tr><td>物料认证更新</td><td>T1</td><td><span class="vt ni">进行中</span></td></tr>
+                    <tr><td>采购计划调整</td><td>OD</td><td><span class="vt ag">已回写</span></td></tr>
+                    <tr><td>成本记录维护</td><td>PACE</td><td><span class="vt pd">待处理</span></td></tr>
+                  </tbody>
+                </table>
+                <div class="inl-f"><span class="nt">升级将通知 Assignee 及其负责人</span><span class="sp"></span>
+                  <button class="btn btn-g" onclick="event.stopPropagation();toast('已在「执行管理」中打开该项目')">执行项目</button>
+                  <button class="btn btn-p" onclick="event.stopPropagation();done('p2')">升级逾期项</button></div>
+              </div>
+            </div>
+
+            <div class="wrow" onclick="tog(this,'p3')">
+              <span class="dot r"></span>
+              <div class="wn"><div class="wt">T14 G6 面板二供 · 实施跟踪</div><div class="wp mono">PCR-2026-08830 · Implementation</div></div>
+              <div class="prog"><div class="bar"><div class="fil" style="width:30%;background:var(--red)"></div></div><div class="pt">30%</div></div>
+              <div class="sig risk">逾期 4d</div><div class="cost na">—</div><span class="tipdot" onclick="showTip(event,'cost',11)">11</span>
+            </div>
+            <div class="inline" id="p3">
+              <div class="inl-in">
+                <div class="inl-h"><span class="tt">EXECUTION</span><h4>执行情况</h4>
+                  <button class="cl" onclick="event.stopPropagation();tog(document.querySelector('[onclick*=p3]'),'p3')">收起 ▴</button></div>
+                <div class="agent"><span class="ai">AI</span><div class="tx">该 PCR 已<b>整体逾期 4 天</b>，根因是 OD 采购计划调整未完成，且 ODM 侧连续两周未更新状态。成本字段对你当前角色不可见。</div></div>
+                <div class="inl-f"><span class="nt">建议同时升级至 ODM 对接人</span><span class="sp"></span>
+                  <button class="btn btn-g" onclick="event.stopPropagation();toast('已打开执行项目工作区')">执行项目</button>
+                  <button class="btn btn-p" onclick="event.stopPropagation();done('p3')">升级并通知</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>执行健康度</h3><span class="tipdot" onclick="showTip(event,'health',15)">15</span><span class="ct">9 个进行中</span></div>
+            <div class="hstat">
+              <button class="hs r" onclick="toast('查看 2 个风险项目')"><div class="hv">2</div><div class="hl">风险</div></button>
+              <button class="hs a" onclick="toast('查看 3 个需关注项目')"><div class="hv">3</div><div class="hl">关注</div></button>
+              <button class="hs g" onclick="toast('查看 4 个健康项目')"><div class="hv">4</div><div class="hl">健康</div></button>
+            </div>
+            <div class="ai-line"><span class="sp">AI</span><span>2 个风险项目均因 ODM 侧回写滞后，非技术问题。</span></div>
+            <div class="card-h" style="padding-top:4px"><h3>职能负载</h3><span class="tipdot" onclick="showTip(event,'load',16)">16</span><span class="ct">Vote / Evaluation 积压</span></div>
+            <div class="loadwrap">
+              <div class="lrow"><span class="ln">Certification</span><span class="lb"><span class="lf hot" style="width:100%"></span></span><span class="lv">24</span></div>
+              <div class="lrow"><span class="ln">Development</span><span class="lb"><span class="lf" style="width:62%"></span></span><span class="lv">15</span></div>
+              <div class="lrow"><span class="ln">Cost</span><span class="lb"><span class="lf" style="width:37%"></span></span><span class="lv">9</span></div>
+              <div class="lrow"><span class="ln">Quality</span><span class="lb"><span class="lf" style="width:25%"></span></span><span class="lv">6</span></div>
+            </div>
+            <div class="ai-line" style="margin-top:12px"><span class="sp">AI</span><span>认证积压是当前主瓶颈，较上周增加 9 条。</span></div>
+          </div>
+        </div>
+
+        <!-- MATRIX + FEED -->
+        <div class="sechead"><h2>分布与动态</h2>
+          <button class="lk" onclick="toast('进入「统计分析」完整视图')">完整分析<svg class="i" style="width:13px;height:13px"><path d="M6 4l3.5 4L6 12"/></svg></button></div>
+        <div class="cards">
+          <div class="card">
+            <div class="card-h"><h3>产品 × 阶段分布</h3><span class="tipdot" onclick="showTip(event,'matrix',17)">17</span><span class="ct">点击单元格查看明细</span></div>
+            <div class="ai-line"><span class="sp">AI</span><span>积压集中在 Vote 阶段（41 条，较上周 +9）；X1 产品线同时压着 17 条变更，是当前最挤的产品线。</span></div>
+            <table class="mx">
+              <thead><tr><th>产品线</th><th>Submit</th><th>Review</th><th>Screen</th><th>Vote</th><th>Assess</th><th>Impl</th></tr></thead>
+              <tbody>
+                <tr><td>ThinkPad X1</td>
+                  <td><span class="cell c1" onclick="toast('X1 · Submit 阶段 2 条')">2</span></td>
+                  <td><span class="cell c2" onclick="toast('X1 · Review 阶段 3 条')">3</span></td>
+                  <td><span class="cell c1" onclick="toast('X1 · Screen 阶段 1 条')">1</span></td>
+                  <td><span class="cell c3" onclick="toast('X1 · Vote 阶段 4 条')">4</span></td>
+                  <td><span class="cell cw" onclick="toast('X1 · Assessment 2 条，含 1 条逾期')">2</span></td>
+                  <td><span class="cell c3" onclick="toast('X1 · Implementation 5 条')">5</span></td></tr>
+                <tr><td>ThinkCentre M90q<span class="tipdot" onclick="showTip(event,'dim',18)">18</span></td>
+                  <td><span class="cell c1">1</span></td><td><span class="cell c0">0</span></td>
+                  <td><span class="cell c1">2</span></td><td><span class="cell c1">1</span></td>
+                  <td><span class="cell c0">0</span></td><td><span class="cell cw">3</span></td></tr>
+                <tr><td>ThinkSystem SR650</td>
+                  <td><span class="cell c0">0</span></td><td><span class="cell c1">1</span></td>
+                  <td><span class="cell c0">0</span></td><td><span class="cell c1">2</span></td>
+                  <td><span class="cell c2">3</span></td><td><span class="cell c1">1</span></td></tr>
+                <tr><td>Legion Pro</td>
+                  <td><span class="cell c1">2</span></td><td><span class="cell c1">2</span></td>
+                  <td><span class="cell c1">1</span></td><td><span class="cell c2">3</span></td>
+                  <td><span class="cell c1">1</span></td><td><span class="cell c1">2</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="card-h"><h3>变化</h3><span class="tipdot" onclick="showTip(event,'feed',19)">19</span><span class="ct">自你上次登录 · 2 天前</span></div>
+            <div class="feed">
+              <div class="fr"><span class="fi r"><svg class="i" style="width:12px;height:12px"><path d="M8 3v6M8 12h.01"/></svg></span>
+                <div class="fc"><div class="ft">Certification 在 <span class="ent" onclick="jump('X1 G13')">X1 G13</span> 提出 Disagree</div><div class="fm">2 小时前 · 触发上方第 1 项</div></div><span class="new"></span></div>
+              <div class="fr"><span class="fi a"><svg class="i" style="width:12px;height:12px"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3.5l2 1"/></svg></span>
+                <div class="fc"><div class="ft">OD 采购计划 Work Item 逾期转红</div><div class="fm">昨天 · T14 G6 面板二供</div></div><span class="new"></span></div>
+              <div class="fr"><span class="fi b"><svg class="i" style="width:12px;height:12px"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+                <div class="fc"><div class="ft"><span class="ent" onclick="jump('XX 订单交付')">XX 订单交付</span> 项目新纳入 2 条 PCR</div><div class="fm">昨天 · 现共 8 条</div></div></div>
+              <div class="fr"><span class="fi g"><svg class="i" style="width:12px;height:12px"><path d="M3 8.5l3 3 7-7"/></svg></span>
+                <div class="fc"><div class="ft">3 条 PCR 完成 Implementation Review</div><div class="fm">昨天 · 已聚合同类变化</div></div></div>
+              <div class="fr"><span class="fi a"><svg class="i" style="width:12px;height:12px"><path d="M8 2l6 11H2z"/></svg></span>
+                <div class="fc"><div class="ft">Vote 环节积压增加 9 条</div><div class="fm">2 天前 · 主要来自 Certification</div></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="parse-rest" id="parseLayer">
+        <div class="parse-user" id="parseUser"></div>
+        <div class="parse-flow" id="parseSticky">
+          <div class="plist" id="plist"></div>
+        </div>
+        <div class="parse-chat" id="parseChat"></div>
+      </div>
+      </div>

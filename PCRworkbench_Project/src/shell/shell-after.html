@@ -1,0 +1,84 @@
+<!-- ASK BAR -->
+    <div class="askwrap" id="askwrap">
+      <div class="ask">
+        <div style="position:relative"><span class="tipdot abs" onclick="showTip(event,'ask',20)">20</span>
+          <span class="tipdot abs" style="right:14px" onclick="showTip(event,'pcrEntry',35)">35</span>
+        </div>
+        <div class="guide" id="guide">
+          <div class="guide-g">提交变更需求 <span>粘贴邮件、会议纪要，或直接描述</span><span class="tipdot" onclick="showTip(event,'pcrGuide',36)">36</span></div>
+          <button class="guide-i" data-g="write" onclick="guideCreate()">粘贴邮件、会议纪要，或直接描述</button>
+          <div class="guide-g">提问与分析 <span>读取现状，不写入</span></div>
+          <button class="guide-i" data-g="read" onclick="askq(this)">X1 G13 现在什么状态</button>
+          <button class="guide-i" data-g="read" onclick="askq(this)">XX 订单交付项目为什么慢</button>
+          <button class="guide-i" data-g="read" onclick="askq(this)">按产品看逾期分布</button>
+          <button class="guide-i" data-g="read" onclick="askq(this)">对比 M90q 与相似案例成本</button>
+        </div>
+        <div class="chips" id="askChips">
+          <button class="chip" onclick="askq(this)">按产品看逾期分布</button>
+          <button class="chip" onclick="askq(this)">XX 订单交付项目为什么慢</button>
+          <button class="chip" onclick="askq(this)">认证积压的根因</button>
+          <button class="chip" onclick="askq(this)">对比 M90q 与相似案例成本</button>
+        </div>
+        <div class="detectbar" id="detectbar">
+          <p>检测到一段变更描述，看起来是硬件变更请求</p>
+          <div class="db-act">
+            <button class="pri" onclick="acceptDetect()">解析为 PCR</button>
+            <button onclick="dismissDetect()">就当普通提问</button>
+          </div>
+        </div>
+        <div class="ask-stack">
+          <div class="plusmenu" id="plusmenu">
+            <button onclick="menuCreate()"><span class="pm-t">📝 创建 PCR</span><span class="pm-s">从描述、邮件或纪要</span></button>
+            <div class="pm-div"></div>
+            <button onclick="menuUpload()"><span class="pm-t">📎 上传附件</span><span class="pm-s">邮件 / 文档 / 图片</span></button>
+            <div class="pm-div"></div>
+            <button onclick="menuFill('分析产品或项目')"><span class="pm-t">📊 分析产品或项目</span></button>
+            <button onclick="menuFill('查询 PCR 状态')"><span class="pm-t">🔍 查询 PCR 状态</span></button>
+          </div>
+          <div class="askbox" id="askbox">
+            <button class="plusbtn" id="plusbtn" title="创建与更多" onclick="togglePlus(event)">+</button>
+            <button class="clipbtn" title="上传附件" onclick="menuUpload()">
+              <svg class="i"><path d="M14 7.5l-6.2 6.2a3 3 0 0 1-4.2-4.2L9.5 3.6a2 2 0 0 1 2.8 2.8L6.4 12.3"/></svg>
+            </button>
+            <input id="askin" placeholder="问点什么，或让我分析某个产品、项目…">
+            <button class="send" onclick="sendq()"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
+          </div>
+        </div>
+        <input type="file" id="pcrfile" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg,.eml,.msg,.txt" style="display:none">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 任务视图：写回确认弹窗 -->
+<div class="scrim" id="scrim"><div id="modalHost"></div></div>
+
+<!-- 结论清单面板 -->
+<div class="lscrim" id="lscrim" onclick="closeList()"></div>
+<aside class="listp" id="listp">
+  <div class="lp-h">
+    <div class="r1"><h3>结论清单</h3>
+      <button class="x" onclick="closeList()"><svg class="i"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
+    <div class="sub" id="lpsub">共 20 处说明</div>
+    <div class="lp-bar"><span id="lpbar" style="width:0%"></span></div>
+    <div class="lp-search">
+      <svg class="i" style="width:14px;height:14px;color:var(--ink-3)"><circle cx="7" cy="7" r="5"/><path d="M10.8 10.8L14 14"/></svg>
+      <input id="lpq" placeholder="搜索标题或结论内容…" oninput="renderList()">
+    </div>
+  </div>
+  <div class="lp-fil" id="lpfil">
+    <button class="on" data-f="all" onclick="setFil(this)">全部</button>
+    <button data-f="noted" onclick="setFil(this)">已记录</button>
+    <button data-f="none" onclick="setFil(this)">未讨论</button>
+    <button data-f="open" onclick="setFil(this)">有争议</button>
+    <button data-f="pending" onclick="setFil(this)">待确认</button>
+    <button data-f="agreed" onclick="setFil(this)">已确认</button>
+  </div>
+  <div class="lp-list" id="lplist"></div>
+</aside>
+
+<div class="toast" id="toast"><span class="k">✓</span><span id="tmsg"></span></div>
+
+
+
