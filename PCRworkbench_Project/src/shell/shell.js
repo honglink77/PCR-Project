@@ -88,6 +88,22 @@ const TIPS_TASK={
    ix:'任务标题条 ▾ 是流程操作（PACE / 转派 / Pending）；顶栏 ▾ 是会话操作（Pin / Rename / Delete）。',
    fn:'前者作用于 PCR 任务本身，后者作用于这次对话记录，层级不同不可混淆。',
    ref:['信息架构']},
+ batchJudge:{t:'AI 的价值在于判断哪些能批量',
+   ix:'AI 主动发现同类任务并给出合并理由，同时排除性质不同的那条（如内存二供 vs CPU SKU）。',
+   fn:'按任务类型分组用筛选器就能做；AI 的价值是读懂变更内容后判断可比性。能指出「这条不该合并」比「帮你全选」更有说服力。',
+   ref:['批量任务处理']},
+ batchIndep:{t:'逐行独立、单行失败不影响其他',
+   ix:'提交后显示逐条结果，失败行保留输入并可单独重试；成功行不受失败行影响。',
+   fn:'批量处理最大的风险是一条失败导致整批回滚或用户输入丢失，必须逐行独立。',
+   ref:['7.7 批量任务处理']},
+ batchExit:{t:'批量不是单行道',
+   ix:'底部保留「逐条处理」入口，随时可退回常规单任务列表模式。',
+   fn:'用户可能在批量过程中发现某条需要仔细看，必须能随时切回单条模式，不能被锁在批量视图里。',
+   ref:['批量任务处理']},
+ batchVsRisk:{t:'批量属于效率机会而非决策事项',
+   ix:'批量提示放在任务列表顶部与工作区卡片，不进入首页的 AI 判断三件事。',
+   fn:'首页判断段留给需要决策的风险；批量是「可以更快干完」的事，混在一起会冲淡紧迫感。',
+   ref:['信息架构']},
 };
 
 
@@ -245,6 +261,10 @@ const TIPS_HOME={
    ix:'提交后标记「已完成」，可回看但只读；不自动隐藏或归档。',
    fn:'后续需要回看当时的判断依据，是审计与追溯的基础。',
    ref:['P-06 可解释可追溯']},
+ batchVsRisk:{t:'批量属于效率机会而非决策事项',
+   ix:'批量提示放在任务列表顶部与工作区卡片，不进入首页的 AI 判断三件事。',
+   fn:'首页判断段留给需要决策的风险；批量是「可以更快干完」的事，混在一起会冲淡紧迫感。',
+   ref:['信息架构']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -450,7 +470,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);

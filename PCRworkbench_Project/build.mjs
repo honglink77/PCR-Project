@@ -37,6 +37,8 @@ const parts = [
   '\n',
   read('src/mytasks/mytasks.js'),
   '\n',
+  read('src/mytasks/batch.js'),
+  '\n',
   read('src/overview/overview.js'),
   read('src/shell/tail.html'),
 ];

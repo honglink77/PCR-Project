@@ -243,3 +243,64 @@
   .view-task .toast .tk{width:18px;height:18px;border-radius:50%;background:var(--agree);display:grid;place-items:center;font-size:11px}
 
   .view-task .empty{height:100%;display:grid;place-items:center;color:var(--ink-3);font-size:13px}
+
+  /* ══ Batch merge ══ */
+  .taskwrap .batch-suggest-host{flex:none;padding:0 10px 8px}
+  .taskwrap .batch-suggest{display:flex;gap:8px;padding:10px;border:1px solid var(--border);border-radius:10px;
+    background:var(--panel);align-items:flex-start}
+  .taskwrap .batch-suggest .bs-ai .ai{width:22px;height:22px;border-radius:6px;background:var(--accent);color:#fff;
+    display:grid;place-items:center;font-size:10px;font-weight:700}
+  .taskwrap .batch-suggest .bs-txt{font-size:12px;line-height:1.55;color:var(--ink-2)}
+  .taskwrap .batch-suggest .bs-txt b{color:var(--ink);font-weight:600}
+  .taskwrap .batch-suggest .bs-acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .taskwrap .batch-suggest .bs-merge{padding:4px 10px;font-size:11.5px;border-radius:7px}
+  .taskwrap .batch-suggest .bs-ignore{padding:4px 10px;font-size:11.5px;border-radius:7px}
+
+  .view-task .batch-card{margin-top:12px;border:1px solid var(--border);border-radius:12px;background:var(--panel);overflow:hidden}
+  .view-task .bc-h{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;
+    font-size:13px;font-weight:600;color:var(--ink)}
+  .view-task .bc-sel{font-size:12px;font-weight:500;color:var(--accent-ink);background:var(--accent-soft);
+    padding:2px 8px;border-radius:6px}
+  .view-task .bc-toolbar{display:flex;align-items:center;gap:14px;padding:0 14px 10px;flex-wrap:wrap;
+    font-size:12px;color:var(--ink-2)}
+  .view-task .bc-checkall{display:flex;align-items:center;gap:6px;cursor:pointer}
+  .view-task .bc-bulk select{margin-left:4px;border:1px solid var(--border);border-radius:6px;padding:3px 8px;
+    font:inherit;font-size:12px;background:var(--bg);color:var(--ink)}
+  .view-task .bc-table-wrap{overflow-x:auto;border-top:1px solid var(--border)}
+  .view-task .bc-table{width:100%;border-collapse:collapse;font-size:12px}
+  .view-task .bc-table th{text-align:left;font-weight:500;color:var(--ink-3);padding:8px 10px;
+    background:var(--soft);border-bottom:1px solid var(--border);white-space:nowrap}
+  .view-task .bc-table td{padding:10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--ink-2)}
+  .view-task .bc-table .c-chk{width:32px}
+  .view-task .bc-row{cursor:pointer}
+  .view-task .bc-row:hover{background:var(--soft)}
+  .view-task .bc-row.on{background:#F0FDFA}
+  .view-task .bc-row.alone{background:#FFFBF5}
+  .view-task .bp-id{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:2px}
+  .view-task .bp-chg{font-size:11.5px;line-height:1.4;color:var(--ink-2)}
+  .view-task .c-vote select{border:1px solid var(--border);border-radius:6px;padding:3px 6px;font:inherit;font-size:12px;background:var(--bg)}
+  .view-task .bv-tag{margin-top:4px;font-size:10px;font-weight:500}
+  .view-task .bv-tag.ai{color:var(--accent-ink)}
+  .view-task .bv-tag.mod{color:var(--ink)}
+  .view-task .bv-tag.warn{color:var(--warn)}
+  .view-task .bc-cmtbtn{text-align:left;font-size:11.5px;color:var(--ink-2);line-height:1.4;max-width:140px}
+  .view-task .bc-cmtbtn:hover{color:var(--accent-ink)}
+  .view-task .bc-edit td,.view-task .bc-detail td{background:var(--soft);padding:12px 14px}
+  .view-task .bc-ta{width:100%;border:1px solid var(--border);border-radius:8px;padding:8px 10px;
+    font:inherit;font-size:12.5px;min-height:64px;resize:vertical}
+  .view-task .bc-edit-acts{display:flex;gap:8px;margin-top:8px}
+  .view-task .bd-title{font-size:11px;font-weight:600;color:var(--ink-3);margin:6px 0 4px;letter-spacing:.04em}
+  .view-task .bd-sum{font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+  .view-task .bd-sim{font-size:12px;padding:4px 0;color:var(--ink-2)}
+  .view-task .bd-sim .pct{color:var(--agree);font-weight:600;margin-left:6px}
+  .view-task .bc-rule{padding:8px 14px 12px;font-size:11px;color:var(--warn);line-height:1.45}
+  .view-task .batch-result{margin-top:12px;border:1px solid var(--border);border-radius:12px;padding:12px 14px;background:var(--panel)}
+  .view-task .br-h{font-size:13px;font-weight:600;margin-bottom:8px}
+  .view-task .br-row{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12.5px;border-bottom:1px dashed var(--border)}
+  .view-task .br-row:last-of-type{border-bottom:none}
+  .view-task .br-mark{width:18px;text-align:center;font-weight:700}
+  .view-task .br-row.ok .br-mark{color:var(--agree)}
+  .view-task .br-row.fail .br-mark{color:var(--disagree)}
+  .view-task .br-msg{color:var(--ink-2);flex:1}
+  .view-task .br-sum{margin-top:8px;font-size:12px;color:var(--ink-2)}
+  .view-task .br-retry{padding:2px 8px;font-size:11px}

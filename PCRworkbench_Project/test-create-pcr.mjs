@@ -619,6 +619,82 @@ try {
     return /建议 Agree|验证范围/.test(s.comment || '') && (s.chat || []).some(m => m.role === 'user');
   }));
 
+  // ── 批量任务合并处理 ──
+  await page.evaluate(() => { if (typeof exitBatchMode === 'function') exitBatchMode(); batchDismissed = false; });
+  await page.evaluate(() => switchView('home'));
+  check('Overview 批量 Vote 标签可点', await page.evaluate(() => {
+    const tag = document.getElementById('batchVoteTag');
+    return !!tag && /批量 Vote 4/.test(tag.textContent) && tag.classList.contains('batch');
+  }));
+  check('批量提示未进首页 AI 判断三件事', await page.evaluate(() => {
+    const brief = document.querySelector('.brief, .ai-brief, .home-brief') || document.querySelector('.scroll');
+    const txt = document.body.innerText;
+    const inJudgment = [...document.querySelectorAll('.bt,.ai-line,.brief')].some(el =>
+      /批量 Vote|合并处理|Cost Vote/.test(el.textContent || '')
+    );
+    return !inJudgment;
+  }));
+  await page.evaluate(() => openBatchVote());
+  await page.waitForFunction(() => !!document.querySelector('.batch-card'));
+  check('Overview 点击批量 Vote 直达批量视图', await page.evaluate(() =>
+    batchMode && VIEW === 'task' && !!document.querySelector('.batch-card') &&
+    /批量处理 · 4 条 Cost Vote/.test(document.getElementById('centerHead')?.innerText || '')
+  ));
+  check('AI 说明可合并与不可合并', await page.evaluate(() => {
+    const txt = document.getElementById('centerBody')?.innerText || '';
+    return /CPU SKU|同封装/.test(txt) && /DDR5|单独处理/.test(txt);
+  }));
+  check('第 4 条默认不勾选且标注单独处理', await page.evaluate(() => {
+    const chk = document.querySelector('[data-bchk="bv4"]');
+    const row = document.querySelector('tr[data-bid="bv4"]');
+    return chk && !chk.checked && /建议单独处理/.test(row?.innerText || '') &&
+      batchState.selected.bv1 && batchState.selected.bv2 && batchState.selected.bv3;
+  }));
+  check('已选数量 3/4', await page.evaluate(() => /已选 3 \/ 4/.test(document.querySelector('.bc-sel')?.textContent || '')));
+  check('规则示例标注存在', await page.evaluate(() =>
+    /原型阶段规则示例/.test(document.querySelector('.bc-rule')?.textContent || '')
+  ));
+  check('底部有逐条处理入口', await page.evaluate(() => !!document.getElementById('batchToSingle')));
+  check('TIP 58–61 存在', await page.evaluate(() =>
+    !!(TIPS_TASK.batchJudge && TIPS_TASK.batchIndep && TIPS_TASK.batchExit && TIPS_TASK.batchVsRisk)
+  ));
+
+  await page.evaluate(() => {
+    document.querySelector('[data-bvote="bv1"]').value = 'ni';
+    document.querySelector('[data-bvote="bv1"]').dispatchEvent(new Event('change'));
+  });
+  check('人工改立场有「已修改」标记', await page.evaluate(() =>
+    batchState.edited.bv1 && /已修改/.test(document.querySelector('tr[data-bid="bv1"]')?.innerText || '')
+  ));
+
+  await page.click('#batchSubmit');
+  await page.waitForFunction(() => document.querySelector('.batch-result'));
+  check('提交显示逐条结果', await page.evaluate(() => {
+    const rows = [...document.querySelectorAll('.br-row')];
+    return rows.length === 3 && rows.some(r => r.classList.contains('ok')) && rows.some(r => r.classList.contains('fail'));
+  }));
+  check('失败行可重试且保留输入', await page.evaluate(() => {
+    const fail = batchState.results.find(r => !r.ok);
+    return fail && fail.id === 'bv3' && !!document.querySelector('[data-bretry="bv3"]') &&
+      !!batchState.comments.bv3;
+  }));
+  await page.click('[data-bretry="bv3"]');
+  check('单行重试成功', await page.evaluate(() => batchState.results.every(r => r.ok)));
+
+  await page.click('#batchToSingle');
+  check('可退回逐条模式', await page.evaluate(() => !batchMode && !document.querySelector('.batch-card')));
+
+  await page.evaluate(() => { batchDismissed = false; switchView('task'); });
+  await page.waitForFunction(() => document.getElementById('batchSuggest') && !document.getElementById('batchSuggest').hidden);
+  check('My Tasks 左侧有 AI 批量建议', await page.evaluate(() => {
+    const el = document.getElementById('batchSuggest');
+    return el && /Cost Vote|合并处理|CPU SKU/.test(el.innerText);
+  }));
+  await page.click('#batchIgnoreBtn');
+  check('忽略后本次会话不再提示', await page.evaluate(() =>
+    batchDismissed && document.getElementById('batchSuggest')?.hidden
+  ));
+
 } catch (e) {
   check('测试未抛异常', false, e.message);
 } finally {
