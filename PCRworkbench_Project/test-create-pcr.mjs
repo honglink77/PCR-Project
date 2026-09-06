@@ -695,6 +695,75 @@ try {
     batchDismissed && document.getElementById('batchSuggest')?.hidden
   ));
 
+  // ── Approval History Tab ──
+  await page.evaluate(() => {
+    if (typeof exitBatchMode === 'function') exitBatchMode();
+    reviewMode = null;
+    cur = 't4';
+    ctxTab = 'detail';
+    switchView('task');
+    renderTaskAll();
+  });
+  check('右侧有 Approval History Tab', await page.evaluate(() =>
+    [...document.querySelectorAll('.ctx-tab')].some(t => t.dataset.t === 'approval' && /Approval History/.test(t.textContent))
+  ));
+  check('中间 AI 有未解决问题提醒', await page.evaluate(() =>
+    !!document.querySelector('.ah-alert') && /认证影响|尚未/.test(document.querySelector('.ah-alert')?.innerText || '')
+  ));
+  await page.click('[data-ahgo]');
+  check('查看审批历史可切 Tab 并定位', await page.evaluate(() =>
+    ctxTab === 'approval' && !!document.querySelector('.ah-tl') &&
+    !!document.querySelector('[data-ahstep="tpm"]')
+  ));
+  check('时间线含 Return/跳过/进行中/未开始', await page.evaluate(() => {
+    const txt = document.getElementById('ctxBody')?.innerText || '';
+    return /Return|重新提交|已跳过|Sponsor|进行中|Benefit Tracking|Vote \/ Evaluation/.test(txt);
+  }));
+  check('竖线样式存在', await page.evaluate(() =>
+    !!document.querySelector('.ah-line.solid') && !!document.querySelector('.ah-line.dash')
+  ));
+  check('未解决标记在右侧', await page.evaluate(() =>
+    /问题尚未解决|认证影响/.test(document.querySelector('.ah-issue')?.innerText || document.getElementById('ctxBody')?.innerText || '')
+  ));
+  check('当前环节标注（你）', await page.evaluate(() =>
+    /（你）/.test(document.querySelector('[data-ahstep="otm_assess"]')?.innerText || '')
+  ));
+  await page.evaluate(() => {
+    const btn = document.querySelector('[data-ahtoggle="tpm"]');
+    if (btn) btn.click();
+  });
+  check('Comment 可展开', await page.evaluate(() => !!ahExpanded.tpm));
+  await page.click('[data-ahvotes]');
+  check('Vote 分组可展开且 Disagree 突出', await page.evaluate(() =>
+    ahVoteOpen && !!document.querySelector('.ah-vrow.dis')
+  ));
+  check('TIP 62–65 存在', await page.evaluate(() =>
+    !!(TIPS_TASK.ahSplit && TIPS_TASK.ahConcern && TIPS_TASK.ahSkip && TIPS_TASK.ahReturn)
+  ));
+  await page.evaluate(() => {
+    cur = 't1';
+    renderTaskAll();
+    ctxTab = 'approval';
+    renderCtx();
+  });
+  check('同 PCR 切换任务时（你）移到 Vote', await page.evaluate(() =>
+    /（你）/.test(document.querySelector('[data-ahstep="votes"]')?.innerText || '') &&
+    !/（你）/.test(document.querySelector('[data-ahstep="otm_assess"]')?.innerText || '')
+  ));
+  await page.evaluate(() => {
+    cur = 't4';
+    ctxTab = 'approval';
+    renderTaskAll();
+  });
+  await page.evaluate(() => {
+    const el = document.querySelector('[data-ahjump="tScr"]');
+    if (el) el.click();
+  });
+  check('本人环节可回看只读', await page.evaluate(() =>
+    cur === 'tScr' && !!reviewMode && /回看/.test(document.getElementById('centerHead')?.innerText || '') &&
+    !!document.querySelector('.sd-done')
+  ));
+
 } catch (e) {
   check('测试未抛异常', false, e.message);
 } finally {

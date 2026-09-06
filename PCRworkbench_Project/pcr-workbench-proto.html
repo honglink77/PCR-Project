@@ -969,8 +969,8 @@
   .view-task .task-askwrap .plusmenu{bottom:46px}
   .view-task #actionbar{display:none !important}
   .view-task .ctx{width:372px;flex:none;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
-  .view-task .ctx-tabs{flex:none;display:flex;border-bottom:1px solid var(--border);padding:0 8px}
-  .view-task .ctx-tab{font-size:12.5px;font-weight:600;color:var(--ink-3);padding:12px 10px;border-bottom:2px solid transparent;transition:.12s}
+  .view-task .ctx-tabs{flex:none;display:flex;border-bottom:1px solid var(--border);padding:0 4px;flex-wrap:wrap;gap:0}
+  .view-task .ctx-tab{font-size:11.5px;font-weight:600;color:var(--ink-3);padding:11px 8px;border-bottom:2px solid transparent;transition:.12s}
   .view-task .ctx-tab:hover{color:var(--ink-2)}
   .view-task .ctx-tab.on{color:var(--ink);border-bottom-color:var(--accent)}
   .view-task .ctx-body{flex:1;overflow-y:auto;padding:14px}
@@ -1099,6 +1099,69 @@
   .view-task .br-msg{color:var(--ink-2);flex:1}
   .view-task .br-sum{margin-top:8px;font-size:12px;color:var(--ink-2)}
   .view-task .br-retry{padding:2px 8px;font-size:11px}
+
+  /* ══ Approval History timeline ══ */
+  .view-task .tb-review{flex:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;
+    background:var(--soft);color:var(--ink-2);border:1px solid var(--border)}
+  .view-task .tb-back{flex:none;font-size:12px;padding:4px 10px;border-radius:7px}
+  .view-task .ah-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+  .view-task .ah-sim{font-size:10.5px;color:var(--ink-3);margin-bottom:12px}
+  .view-task .ah-empty{padding:28px 8px;text-align:center;font-size:12.5px;color:var(--ink-3);line-height:1.5}
+  .view-task .ah-note{font-size:11px;color:var(--ink-3);margin-top:8px;text-align:center}
+  .view-task .ah-tl{display:flex;flex-direction:column}
+  .view-task .ah-step{display:flex;gap:10px;min-width:0}
+  .view-task .ah-step.mine{cursor:pointer}
+  .view-task .ah-step.mine:hover .ah-main{background:var(--soft);border-radius:8px}
+  .view-task .ah-step.focus .ah-main{box-shadow:0 0 0 2px var(--accent-soft);border-radius:8px;background:#F0FDFA}
+  .view-task .ah-rail{width:18px;flex:none;display:flex;flex-direction:column;align-items:center}
+  .view-task .ah-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;flex:none;z-index:1}
+  .view-task .ah-dot.ah-ok{background:var(--agree-bg);color:var(--agree)}
+  .view-task .ah-dot.ah-warn{background:var(--warn-bg);color:var(--warn)}
+  .view-task .ah-dot.ah-bad{background:var(--disagree-bg);color:var(--disagree)}
+  .view-task .ah-dot.ah-skip{background:var(--soft);color:var(--ink-3)}
+  .view-task .ah-dot.ah-cur{background:var(--accent-soft);color:var(--accent-ink);box-shadow:0 0 0 3px var(--accent-soft)}
+  .view-task .ah-dot.ah-pend{background:transparent;color:var(--ink-3);border:1.5px solid var(--border-2)}
+  .view-task .ah-dot.ah-re{background:var(--info-bg);color:var(--info)}
+  .view-task .ah-dot.ah-grp{background:var(--soft);color:var(--ink-2)}
+  .view-task .ah-line{width:2px;flex:1;min-height:12px;margin:2px 0}
+  .view-task .ah-line.solid{background:var(--border-2)}
+  .view-task .ah-line.dash{background:repeating-linear-gradient(180deg,var(--border) 0 3px,transparent 3px 6px)}
+  .view-task .ah-line.none{background:transparent;min-height:0}
+  .view-task .ah-main{flex:1;min-width:0;padding:0 4px 14px}
+  .view-task .ah-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .view-task .ah-title{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .view-task .ah-you{font-size:11px;font-weight:600;color:var(--accent-ink)}
+  .view-task .ah-act{font-size:11px;font-weight:500;margin-left:auto}
+  .view-task .ah-act.ah-ok{color:var(--agree)}
+  .view-task .ah-act.ah-warn{color:var(--warn)}
+  .view-task .ah-act.ah-bad{color:var(--disagree)}
+  .view-task .ah-act.ah-skip{color:var(--ink-3)}
+  .view-task .ah-act.ah-cur{color:var(--accent-ink)}
+  .view-task .ah-meta{font-size:11px;color:var(--ink-3);margin-top:3px}
+  .view-task .ah-reason{font-size:11.5px;color:var(--ink-2);margin-top:5px;line-height:1.45}
+  .view-task .ah-cmt{margin-top:6px;font-size:11.5px;color:var(--ink-2);line-height:1.5}
+  .view-task .ah-exp{display:inline;margin-left:4px;font-size:11px;color:var(--accent-ink);font-weight:500}
+  .view-task .ah-dur{font-size:10.5px;color:var(--ink-3);margin-top:4px}
+  .view-task .ah-dur.live{color:var(--accent-ink)}
+  .view-task .ah-issue{margin-top:6px;font-size:11.5px;color:var(--warn);background:var(--warn-bg);
+    border-radius:6px;padding:6px 8px;line-height:1.4;font-weight:500}
+  .view-task .ah-grp-h{width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:2px 0}
+  .view-task .ah-sum{font-size:11px;color:var(--ink-3);margin-left:auto}
+  .view-task .ah-votes{margin-top:8px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--soft)}
+  .view-task .ah-vrow{padding:8px 4px;border-bottom:1px dashed var(--border)}
+  .view-task .ah-vrow:last-child{border-bottom:none}
+  .view-task .ah-vrow.dis{background:#FDF3E0;border-radius:6px;padding:8px;margin-bottom:4px;border:1px solid #F5D0A9}
+  .view-task .ah-vtop{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px}
+  .view-task .ah-vfunc{font-weight:600;color:var(--ink)}
+  .view-task .ah-vstance.ok{color:var(--agree);font-weight:600}
+  .view-task .ah-vstance.bad{color:var(--disagree);font-weight:700}
+  .view-task .ah-vmeta{font-size:10.5px;color:var(--ink-3);margin-left:auto}
+  .view-task .ah-vcmt{font-size:11.5px;color:var(--ink-2);margin-top:4px;line-height:1.45}
+  .view-task .ah-alert{margin:10px 0 12px;padding:10px 12px;border-radius:10px;border:1px solid #F5D0A9;
+    background:var(--warn-bg)}
+  .view-task .aha-txt{font-size:12.5px;line-height:1.55;color:var(--ink);margin-bottom:8px}
+  .view-task .aha-go{font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:var(--panel)}
+  .view-task .aha-go:hover{border-color:var(--accent);color:var(--accent-ink)}
 </style>
 </head>
 <body>
@@ -1525,6 +1588,7 @@
         <button class="ctx-tab on" data-t="detail">PCR Details</button><span class="tipdot" onclick="showTip(event,'ctx',31)">31</span>
         <button class="ctx-tab" data-t="similar">Similar PCR</button><span class="tipdot" onclick="showTip(event,'sim',32)">32</span>
         <button class="ctx-tab" data-t="evidence">AI Evidence</button><span class="tipdot" onclick="showTip(event,'tevi',33)">33</span>
+        <button class="ctx-tab" data-t="approval">Approval History</button><span class="tipdot" onclick="showTip(event,'ahSplit',62)">62</span>
       </div>
       <div class="ctx-body" id="ctxBody"></div>
     </aside>
@@ -1720,6 +1784,22 @@ const TIPS_TASK={
    ix:'批量提示放在任务列表顶部与工作区卡片，不进入首页的 AI 判断三件事。',
    fn:'首页判断段留给需要决策的风险；批量是「可以更快干完」的事，混在一起会冲淡紧迫感。',
    ref:['信息架构']},
+ ahSplit:{t:'右侧给全量、中间给要注意的',
+   ix:'完整审批链路在右侧 Approval History；未解决的问题在中间 AI 消息中主动提出。',
+   fn:'需要注意的事不能藏在右侧等人去点；完整链路属于「我需要知道什么」而非「我现在要做什么」，放右侧避免中间区过长。',
+   ref:['信息架构']},
+ ahConcern:{t:'Approve with concern 最容易被忽略',
+   ix:'标注「问题尚未解决」并在 AI 消息中提醒；可一键跳转审批历史定位该环节。',
+   fn:'审批人放行了但担心还在，若无人接手会一路带到最后；这是审批历史中最有价值的信息。',
+   ref:['审批历史']},
+ ahSkip:{t:'跳过的环节必须显示',
+   ix:'以独立图标显示并说明跳过原因，不得直接省略。',
+   fn:'直接省略会让用户疑惑为什么少了一步，且无法判断这个跳过是否合理。',
+   ref:['审批历史']},
+ ahReturn:{t:'被退回的历史最有参考价值',
+   ix:'完整显示退回原因与重提时间，以及后续再次 Approve 的呼应。',
+   fn:'被退回过的经历最能说明这条 PCR 的问题所在，对当前审批人的判断极有帮助。',
+   ref:['审批历史']},
 };
 
 
@@ -2086,7 +2166,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -2776,18 +2856,24 @@ function renderTaskList(){
       </div>
     </div>`;
   }).join('') || `<div class="task-empty">无匹配任务</div>`;
-  host.querySelectorAll('.task').forEach(el=>el.onclick=()=>{cur=el.dataset.id;renderTaskAll();});
+  host.querySelectorAll('.task').forEach(el=>el.onclick=()=>{
+    if(typeof reviewMode!=='undefined') reviewMode=null;
+    cur=el.dataset.id;renderTaskAll();
+  });
 }
 
 /* ---------- render center（对话形态） ---------- */
 function renderCenter(){
   const t=TASKS[cur],s=state[cur];
+  const isReview=typeof reviewMode!=='undefined' && reviewMode && s.done;
   document.getElementById('centerHead').innerHTML=`
     <div class="tb-t" title="${escTask(shortTaskTitle(t))}">
       <span class="tb-pin" title="已钉住">PCR Agent</span>
+      ${isReview?'<span class="tb-review">回看 · 已完成</span>':''}
       <span class="ttype ${t.type}">${escTask(t.tt)}</span>
       <span class="tb-name">${escTask(shortTaskName(t))}</span>
     </div>
+    ${isReview?`<button type="button" class="btn btn-ghost tb-back" id="ahReviewBack">← 返回</button>`:`
     <button type="button" class="tb-more" id="taskFlowBtn" title="流程操作">▾</button>
     <span class="tipdot" onclick="showTip(event,'flowVsSess',57)">57</span>
     <div class="task-flowmenu" id="taskFlowMenu">
@@ -2795,7 +2881,7 @@ function renderCenter(){
       <button type="button" data-flow="reassign">⇄  转派他人</button>
       <button type="button" data-flow="pending">⏸  标记 Pending</button>
       <button type="button" data-flow="full">▤  查看完整 PCR</button>
-    </div>`;
+    </div>`}`;
   const cards={vote:voteCards,eval:evalCards,otm:otmCards,rev:revCards,wi:wiCards}[t.type](t,s);
   const lead={
     vote:`我已读取该 PCR 的变更详情与产品范围，并按 <b>${t.func} 的 Vote 输入标准</b>做了完整性检查。下方是我生成的 Comment 草稿——<span class="muted">你可以直接编辑，确认后才会写回 PACE。</span><span class="tipdot" onclick="showTip(event,'agent',23)">23</span>`,
@@ -2804,7 +2890,8 @@ function renderCenter(){
     rev:`我把这条 PCR 的变更详情、产品范围与附件做了摘要。<b>Approve / Return / Reject 由你决定</b>。`,
     wi:`这条 PCR 有 3 项已下发的 Work Item。我按 Target Date 与回写状态做了异常识别——<b>1 项已逾期</b>。`
   }[t.type];
-  const dock=taskDockHtml(t,s);
+  const alertHtml=(typeof approvalAlertHtml==='function' && !isReview)?approvalAlertHtml(t):'';
+  const dock=isReview?`<div class="submit-dock"><div class="sd-done"><div class="ok">✓ 回看 · 已完成（只读，不可再提交）</div></div></div>`:taskDockHtml(t,s);
   const follow=(s.chat||[]).map(m=>{
     if(m.role==='user') return `<div class="bub me">${escTask(m.text)}</div>`;
     return `<div class="ai-lead task-follow"><div class="ai">AI</div><div class="txt">${m.html||escTask(m.text)}</div></div>`;
@@ -2813,15 +2900,27 @@ function renderCenter(){
     <div class="task-thread" id="taskThread">
       <div class="task-ai">
         <div class="ai-lead"><div class="ai">AI</div><div class="txt">${lead}</div></div>
+        ${alertHtml}
         ${cards}
         ${dock}
       </div>
       ${follow}
     </div>`;
   wireCenter();
+  document.getElementById('ahReviewBack')?.addEventListener('click',()=>{
+    if(typeof exitApprovalReview==='function') exitApprovalReview();
+  });
+  document.querySelectorAll('[data-ahgo]').forEach(b=>{
+    b.onclick=()=>openApprovalHistoryTab(b.dataset.ahgo);
+  });
+  if(isReview){
+    // disable edits
+    document.querySelectorAll('#centerBody [contenteditable]').forEach(el=>{el.contentEditable='false';});
+    document.querySelectorAll('#centerBody button[data-act],#centerBody .voteopt,#centerBody .path').forEach(el=>{el.disabled=true;});
+  }
   bindTaskAskOnce();
   const body=document.getElementById('centerBody');
-  if(body) body.scrollTop=body.scrollHeight;
+  if(body) body.scrollTop=0;
 }
 
 function taskDockHtml(t,s){
@@ -3169,6 +3268,11 @@ function renderCtx(){
         <h5>${x.n}</h5>
         <div class="sm">${x.m.map(m=>`<span>· ${m}</span>`).join('')}</div>
       </div>`).join('');
+  } else if(ctxTab==='approval'){
+    body.innerHTML=typeof renderApprovalHistoryHtml==='function'
+      ? renderApprovalHistoryHtml(t)
+      : '<div class="ah-empty">Approval History 未加载</div>';
+    if(typeof wireApprovalHistory==='function') wireApprovalHistory();
   } else {
     const ev=EVI[cur]||EVI.t1;
     body.innerHTML=`<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Evidence sources behind each AI suggestion; click to trace original records</div>`+
@@ -3300,6 +3404,449 @@ window.MyTasks = {
 window.renderTaskAll = renderTaskAll;
 window.sendTaskAsk = sendTaskAsk;
 window.state = state;
+
+/* mytasks/approval-history: 右侧 Approval History 时间线（数据驱动，审批类任务共用） */
+
+const CURRENT_USER = 'JC';
+
+/** @type {Record<string, object>} PCR Number → 审批链路 */
+const APPROVAL_HISTORY = {};
+
+function buildDemoApprovalChain() {
+  return {
+    pcr: 'PCR-2026-08871',
+    simulated: true,
+    steps: [
+      {
+        id: 'submit',
+        title: 'Submit',
+        status: 'done',
+        actor: 'test@lenovo.com',
+        time: '01-03 09:20',
+        duration: null,
+      },
+      {
+        id: 'lm1',
+        title: 'Line Manager Review',
+        status: 'return',
+        action: 'Return',
+        actor: 'test29@lenovo.com',
+        time: '01-03 16:40',
+        duration: '7 小时',
+        returnReason: '需补充成本收益的具体金额（原文称 better cost 但未提供金额或比例）',
+        mine: false,
+      },
+      {
+        id: 'resubmit',
+        title: '提交人重新提交',
+        status: 'resubmit',
+        actor: 'test@lenovo.com',
+        time: '01-04 10:15',
+        note: '已补充成本收益说明',
+      },
+      {
+        id: 'lm2',
+        title: 'Line Manager Review',
+        status: 'done',
+        action: 'Approve',
+        actor: 'test29@lenovo.com',
+        time: '01-05 14:20',
+        duration: '1 天',
+        comment: `【审阅结论】
+同意本次变更。属于 T14p 产品线职责范围，有明确成本优化驱动，团队可承接。
+
+【需注意事项】
+1. 补充的成本数据已确认，单机成本下降约 1.8%
+2. Geo Impact 仅填 PRC，Intel SKU 变更通常为全球性，建议在后续环节确认区域范围是否完整
+
+【依据】
+Intel 已确认新 SKU 可用，pin-to-pin 替代，目标实施日尚有充足余量，工作量可控。`,
+        openIssues: ['Geo Impact 仅填 PRC，区域范围是否完整至今未确认'],
+        mine: false,
+      },
+      {
+        id: 'tpm',
+        title: 'TPM Review',
+        status: 'concern',
+        action: 'Approve with concern',
+        actor: 'huangxl16@lenovo.com',
+        time: '01-07 11:05',
+        duration: '2 天',
+        comment: `【审阅结论】
+技术方案可行。X9 12Xe vPro (MS5) 与 non-vPro (T6) 为同封装 pin-to-pin 替代，主板与供电无需改动。
+
+【需注意事项】
+1. 认证影响未说明：3 个影响机型中，T14p Gen 5 与 T16p Gen 5 已完成 CCC 认证，CPU 变更可能触发重新认证，原文未提及此影响
+2. BIOS microcode 支持需确认
+
+【依据】
+参考 SP20250612_0031 同类换代案例，技术路径成熟。`,
+        openIssues: ['未说明认证影响，问题尚未解决'],
+        mine: false,
+      },
+      {
+        id: 'sponsor',
+        title: 'Sponsor Review',
+        status: 'skipped',
+        action: '已跳过',
+        skipReason: '变更成本低于 Sponsor 审批阈值',
+      },
+      {
+        id: 'screen',
+        title: 'OTM Screen',
+        status: 'done',
+        action: '通过',
+        actor: 'JC',
+        time: '01-09 15:30',
+        duration: '2 天',
+        comment: `【范围判断】
+影响 3 个 ThinkPad 机型，均为同一 CPU SKU 替换动作，变更内容一致，无需拆分 Branch PCR。
+
+【风险】
+1. 认证影响未评估（来源：TPM Review Comment）
+2. 成本收益已由 LM 环节补充确认
+
+【处理决定】
+正常通过，进入 Vote / Evaluation 环节。
+Critical Flag：No
+派发 Vote Task：Cost（必选）、BOM（必选）、Planner
+派发 Evaluation Task：认证影响专项评估（TPMDM）
+
+【依据】
+TPM 提出的认证影响问题将通过专项 Evaluation Task 解决，不阻塞本阶段通过。`,
+        mine: true,
+        taskId: 'tScr',
+      },
+      {
+        id: 'votes',
+        title: 'Vote / Evaluation',
+        status: 'group',
+        summary: '4 条 · 3 Agree 1 Disagree',
+        votes: [
+          {
+            id: 'v-cost', func: 'Cost', stance: 'Agree', actor: 'test@lenovo.com', time: '01-12',
+            comment: '成本影响可控，单机下降 1.8%，无 NRE 增加。',
+          },
+          {
+            id: 'v-bom', func: 'BOM', stance: 'Agree', actor: 'test29@lenovo.com', time: '01-12',
+            comment: '物料清单变更范围清晰，3 个机型均可覆盖。',
+          },
+          {
+            id: 'v-pl', func: 'Planner', stance: 'Agree', actor: 'huangxl16@lenovo.com', time: '01-13',
+            comment: '供应计划无冲突，切换时点可配合目标实施日。',
+          },
+          {
+            id: 'v-tpm', func: 'TPMDM', stance: 'Disagree', actor: 'test@lenovo.com', time: '01-14',
+            comment: '认证专项评估结论：T14p Gen 5 与 T16p Gen 5 需重新送测，周期约 3 周，威胁 02-09 目标实施日。',
+            highlight: true,
+          },
+        ],
+      },
+      {
+        id: 'otm_assess',
+        title: 'OTM Assessment',
+        status: 'current',
+        action: '进行中',
+        actor: 'JC',
+        time: '01-15 开始',
+        durationLive: '已进行 1 天',
+        youStepKey: 'otm',
+      },
+      {
+        id: 'wi',
+        title: 'Work Item / Implementation',
+        status: 'pending',
+        action: '未开始',
+        youStepKey: 'wi',
+      },
+      {
+        id: 'benefit',
+        title: 'Benefit Tracking',
+        status: 'pending',
+        action: '未开始',
+      },
+    ],
+  };
+}
+
+APPROVAL_HISTORY['PCR-2026-08871'] = buildDemoApprovalChain();
+APPROVAL_HISTORY['SP20250825_0001'] = (() => {
+  const c = buildDemoApprovalChain();
+  c.pcr = 'SP20250825_0001';
+  return c;
+})();
+
+let ahExpanded = {}; // stepId → bool for comment
+let ahVoteOpen = false;
+let ahVoteCmt = {};
+let ahFocusStep = null;
+let reviewMode = null; // { from: cur, stepId }
+
+function ensureApprovalScreenTask() {
+  if (TASKS.tScr) return;
+  TASKS.tScr = {
+    type: 'otm', tt: 'SCREEN', ttl: 'OTM Screen · 范围与派发（已完成）',
+    pcr: 'PCR-2026-08871', status: 'Closed', product: 'ThinkPad X1 Carbon Gen 13',
+    func: 'OTM', mandatory: true, critical: false, due: '已完成', late: false,
+    change: 'OTM Screen：正常通过，派发 Vote / Evaluation。',
+    name: 'X1 Carbon G13 · OTM Screen', geo: 'WW', date: '2026-01-09', stage: 'Screen', progress: 100, risk: 'mid',
+    youStep: 'screen',
+  };
+  state.tScr = {
+    vote: null, path: 'screen_pass', done: true, chat: [],
+    comment: '正常通过，Critical Flag: No。认证影响通过 TPMDM Evaluation 跟进。',
+  };
+  if (!ORDER.includes('tScr')) {
+    /* 不进入左侧列表，仅供审批历史「本人已完成环节」回看跳转 */
+  }
+}
+
+function youStepForTask(t) {
+  if (!t) return null;
+  if (t.youStep) return t.youStep;
+  if (t.type === 'otm' && t.tt === 'SCREEN') return 'screen';
+  if (t.type === 'otm') return 'otm_assess';
+  if (t.type === 'vote' || t.type === 'eval') return 'votes';
+  if (t.type === 'wi') return 'wi';
+  if (t.type === 'rev') return 'lm2';
+  return null;
+}
+
+function approvalChainForTask(t) {
+  if (!t) return null;
+  return APPROVAL_HISTORY[t.pcr] || null;
+}
+
+function openIssuesForTask(t) {
+  const chain = approvalChainForTask(t);
+  if (!chain) return [];
+  const list = [];
+  chain.steps.forEach((s) => {
+    (s.openIssues || []).forEach((msg) => {
+      list.push({ stepId: s.id, title: s.title, msg });
+    });
+  });
+  return list;
+}
+
+function statusMeta(st) {
+  const map = {
+    done: { icon: '✓', cls: 'ah-ok' },
+    concern: { icon: '⚠', cls: 'ah-warn' },
+    return: { icon: '✗', cls: 'ah-bad' },
+    skipped: { icon: '⊘', cls: 'ah-skip' },
+    current: { icon: '◐', cls: 'ah-cur' },
+    pending: { icon: '○', cls: 'ah-pend' },
+    resubmit: { icon: '↻', cls: 'ah-re' },
+    group: { icon: '▸', cls: 'ah-grp' },
+  };
+  return map[st] || map.pending;
+}
+
+function truncateCmt(text, lines) {
+  const parts = String(text || '').trim().split(/\n+/).filter(Boolean);
+  if (parts.length <= lines) return { short: parts.join(' '), full: false };
+  return { short: parts.slice(0, lines).join(' '), full: true };
+}
+
+function commentBlockHtml(id, text, prefix) {
+  if (!text) return '';
+  const open = !!ahExpanded[id];
+  const { short, full } = truncateCmt(text, 2);
+  const body = open ? escTask(text).replace(/\n/g, '<br>') : escTask(short) + (full ? '…' : '');
+  return `<div class="ah-cmt ${open ? 'open' : ''}" data-ahcmt="${escTask(id)}">
+    ${prefix ? `<div class="ah-cmt-pre">${escTask(prefix)}</div>` : ''}
+    <div class="ah-cmt-body">${body}</div>
+    ${full || open ? `<button type="button" class="ah-exp" data-ahtoggle="${escTask(id)}">${open ? '收起 ▴' : '展开 ▾'}</button>` : ''}
+  </div>`;
+}
+
+function renderApprovalHistoryHtml(t) {
+  const chain = approvalChainForTask(t);
+  if (!chain) {
+    return `<div class="ah-empty">该 PCR 尚未进入审批流程<span class="tipdot" onclick="showTip(event,'ahSplit',62)">62</span></div>
+      <div class="ah-note">演示数据说明：有审批链路时展示的是原型模拟数据。</div>`;
+  }
+  const youKey = youStepForTask(t);
+  const steps = chain.steps;
+  let html = `<div class="ah-head">审批历史<span class="tipdot" onclick="showTip(event,'ahSplit',62)">62</span>
+    <span class="tipdot" onclick="showTip(event,'ahConcern',63)">63</span>
+    <span class="tipdot" onclick="showTip(event,'ahSkip',64)">64</span>
+    <span class="tipdot" onclick="showTip(event,'ahReturn',65)">65</span></div>
+    <div class="ah-sim">模拟数据 · 仅供原型演示</div>
+    <div class="ah-tl" id="ahTimeline">`;
+
+  steps.forEach((s, idx) => {
+    const isLast = idx === steps.length - 1;
+    const afterCurrent = (() => {
+      const curIdx = steps.findIndex((x) => x.status === 'current' || x.id === youKey);
+      return curIdx >= 0 && idx > curIdx;
+    })();
+    const lineCls = isLast ? 'none' : (s.status === 'pending' || afterCurrent ? 'dash' : 'solid');
+    const meta = statusMeta(s.status === 'group' && ahVoteOpen ? 'group' : s.status);
+    const clickable = !!(s.mine && s.taskId && TASKS[s.taskId]);
+    const focus = ahFocusStep === s.id ? ' focus' : '';
+
+    if (s.status === 'group') {
+      const youOnVotes = youKey === 'votes';
+      html += `<div class="ah-step ah-group${focus}" data-ahstep="${s.id}">
+        <div class="ah-rail"><span class="ah-dot ${meta.cls}">${ahVoteOpen ? '▾' : '▸'}</span><i class="ah-line ${lineCls}"></i></div>
+        <div class="ah-main">
+          <button type="button" class="ah-grp-h" data-ahvotes>
+            <span class="ah-title">${escTask(s.title)}${youOnVotes ? ' <span class="ah-you">（你）</span>' : ''}</span>
+            <span class="ah-sum">${escTask(s.summary)}</span>
+          </button>
+          ${ahVoteOpen ? renderVoteDetails(s.votes) : ''}
+        </div>
+      </div>`;
+      return;
+    }
+
+    const youTag = (s.id === youKey || (s.status === 'current' && s.youStepKey === t.type))
+      ? ' <span class="ah-you">（你）</span>' : '';
+    html += `<div class="ah-step${clickable ? ' mine' : ''}${focus}" data-ahstep="${s.id}" ${clickable ? `data-ahjump="${s.taskId}"` : ''}>
+      <div class="ah-rail"><span class="ah-dot ${meta.cls}">${meta.icon}</span><i class="ah-line ${lineCls}"></i></div>
+      <div class="ah-main">
+        <div class="ah-top">
+          <span class="ah-title">${escTask(s.title)}${youTag}</span>
+          ${s.action ? `<span class="ah-act ${meta.cls}">${escTask(s.action)}</span>` : ''}
+        </div>
+        ${s.actor || s.time ? `<div class="ah-meta">${escTask([s.actor, s.time].filter(Boolean).join(' · '))}</div>` : ''}
+        ${s.returnReason ? `<div class="ah-reason">退回原因：${escTask(s.returnReason)}</div>` : ''}
+        ${s.skipReason ? `<div class="ah-reason">跳过原因：${escTask(s.skipReason)}</div>` : ''}
+        ${s.note ? `<div class="ah-reason">${escTask(s.note)}</div>` : ''}
+        ${s.comment ? commentBlockHtml(s.id, s.comment) : ''}
+        ${s.duration ? `<div class="ah-dur">用时 ${escTask(s.duration)}</div>` : ''}
+        ${s.durationLive ? `<div class="ah-dur live">${escTask(s.durationLive)}</div>` : ''}
+        ${(s.openIssues || []).map((m) => `<div class="ah-issue">⚠ ${escTask(m.includes('尚未') ? m : m + '，问题尚未解决')}</div>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  return html;
+}
+
+function renderVoteDetails(votes) {
+  return `<div class="ah-votes">${votes.map((v) => {
+    const open = !!ahVoteCmt[v.id];
+    const { short, full } = truncateCmt(v.comment, 1);
+    const dis = v.stance === 'Disagree' || v.highlight;
+    return `<div class="ah-vrow ${dis ? 'dis' : ''}">
+      <div class="ah-vtop">
+        <span class="ah-vico">${dis ? '⚠' : '✓'}</span>
+        <span class="ah-vfunc">${escTask(v.func)}</span>
+        <span class="ah-vstance ${dis ? 'bad' : 'ok'}">${escTask(v.stance)}</span>
+        <span class="ah-vmeta">${escTask(v.actor)} · ${escTask(v.time)}</span>
+      </div>
+      <div class="ah-vcmt">${open ? escTask(v.comment) : escTask(short) + (full ? '…' : '')}
+        ${full || open ? `<button type="button" class="ah-exp" data-ahvcmt="${v.id}">${open ? '收起 ▴' : '展开 ▾'}</button>` : ''}
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function wireApprovalHistory() {
+  const root = document.getElementById('ctxBody');
+  if (!root) return;
+  root.querySelectorAll('[data-ahtoggle]').forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      const id = b.dataset.ahtoggle;
+      ahExpanded[id] = !ahExpanded[id];
+      renderCtx();
+    };
+  });
+  root.querySelectorAll('[data-ahvotes]').forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      ahVoteOpen = !ahVoteOpen;
+      renderCtx();
+    };
+  });
+  root.querySelectorAll('[data-ahvcmt]').forEach((b) => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      const id = b.dataset.ahvcmt;
+      ahVoteCmt[id] = !ahVoteCmt[id];
+      renderCtx();
+    };
+  });
+  root.querySelectorAll('[data-ahjump]').forEach((el) => {
+    el.onclick = (e) => {
+      if (e.target.closest('button')) return;
+      const tid = el.dataset.ahjump;
+      openApprovalReview(tid, el.dataset.ahstep || el.getAttribute('data-ahstep'));
+    };
+  });
+  if (ahFocusStep) {
+    const el = root.querySelector(`[data-ahstep="${ahFocusStep}"]`);
+    if (el) el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    setTimeout(() => { ahFocusStep = null; }, 1800);
+  }
+}
+
+function openApprovalHistoryTab(stepId) {
+  ctxTab = 'approval';
+  ahFocusStep = stepId || 'tpm';
+  document.querySelectorAll('.ctx-tab').forEach((x) => x.classList.toggle('on', x.dataset.t === 'approval'));
+  renderCtx();
+}
+
+function openApprovalReview(taskId, stepId) {
+  if (!TASKS[taskId]) return;
+  reviewMode = { from: cur, stepId: stepId || null };
+  cur = taskId;
+  state[taskId].done = true;
+  if (window.MyTasks && MyTasks.selectTask) {
+    // select without exiting batch oddly
+  }
+  if (typeof batchMode !== 'undefined' && batchMode && typeof exitBatchMode === 'function') {
+    exitBatchMode(taskId);
+  } else {
+    renderTaskAll();
+  }
+  toast('回看 · 已完成（只读）');
+}
+
+function exitApprovalReview() {
+  if (!reviewMode) return;
+  const back = reviewMode.from;
+  reviewMode = null;
+  if (back && TASKS[back]) cur = back;
+  renderTaskAll();
+}
+
+function approvalAlertHtml(t) {
+  const issues = openIssuesForTask(t);
+  if (!issues.length) return '';
+  // Prefer cert concern as primary
+  const primary = issues.find((i) => /认证/.test(i.msg)) || issues[0];
+  return `<div class="ah-alert">
+    <div class="aha-txt">⚠ 提醒：${escTask(primary.title)} 提出「${escTask(primary.msg.replace(/，问题尚未解决$/, ''))}」，该问题至今未处理。建议在本环节一并解决，或派发专项评估。
+      <span class="tipdot" onclick="showTip(event,'ahConcern',63)">63</span>
+    </div>
+    <button type="button" class="btn btn-ghost aha-go" data-ahgo="${escTask(primary.stepId)}">查看审批历史</button>
+  </div>`;
+}
+
+ensureApprovalScreenTask();
+// Mark shared PCR tasks for you-step
+if (TASKS.t4) TASKS.t4.youStep = 'otm_assess';
+if (TASKS.t1) TASKS.t1.youStep = 'votes';
+
+window.openApprovalHistoryTab = openApprovalHistoryTab;
+window.approvalAlertHtml = approvalAlertHtml;
+window.renderApprovalHistoryHtml = renderApprovalHistoryHtml;
+window.wireApprovalHistory = wireApprovalHistory;
+window.openIssuesForTask = openIssuesForTask;
+window.exitApprovalReview = exitApprovalReview;
+window.APPROVAL_HISTORY = APPROVAL_HISTORY;
+// expose reviewMode for center bar
+Object.defineProperty(window, 'reviewMode', {
+  get() { return reviewMode; },
+  set(v) { reviewMode = v; },
+});
 
 /* mytasks/batch: 同类任务合并处理（AI 发现的批量 Cost Vote） */
 
@@ -3771,6 +4318,7 @@ function renderTaskListBatched() {
   host.querySelectorAll('.task').forEach((el) => {
     el.onclick = () => {
       cur = el.dataset.id;
+      if (typeof reviewMode !== 'undefined') reviewMode = null;
       if (batchMode) exitBatchMode(cur);
       else renderTaskAll();
     };

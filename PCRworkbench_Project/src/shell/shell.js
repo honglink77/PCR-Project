@@ -104,6 +104,22 @@ const TIPS_TASK={
    ix:'批量提示放在任务列表顶部与工作区卡片，不进入首页的 AI 判断三件事。',
    fn:'首页判断段留给需要决策的风险；批量是「可以更快干完」的事，混在一起会冲淡紧迫感。',
    ref:['信息架构']},
+ ahSplit:{t:'右侧给全量、中间给要注意的',
+   ix:'完整审批链路在右侧 Approval History；未解决的问题在中间 AI 消息中主动提出。',
+   fn:'需要注意的事不能藏在右侧等人去点；完整链路属于「我需要知道什么」而非「我现在要做什么」，放右侧避免中间区过长。',
+   ref:['信息架构']},
+ ahConcern:{t:'Approve with concern 最容易被忽略',
+   ix:'标注「问题尚未解决」并在 AI 消息中提醒；可一键跳转审批历史定位该环节。',
+   fn:'审批人放行了但担心还在，若无人接手会一路带到最后；这是审批历史中最有价值的信息。',
+   ref:['审批历史']},
+ ahSkip:{t:'跳过的环节必须显示',
+   ix:'以独立图标显示并说明跳过原因，不得直接省略。',
+   fn:'直接省略会让用户疑惑为什么少了一步，且无法判断这个跳过是否合理。',
+   ref:['审批历史']},
+ ahReturn:{t:'被退回的历史最有参考价值',
+   ix:'完整显示退回原因与重提时间，以及后续再次 Approve 的呼应。',
+   fn:'被退回过的经历最能说明这条 PCR 的问题所在，对当前审批人的判断极有帮助。',
+   ref:['审批历史']},
 };
 
 
@@ -470,7 +486,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);

@@ -119,18 +119,24 @@ function renderTaskList(){
       </div>
     </div>`;
   }).join('') || `<div class="task-empty">无匹配任务</div>`;
-  host.querySelectorAll('.task').forEach(el=>el.onclick=()=>{cur=el.dataset.id;renderTaskAll();});
+  host.querySelectorAll('.task').forEach(el=>el.onclick=()=>{
+    if(typeof reviewMode!=='undefined') reviewMode=null;
+    cur=el.dataset.id;renderTaskAll();
+  });
 }
 
 /* ---------- render center（对话形态） ---------- */
 function renderCenter(){
   const t=TASKS[cur],s=state[cur];
+  const isReview=typeof reviewMode!=='undefined' && reviewMode && s.done;
   document.getElementById('centerHead').innerHTML=`
     <div class="tb-t" title="${escTask(shortTaskTitle(t))}">
       <span class="tb-pin" title="已钉住">PCR Agent</span>
+      ${isReview?'<span class="tb-review">回看 · 已完成</span>':''}
       <span class="ttype ${t.type}">${escTask(t.tt)}</span>
       <span class="tb-name">${escTask(shortTaskName(t))}</span>
     </div>
+    ${isReview?`<button type="button" class="btn btn-ghost tb-back" id="ahReviewBack">← 返回</button>`:`
     <button type="button" class="tb-more" id="taskFlowBtn" title="流程操作">▾</button>
     <span class="tipdot" onclick="showTip(event,'flowVsSess',57)">57</span>
     <div class="task-flowmenu" id="taskFlowMenu">
@@ -138,7 +144,7 @@ function renderCenter(){
       <button type="button" data-flow="reassign">⇄  转派他人</button>
       <button type="button" data-flow="pending">⏸  标记 Pending</button>
       <button type="button" data-flow="full">▤  查看完整 PCR</button>
-    </div>`;
+    </div>`}`;
   const cards={vote:voteCards,eval:evalCards,otm:otmCards,rev:revCards,wi:wiCards}[t.type](t,s);
   const lead={
     vote:`我已读取该 PCR 的变更详情与产品范围，并按 <b>${t.func} 的 Vote 输入标准</b>做了完整性检查。下方是我生成的 Comment 草稿——<span class="muted">你可以直接编辑，确认后才会写回 PACE。</span><span class="tipdot" onclick="showTip(event,'agent',23)">23</span>`,
@@ -147,7 +153,8 @@ function renderCenter(){
     rev:`我把这条 PCR 的变更详情、产品范围与附件做了摘要。<b>Approve / Return / Reject 由你决定</b>。`,
     wi:`这条 PCR 有 3 项已下发的 Work Item。我按 Target Date 与回写状态做了异常识别——<b>1 项已逾期</b>。`
   }[t.type];
-  const dock=taskDockHtml(t,s);
+  const alertHtml=(typeof approvalAlertHtml==='function' && !isReview)?approvalAlertHtml(t):'';
+  const dock=isReview?`<div class="submit-dock"><div class="sd-done"><div class="ok">✓ 回看 · 已完成（只读，不可再提交）</div></div></div>`:taskDockHtml(t,s);
   const follow=(s.chat||[]).map(m=>{
     if(m.role==='user') return `<div class="bub me">${escTask(m.text)}</div>`;
     return `<div class="ai-lead task-follow"><div class="ai">AI</div><div class="txt">${m.html||escTask(m.text)}</div></div>`;
@@ -156,15 +163,27 @@ function renderCenter(){
     <div class="task-thread" id="taskThread">
       <div class="task-ai">
         <div class="ai-lead"><div class="ai">AI</div><div class="txt">${lead}</div></div>
+        ${alertHtml}
         ${cards}
         ${dock}
       </div>
       ${follow}
     </div>`;
   wireCenter();
+  document.getElementById('ahReviewBack')?.addEventListener('click',()=>{
+    if(typeof exitApprovalReview==='function') exitApprovalReview();
+  });
+  document.querySelectorAll('[data-ahgo]').forEach(b=>{
+    b.onclick=()=>openApprovalHistoryTab(b.dataset.ahgo);
+  });
+  if(isReview){
+    // disable edits
+    document.querySelectorAll('#centerBody [contenteditable]').forEach(el=>{el.contentEditable='false';});
+    document.querySelectorAll('#centerBody button[data-act],#centerBody .voteopt,#centerBody .path').forEach(el=>{el.disabled=true;});
+  }
   bindTaskAskOnce();
   const body=document.getElementById('centerBody');
-  if(body) body.scrollTop=body.scrollHeight;
+  if(body) body.scrollTop=0;
 }
 
 function taskDockHtml(t,s){
@@ -512,6 +531,11 @@ function renderCtx(){
         <h5>${x.n}</h5>
         <div class="sm">${x.m.map(m=>`<span>· ${m}</span>`).join('')}</div>
       </div>`).join('');
+  } else if(ctxTab==='approval'){
+    body.innerHTML=typeof renderApprovalHistoryHtml==='function'
+      ? renderApprovalHistoryHtml(t)
+      : '<div class="ah-empty">Approval History 未加载</div>';
+    if(typeof wireApprovalHistory==='function') wireApprovalHistory();
   } else {
     const ev=EVI[cur]||EVI.t1;
     body.innerHTML=`<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Evidence sources behind each AI suggestion; click to trace original records</div>`+

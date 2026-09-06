@@ -174,8 +174,8 @@
   .view-task .task-askwrap .plusmenu{bottom:46px}
   .view-task #actionbar{display:none !important}
   .view-task .ctx{width:372px;flex:none;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
-  .view-task .ctx-tabs{flex:none;display:flex;border-bottom:1px solid var(--border);padding:0 8px}
-  .view-task .ctx-tab{font-size:12.5px;font-weight:600;color:var(--ink-3);padding:12px 10px;border-bottom:2px solid transparent;transition:.12s}
+  .view-task .ctx-tabs{flex:none;display:flex;border-bottom:1px solid var(--border);padding:0 4px;flex-wrap:wrap;gap:0}
+  .view-task .ctx-tab{font-size:11.5px;font-weight:600;color:var(--ink-3);padding:11px 8px;border-bottom:2px solid transparent;transition:.12s}
   .view-task .ctx-tab:hover{color:var(--ink-2)}
   .view-task .ctx-tab.on{color:var(--ink);border-bottom-color:var(--accent)}
   .view-task .ctx-body{flex:1;overflow-y:auto;padding:14px}
@@ -304,3 +304,66 @@
   .view-task .br-msg{color:var(--ink-2);flex:1}
   .view-task .br-sum{margin-top:8px;font-size:12px;color:var(--ink-2)}
   .view-task .br-retry{padding:2px 8px;font-size:11px}
+
+  /* ══ Approval History timeline ══ */
+  .view-task .tb-review{flex:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;
+    background:var(--soft);color:var(--ink-2);border:1px solid var(--border)}
+  .view-task .tb-back{flex:none;font-size:12px;padding:4px 10px;border-radius:7px}
+  .view-task .ah-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}
+  .view-task .ah-sim{font-size:10.5px;color:var(--ink-3);margin-bottom:12px}
+  .view-task .ah-empty{padding:28px 8px;text-align:center;font-size:12.5px;color:var(--ink-3);line-height:1.5}
+  .view-task .ah-note{font-size:11px;color:var(--ink-3);margin-top:8px;text-align:center}
+  .view-task .ah-tl{display:flex;flex-direction:column}
+  .view-task .ah-step{display:flex;gap:10px;min-width:0}
+  .view-task .ah-step.mine{cursor:pointer}
+  .view-task .ah-step.mine:hover .ah-main{background:var(--soft);border-radius:8px}
+  .view-task .ah-step.focus .ah-main{box-shadow:0 0 0 2px var(--accent-soft);border-radius:8px;background:#F0FDFA}
+  .view-task .ah-rail{width:18px;flex:none;display:flex;flex-direction:column;align-items:center}
+  .view-task .ah-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:700;flex:none;z-index:1}
+  .view-task .ah-dot.ah-ok{background:var(--agree-bg);color:var(--agree)}
+  .view-task .ah-dot.ah-warn{background:var(--warn-bg);color:var(--warn)}
+  .view-task .ah-dot.ah-bad{background:var(--disagree-bg);color:var(--disagree)}
+  .view-task .ah-dot.ah-skip{background:var(--soft);color:var(--ink-3)}
+  .view-task .ah-dot.ah-cur{background:var(--accent-soft);color:var(--accent-ink);box-shadow:0 0 0 3px var(--accent-soft)}
+  .view-task .ah-dot.ah-pend{background:transparent;color:var(--ink-3);border:1.5px solid var(--border-2)}
+  .view-task .ah-dot.ah-re{background:var(--info-bg);color:var(--info)}
+  .view-task .ah-dot.ah-grp{background:var(--soft);color:var(--ink-2)}
+  .view-task .ah-line{width:2px;flex:1;min-height:12px;margin:2px 0}
+  .view-task .ah-line.solid{background:var(--border-2)}
+  .view-task .ah-line.dash{background:repeating-linear-gradient(180deg,var(--border) 0 3px,transparent 3px 6px)}
+  .view-task .ah-line.none{background:transparent;min-height:0}
+  .view-task .ah-main{flex:1;min-width:0;padding:0 4px 14px}
+  .view-task .ah-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .view-task .ah-title{font-size:12.5px;font-weight:600;color:var(--ink)}
+  .view-task .ah-you{font-size:11px;font-weight:600;color:var(--accent-ink)}
+  .view-task .ah-act{font-size:11px;font-weight:500;margin-left:auto}
+  .view-task .ah-act.ah-ok{color:var(--agree)}
+  .view-task .ah-act.ah-warn{color:var(--warn)}
+  .view-task .ah-act.ah-bad{color:var(--disagree)}
+  .view-task .ah-act.ah-skip{color:var(--ink-3)}
+  .view-task .ah-act.ah-cur{color:var(--accent-ink)}
+  .view-task .ah-meta{font-size:11px;color:var(--ink-3);margin-top:3px}
+  .view-task .ah-reason{font-size:11.5px;color:var(--ink-2);margin-top:5px;line-height:1.45}
+  .view-task .ah-cmt{margin-top:6px;font-size:11.5px;color:var(--ink-2);line-height:1.5}
+  .view-task .ah-exp{display:inline;margin-left:4px;font-size:11px;color:var(--accent-ink);font-weight:500}
+  .view-task .ah-dur{font-size:10.5px;color:var(--ink-3);margin-top:4px}
+  .view-task .ah-dur.live{color:var(--accent-ink)}
+  .view-task .ah-issue{margin-top:6px;font-size:11.5px;color:var(--warn);background:var(--warn-bg);
+    border-radius:6px;padding:6px 8px;line-height:1.4;font-weight:500}
+  .view-task .ah-grp-h{width:100%;display:flex;align-items:center;gap:8px;text-align:left;padding:2px 0}
+  .view-task .ah-sum{font-size:11px;color:var(--ink-3);margin-left:auto}
+  .view-task .ah-votes{margin-top:8px;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--soft)}
+  .view-task .ah-vrow{padding:8px 4px;border-bottom:1px dashed var(--border)}
+  .view-task .ah-vrow:last-child{border-bottom:none}
+  .view-task .ah-vrow.dis{background:#FDF3E0;border-radius:6px;padding:8px;margin-bottom:4px;border:1px solid #F5D0A9}
+  .view-task .ah-vtop{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:11.5px}
+  .view-task .ah-vfunc{font-weight:600;color:var(--ink)}
+  .view-task .ah-vstance.ok{color:var(--agree);font-weight:600}
+  .view-task .ah-vstance.bad{color:var(--disagree);font-weight:700}
+  .view-task .ah-vmeta{font-size:10.5px;color:var(--ink-3);margin-left:auto}
+  .view-task .ah-vcmt{font-size:11.5px;color:var(--ink-2);margin-top:4px;line-height:1.45}
+  .view-task .ah-alert{margin:10px 0 12px;padding:10px 12px;border-radius:10px;border:1px solid #F5D0A9;
+    background:var(--warn-bg)}
+  .view-task .aha-txt{font-size:12.5px;line-height:1.55;color:var(--ink);margin-bottom:8px}
+  .view-task .aha-go{font-size:12px;padding:4px 10px;border-radius:7px;border:1px solid var(--border);background:var(--panel)}
+  .view-task .aha-go:hover{border-color:var(--accent);color:var(--accent-ink)}

@@ -468,6 +468,7 @@ function renderTaskListBatched() {
   host.querySelectorAll('.task').forEach((el) => {
     el.onclick = () => {
       cur = el.dataset.id;
+      if (typeof reviewMode !== 'undefined') reviewMode = null;
       if (batchMode) exitBatchMode(cur);
       else renderTaskAll();
     };
