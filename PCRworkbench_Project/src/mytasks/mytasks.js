@@ -367,13 +367,13 @@ function sendTaskAsk(){
   s.chat=s.chat||[];
   s.chat.push({role:'user',text:v});
   let reply='已记录你的补充。你可以继续完善 Comment，或选择 Vote 立场后写回。';
-  let html=null;
+  let tipSuffix='';
   if(/Comment|严谨|改写|修改草稿/i.test(v)){
     s.comment=`开发侧确认：Ultra 155U→165U 为同封装 pin-to-pin 替代，主板无硬件改动。参考 X1 Carbon G12（PCR-2025-07612）结论为无影响。
 
 补充说明：① BIOS microcode 兼容性验证计划（含回归范围）；② 满载功耗与散热余量的量化验证数据与窗口。结论：建议 Agree，并在 Comment 中保留上述两项跟踪项。`;
     reply='已把上方 Comment 草稿改得更严谨：补强了验证范围表述，并明确建议 Agree。';
-    html=reply+`<span class="tipdot" onclick="showTip(event,'taskUpdate',55)">55</span>`;
+    tipSuffix=`<span class="tipdot" onclick="showTip(event,'taskUpdate',55)">55</span><span class="tipdot" onclick="showTip(event,'dmStream',66)">66</span>`;
   }else if(/Disagree|不同意/i.test(v)){
     reply='若投 Disagree：任务将回到提出方补充材料，OTM 可见你的 Comment 与阻碍点；不会直接写回 Agree。建议在 Comment 中写清阻断原因（如认证窗口）。';
   }else if(/Schedule|校验|补什么/i.test(v)){
@@ -381,9 +381,26 @@ function sendTaskAsk(){
   }else if(/G12|相似|案例|BIOS/i.test(v)){
     reply='参考 G12（PCR-2025-07612）是因为同产品线、同类 CPU 换代且已 Closed。右侧 Similar PCR 还有 T14s 案例（含 BIOS Return 记录），可一并对照。';
   }
-  s.chat.push({role:'ai',text:reply,html:html||escTask(reply)});
+  s.chat.push({role:'ai',text:reply,html:escTask(reply)+tipSuffix});
   if(inp){inp.value='';if(window.AskComposer) AskComposer.autoGrow(inp);}
   hideTaskGuide();closeTaskPlus();
+
+  const thread=document.getElementById('taskThread');
+  const scrollRoot=document.getElementById('centerBody');
+  if(thread && window.DialogueMotion){
+    // 静默更新 Comment 草稿（不整页重绘，避免打断动画）
+    const cmt=document.querySelector('#centerBody .comment.edit');
+    if(cmt && s.comment!=null) cmt.innerHTML=escTask(s.comment).replace(/\n/g,'<br>');
+    DialogueMotion.appendUser(thread,v,scrollRoot);
+    DialogueMotion.playAssistant({
+      mount:thread,
+      scrollRoot,
+      text:reply,
+      htmlSuffix:tipSuffix,
+      animate:true
+    }).then(()=>{ if(typeof paintDots==='function') paintDots(); });
+    return;
+  }
   renderCenter();
 }
 

@@ -36,6 +36,7 @@ page.on('pageerror', e => console.error('PAGEERROR', e.message));
 try {
   await page.goto(pathToFileURL(htmlPath).href, { waitUntil: 'domcontentloaded' });
   await page.waitForSelector('#askin');
+  await page.evaluate(() => { window.__DM_DISABLE = true; });
 
   const nav = await page.$$eval('.nav > .navitem', els => els.map(e => e.textContent.replace(/\s+/g, ' ').trim()));
   check('导航两项', nav.length === 2 && nav[0].includes('Overview') && nav[1].includes('My Tasks'));
@@ -763,6 +764,102 @@ try {
     cur === 'tScr' && !!reviewMode && /回看/.test(document.getElementById('centerHead')?.innerText || '') &&
     !!document.querySelector('.sd-done')
   ));
+
+  // ── DialogueMotion ──
+  await page.evaluate(() => { window.__DM_DISABLE = false; });
+  check('DialogueMotion 通用模块存在', await page.evaluate(() =>
+    !!(window.DialogueMotion && DialogueMotion.playAssistant && DialogueMotion.streamText && DialogueMotion.skip)
+  ));
+  check('TIP 66–69 对话动画说明存在', await page.evaluate(() =>
+    !!(TIPS_TASK.dmStream && TIPS_TASK.dmWarnLast && TIPS_TASK.dmScroll && TIPS_TASK.dmSkip)
+  ));
+  await page.evaluate(() => {
+    reviewMode = null;
+    cur = 't1';
+    state.t1.done = false;
+    state.t1.chat = [];
+    switchView('task');
+    renderTaskAll();
+  });
+  await page.evaluate(async () => {
+    const inp = document.getElementById('taskAskin');
+    inp.value = '历史上同类换代有没有出过 BIOS 兼容问题';
+    sendTaskAsk();
+    await new Promise(r => setTimeout(r, 220));
+  });
+  check('发送后出现思考三点（无文字）', await page.evaluate(() => {
+    const think = document.querySelector('.dm-think');
+    return !!think && !!think.querySelector('.dm-dots') && !/正在思考/.test(think.innerText || '');
+  }));
+  await page.evaluate(async () => {
+    DialogueMotion.skip();
+    await new Promise(r => setTimeout(r, 500));
+  });
+  check('点击跳过后完整呈现', await page.evaluate(() => {
+    const turn = document.querySelector('.dm-ai-turn .txt');
+    const txt = turn?.textContent || '';
+    return !!turn && /G12|BIOS|Similar|案例/.test(txt) && !document.querySelector('.dm-think');
+  }));
+  check('追问状态已写入 chat', await page.evaluate(() =>
+    (state.t1.chat || []).some(m => m.role === 'user') && (state.t1.chat || []).some(m => m.role === 'ai')
+  ));
+  await page.evaluate(() => { window.__DM_DISABLE = true; });
+
+  // ── HomePins 钉到首页 ──
+  await page.evaluate(() => { switchView('home'); window.__DM_DISABLE = true; });
+  check('HomePins 模块存在', await page.evaluate(() =>
+    !!(window.HomePins && HomePins.pin && HomePins.runAnalysis && HomePins.PIN_MAX === 4)
+  ));
+  check('首页「我钉住的」有 3 张演示卡片', await page.evaluate(() => {
+    const sec = document.getElementById('homePinsSection');
+    return !sec.hidden && document.querySelectorAll('#homePinsGrid .hp-card').length === 3;
+  }));
+  check('左栏 Pinned 可点击且为图钉图标', await page.evaluate(() => {
+    const list = document.querySelectorAll('#overview-rail-pinned .pitem');
+    const pinSvg = document.querySelector('#overview-rail-pinned .pin-ico');
+    return list.length === 3 && !!pinSvg;
+  }));
+  check('卡片含实时与快照标注', await page.evaluate(() => {
+    const t = document.getElementById('homePinsSection')?.innerText || '';
+    return /实时/.test(t) && /快照/.test(t) && /3 \/ 4/.test(t);
+  }));
+  check('TIP 70–73 存在', await page.evaluate(() =>
+    !!(TIPS_HOME.pinCustom && TIPS_HOME.pinVsHist && TIPS_HOME.pinLive && TIPS_HOME.pinLimit)
+  ));
+  await page.evaluate(() => {
+    HomePins.unpin('m90q-cost');
+  });
+  check('取消钉住后首页与左栏同步', await page.evaluate(() =>
+    document.querySelectorAll('#homePinsGrid .hp-card').length === 2 &&
+    document.querySelectorAll('#overview-rail-pinned .pitem').length === 2 &&
+    !HomePins.isPinned('m90q-cost')
+  ));
+  await page.evaluate(async () => {
+    await HomePins.runAnalysis('M90q 二供成本对比');
+  });
+  check('分析对话出现钉到首页按钮', await page.evaluate(() => {
+    const btn = document.querySelector('#homeAnalysis [data-pinid="m90q-cost"]');
+    return !!btn && /钉到首页/.test(btn.textContent || '');
+  }));
+  await page.evaluate(() => {
+    HomePins.pin('m90q-cost');
+    HomePins.pin('cert-backlog');
+  });
+  check('可钉满至上限 4', await page.evaluate(() =>
+    HomePins.pins.length === 4 && /4 \/ 4/.test(document.getElementById('homePinsCount')?.textContent || '')
+  ));
+  check('达上限再钉弹出替换框', await page.evaluate(() => {
+    HomePins.CATALOG['tmp-fifth'] = {
+      id: 'tmp-fifth', title: '临时第五', live: true, query: '临时', keywords: [],
+      rowsHtml: () => '', insight: '', full: '',
+    };
+    HomePins.pin('tmp-fifth');
+    const ok = /已达钉住上限/.test(document.querySelector('#modalHost .modal')?.innerText || '');
+    delete HomePins.CATALOG['tmp-fifth'];
+    document.getElementById('scrim')?.classList.remove('show');
+    document.getElementById('modalHost').innerHTML = '';
+    return ok;
+  }));
 
 } catch (e) {
   check('测试未抛异常', false, e.message);

@@ -539,6 +539,7 @@ function newChatSession(){
   if(PARSE.active||PARSE.suspended||PARSE.text){
     exitParseMode();
   }
+  if(window.HomePins&&HomePins.clearAnalysis) HomePins.clearAnalysis();
   document.querySelector('.scroll').scrollTop=0;
   toast('已新建会话');
   const inp=document.getElementById('askin');if(inp){inp.value='';inp.focus();}
@@ -547,6 +548,7 @@ function clearParseTimers(){PARSE.timers.forEach(id=>clearTimeout(id));PARSE.tim
 function later(ms,fn){PARSE.timers.push(setTimeout(fn,ms));}
 
 function startParse(text){
+  if(window.HomePins&&HomePins.clearAnalysis) HomePins.clearAnalysis();
   PARSE.text=text||DEMO_MAIL;PARSE.createIntent=false;PARSE.skipped=false;
   PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
   PARSE.typeConfirmed=false;PARSE.pcrType=null;PARSE.typePick='Hardware/SBB';
@@ -769,6 +771,63 @@ function renderConclusion(){
   }
   html+='</div>';
   host.innerHTML=html;
+  if(PARSE._animateConclusion && window.DialogueMotion){
+    PARSE._animateConclusion=false;
+    animateParseConclusion(host);
+  }
+}
+
+async function animateParseConclusion(host){
+  const DM=window.DialogueMotion;
+  if(!DM||DM.reduced()||window.__DM_DISABLE) return;
+  const scrollRoot=document.querySelector('.scroll');
+  DM.bindSkip(host);
+  DM._bindScrollFollow(scrollRoot);
+  DM._skip=false; DM._running=true;
+  try{
+    const lead=host.querySelector('.ai-lead');
+    const tl=host.querySelector('.tl-wrap');
+    const docks=[...host.querySelectorAll('.submit-dock')];
+    const fullLead=lead?lead.textContent.trim():'';
+    if(tl){tl.hidden=true;tl.classList.add('dm-pending');}
+    docks.forEach(d=>{d.hidden=true;d.classList.add('dm-pending');});
+    if(lead && fullLead){
+      lead.textContent='';
+      await DM.streamText(lead, fullLead, scrollRoot);
+    }
+    if(tl){
+      await DM.revealEl(tl, scrollRoot);
+      // 警告/错误项后出现：先 info，再 warn，再 err
+      const items=[...tl.querySelectorAll('.tl-item')];
+      items.forEach(it=>{
+        it.classList.add('dm-li-pending');
+        const dot=it.querySelector('.tl-dot');
+        if(dot){dot.dataset.dmFinal=dot.innerHTML;dot.innerHTML='<span class="dm-spin"></span>';}
+      });
+      const rank=it=>it.classList.contains('err')?2:it.classList.contains('warn')?1:0;
+      items.sort((a,b)=>rank(a)-rank(b));
+      let seenBad=false;
+      for(const it of items){
+        if(rank(it)>0 && !seenBad){seenBad=true;await DM.sleep(DM.isSkipping()?0:400);}
+        it.classList.remove('dm-li-pending');it.classList.add('dm-li-in');
+        const dot=it.querySelector('.tl-dot');
+        if(dot&&dot.dataset.dmFinal!=null){
+          await DM.sleep(DM.isSkipping()?0:160);
+          dot.innerHTML=dot.dataset.dmFinal;
+        }
+        DM.scrollToBottom(scrollRoot);
+        await DM.sleep(DM.isSkipping()?0:220);
+      }
+    }
+    for(const d of docks){
+      await DM.sleep(DM.isSkipping()?0:200);
+      d.hidden=false;d.classList.remove('dm-pending');
+      d.classList.add('dm-fade');requestAnimationFrame(()=>d.classList.add('dm-in'));
+      DM.scrollToBottom(scrollRoot);
+    }
+  } finally {
+    DM._running=false;DM._skip=false;DM._unfollowScroll();
+  }
 }
 
 function resolveIssue(id,act){
@@ -1119,6 +1178,7 @@ function finishParse(ex){
   collapseAllSteps();
   fillAllStepBodies(ex);
   renderPlist();
+  PARSE._animateConclusion=true;
   renderConclusion();
 }
 

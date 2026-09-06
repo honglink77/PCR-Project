@@ -14,6 +14,74 @@
   .pitem{width:100%;display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;
     font-size:12.5px;color:var(--ink-2);transition:.12s;text-align:left}
   .pitem:hover{background:#F0F0EE;color:var(--ink)}
+  .pitem-wrap{position:relative;display:flex;align-items:center;gap:2px}
+  .pitem-wrap.dragging{opacity:.5}
+  .pitem-wrap .pitem{flex:1;min-width:0}
+  .pitem-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pitem-more{opacity:0;width:24px;height:24px;border-radius:6px;color:var(--ink-3);flex:none}
+  .pitem-wrap:hover .pitem-more{opacity:1}
+  .pitem-more:hover{background:var(--soft);color:var(--ink)}
+  .pin-ico{width:13px;height:13px;flex:none;stroke:currentColor;fill:none;stroke-width:1.4}
+  .pin-empty{font-size:11.5px;color:var(--ink-3);padding:6px 9px}
+  .hp-menu{position:absolute;right:4px;top:28px;z-index:25;min-width:168px;padding:6px;
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 8px 24px rgba(16,24,40,.14);display:flex;flex-direction:column;gap:2px}
+  .hp-menu[hidden]{display:none!important}
+  .hp-menu button{text-align:left;padding:8px 10px;border-radius:7px;font-size:12.5px;color:var(--ink-2)}
+  .hp-menu button:hover{background:var(--soft);color:var(--ink)}
+  .hp-menu button.danger{color:var(--disagree)}
+  .hp-menu-div{height:1px;background:var(--border);margin:4px 0}
+
+  .home-pins-section{margin-top:28px}
+  .hp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .hp-card{border:1px solid var(--border);border-radius:12px;padding:14px 14px 12px;background:var(--panel);
+    cursor:pointer;transition:.15s;position:relative}
+  .hp-card:hover{border-color:var(--border-2)}
+  .hp-card.hp-new{opacity:0;transform:translateY(8px)}
+  .hp-card.hp-new.hp-in{opacity:1;transform:translateY(0);transition:opacity .3s ease,transform .3s ease;
+    box-shadow:0 0 0 2px var(--accent-soft);border-color:var(--accent)}
+  .hp-card.hp-flash{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent);transition:box-shadow .2s}
+  .hp-card-h{display:flex;align-items:center;gap:8px;margin-bottom:10px;position:relative}
+  .hp-card-h h3{font-size:13.5px;font-weight:650;color:var(--ink);margin:0}
+  .hp-fresh{font-size:10.5px;font-weight:500;margin-left:auto}
+  .hp-fresh.live{color:var(--accent-ink)}
+  .hp-fresh.snap{color:var(--ink-3)}
+  .hp-more{width:26px;height:26px;border-radius:6px;color:var(--ink-3)}
+  .hp-more:hover{background:var(--soft);color:var(--ink)}
+  .hp-card .hp-menu{top:30px;right:0}
+  .hp-rows{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ink-2)}
+  .hp-row{display:flex;gap:8px;align-items:baseline;line-height:1.4}
+  .hp-d{font-weight:600;color:var(--ink);min-width:36px}
+  .hp-up{color:var(--disagree);font-weight:600}
+  .hp-dn{color:var(--agree);font-weight:600}
+  .hp-flat{color:var(--ink-3)}
+  .hp-proj-t{font-size:12.5px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between}
+  .hp-proj-t span{font-weight:400;color:var(--ink-3);font-size:11.5px}
+  .hp-bar{height:6px;background:var(--soft);border-radius:4px;margin:8px 0 4px;overflow:hidden}
+  .hp-bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+  .hp-proj-m{font-size:11.5px;color:var(--ink-3)}
+  .hp-stat{display:flex;gap:12px;margin-top:8px;font-size:11.5px;color:var(--ink-2)}
+  .hp-ai{margin-top:10px;display:flex;gap:8px;font-size:12px;line-height:1.45;color:var(--ink-2)}
+  .hp-ai .sp{flex:none;font-size:10px;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);
+    padding:2px 5px;border-radius:4px;height:fit-content}
+  .home-analysis{margin-top:22px;max-width:none;width:100%}
+  .home-analysis-thread{display:flex;flex-direction:column;align-items:stretch;gap:12px;width:100%}
+  .home-analysis-thread .bub.me{align-self:flex-end;margin-left:auto;max-width:min(78%,640px)}
+  .home-analysis-thread .dm-ai-turn,
+  .home-analysis-thread .ai-lead{align-self:flex-start;max-width:min(100%,720px)}
+  .home-analysis-thread .dm-card,
+  .home-analysis-thread .dm-actions{max-width:min(100%,720px)}
+  .hp-actions{display:flex;gap:8px;align-items:center;margin-top:4px}
+  .hp-inline-card{margin-top:4px}
+  /* 分析对话进行中：收起建议 chips，避免输入框上方空白条 */
+  body.has-home-analysis .chips{display:none}
+  body.has-home-analysis .askwrap{padding:10px 30px 8px}
+  .hp-replace{display:flex;flex-direction:column;gap:8px}
+  .hp-rep{display:flex;align-items:center;gap:8px;font-size:13px;padding:8px 10px;border:1px solid var(--border);
+    border-radius:8px;cursor:pointer}
+  .hp-rep:hover{background:var(--soft)}
+  @media (max-width:960px){.hp-grid{grid-template-columns:1fr 1fr}}
+  @media (max-width:640px){.hp-grid{grid-template-columns:1fr}}
   /* My Tasks 视图下隐藏 Overview 侧栏；有 PARSE 会话时保留一条入口 */
   body.taskview .histwrap{display:none}
   body.taskview.has-parse-session .histwrap{display:block;flex:none;max-height:120px;border-bottom:1px solid var(--border)}
@@ -48,8 +116,8 @@
   .feed{padding:2px 17px 8px}
 
   /* ask bar */
-  .askwrap{position:absolute;left:0;right:0;bottom:0;padding:16px 30px 20px;
-    background:linear-gradient(180deg,rgba(255,255,255,0),#fff 34%)}
+  .askwrap{position:absolute;left:0;right:0;bottom:0;padding:16px 30px 8px;
+    background:linear-gradient(180deg,rgba(255,255,255,0),#fff 28%)}
   .ask{max-width:1080px;margin:0 auto;position:relative}
   .chips{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap}
   .ask-stack{position:relative}

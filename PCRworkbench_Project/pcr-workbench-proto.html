@@ -332,6 +332,14 @@
   .pgrp-h{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:8px 0 4px;letter-spacing:.02em}
   .rule-note{font-size:11px;color:var(--amber);margin-top:8px}
   .ai-lead{font-size:13.5px;color:var(--ink);line-height:1.65;margin:0 0 14px}
+  /* 带徽章的 AI 回复（对话通用）：绿底白字 AI */
+  .ai-lead:has(> .ai){display:flex;gap:12px;align-items:flex-start;margin:0 0 12px}
+  .ai-lead > .ai{width:24px;height:24px;flex:none;border-radius:6px;
+    background:linear-gradient(135deg,#0D9488,#2CB3A6);color:#fff;
+    display:grid;place-items:center;font-size:10px;font-weight:600;line-height:1}
+  .ai-lead > .txt{font-size:13.5px;font-weight:400;color:var(--ink);line-height:1.7;min-width:0;flex:1}
+  .ai-lead > .txt b{font-weight:500}
+  .ai-lead > .txt .muted{color:var(--ink-2)}
   .tl{display:flex;flex-direction:column;align-items:flex-start}
   .hitem .hm.live{color:var(--accent-ink)}
   .hitem .d.spin{background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
@@ -541,6 +549,35 @@
   textarea.reason:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
   svg.i{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 
+  /* ══ DialogueMotion（跨场景共用） ══ */
+  .dm-enter{opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease}
+  .dm-enter.dm-in{opacity:1;transform:translateY(0)}
+  .dm-fade{opacity:0;transition:opacity .2s ease}
+  .dm-fade.dm-in{opacity:1}
+  .dm-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+  .dm-actions .btn{font-size:12.5px}
+  .dm-pending,.dm-li-pending{opacity:0;pointer-events:none}
+  .dm-li-in{opacity:1;transition:opacity .2s ease,transform .2s ease;transform:translateY(0)}
+  .dm-li-pending{transform:translateY(6px)}
+  .dm-think{display:flex;gap:12px;align-items:center;margin:4px 0}
+  .dm-dots{display:flex;gap:5px;align-items:center;height:18px}
+  .dm-dots i{width:6px;height:6px;border-radius:50%;background:var(--ink-3);display:block;
+    animation:dmDot 1.2s ease-in-out infinite}
+  .dm-dots i:nth-child(2){animation-delay:.16s}
+  .dm-dots i:nth-child(3){animation-delay:.32s}
+  @keyframes dmDot{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-4px);opacity:1}}
+  .dm-caret{display:inline-block;width:1.5px;height:1em;margin-left:1px;vertical-align:-2px;
+    background:var(--ink-2);animation:dmCaret .8s step-end infinite}
+  @keyframes dmCaret{50%{opacity:0}}
+  .dm-spin{display:inline-block;width:10px;height:10px;border:1.5px solid var(--border-2);
+    border-top-color:var(--ink-3);border-radius:50%;animation:dmSpin .7s linear infinite;vertical-align:-1px}
+  @keyframes dmSpin{to{transform:rotate(360deg)}}
+  .dm-card{margin-top:10px}
+  .dm-ai-turn{width:100%}
+  @media (prefers-reduced-motion:reduce){
+    .dm-enter,.dm-fade,.dm-dots i,.dm-caret,.dm-spin{animation:none!important;transition:none!important;opacity:1!important;transform:none!important}
+  }
+
 /* overview: left rail (hist/pinned) + home + create PCR */
 
   /* ── Overview left rail ── */
@@ -557,6 +594,74 @@
   .pitem{width:100%;display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:8px;
     font-size:12.5px;color:var(--ink-2);transition:.12s;text-align:left}
   .pitem:hover{background:#F0F0EE;color:var(--ink)}
+  .pitem-wrap{position:relative;display:flex;align-items:center;gap:2px}
+  .pitem-wrap.dragging{opacity:.5}
+  .pitem-wrap .pitem{flex:1;min-width:0}
+  .pitem-t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pitem-more{opacity:0;width:24px;height:24px;border-radius:6px;color:var(--ink-3);flex:none}
+  .pitem-wrap:hover .pitem-more{opacity:1}
+  .pitem-more:hover{background:var(--soft);color:var(--ink)}
+  .pin-ico{width:13px;height:13px;flex:none;stroke:currentColor;fill:none;stroke-width:1.4}
+  .pin-empty{font-size:11.5px;color:var(--ink-3);padding:6px 9px}
+  .hp-menu{position:absolute;right:4px;top:28px;z-index:25;min-width:168px;padding:6px;
+    background:var(--panel);border:1px solid var(--border);border-radius:10px;
+    box-shadow:0 8px 24px rgba(16,24,40,.14);display:flex;flex-direction:column;gap:2px}
+  .hp-menu[hidden]{display:none!important}
+  .hp-menu button{text-align:left;padding:8px 10px;border-radius:7px;font-size:12.5px;color:var(--ink-2)}
+  .hp-menu button:hover{background:var(--soft);color:var(--ink)}
+  .hp-menu button.danger{color:var(--disagree)}
+  .hp-menu-div{height:1px;background:var(--border);margin:4px 0}
+
+  .home-pins-section{margin-top:28px}
+  .hp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .hp-card{border:1px solid var(--border);border-radius:12px;padding:14px 14px 12px;background:var(--panel);
+    cursor:pointer;transition:.15s;position:relative}
+  .hp-card:hover{border-color:var(--border-2)}
+  .hp-card.hp-new{opacity:0;transform:translateY(8px)}
+  .hp-card.hp-new.hp-in{opacity:1;transform:translateY(0);transition:opacity .3s ease,transform .3s ease;
+    box-shadow:0 0 0 2px var(--accent-soft);border-color:var(--accent)}
+  .hp-card.hp-flash{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent);transition:box-shadow .2s}
+  .hp-card-h{display:flex;align-items:center;gap:8px;margin-bottom:10px;position:relative}
+  .hp-card-h h3{font-size:13.5px;font-weight:650;color:var(--ink);margin:0}
+  .hp-fresh{font-size:10.5px;font-weight:500;margin-left:auto}
+  .hp-fresh.live{color:var(--accent-ink)}
+  .hp-fresh.snap{color:var(--ink-3)}
+  .hp-more{width:26px;height:26px;border-radius:6px;color:var(--ink-3)}
+  .hp-more:hover{background:var(--soft);color:var(--ink)}
+  .hp-card .hp-menu{top:30px;right:0}
+  .hp-rows{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--ink-2)}
+  .hp-row{display:flex;gap:8px;align-items:baseline;line-height:1.4}
+  .hp-d{font-weight:600;color:var(--ink);min-width:36px}
+  .hp-up{color:var(--disagree);font-weight:600}
+  .hp-dn{color:var(--agree);font-weight:600}
+  .hp-flat{color:var(--ink-3)}
+  .hp-proj-t{font-size:12.5px;font-weight:600;color:var(--ink);display:flex;justify-content:space-between}
+  .hp-proj-t span{font-weight:400;color:var(--ink-3);font-size:11.5px}
+  .hp-bar{height:6px;background:var(--soft);border-radius:4px;margin:8px 0 4px;overflow:hidden}
+  .hp-bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+  .hp-proj-m{font-size:11.5px;color:var(--ink-3)}
+  .hp-stat{display:flex;gap:12px;margin-top:8px;font-size:11.5px;color:var(--ink-2)}
+  .hp-ai{margin-top:10px;display:flex;gap:8px;font-size:12px;line-height:1.45;color:var(--ink-2)}
+  .hp-ai .sp{flex:none;font-size:10px;font-weight:700;color:var(--accent-ink);background:var(--accent-soft);
+    padding:2px 5px;border-radius:4px;height:fit-content}
+  .home-analysis{margin-top:22px;max-width:none;width:100%}
+  .home-analysis-thread{display:flex;flex-direction:column;align-items:stretch;gap:12px;width:100%}
+  .home-analysis-thread .bub.me{align-self:flex-end;margin-left:auto;max-width:min(78%,640px)}
+  .home-analysis-thread .dm-ai-turn,
+  .home-analysis-thread .ai-lead{align-self:flex-start;max-width:min(100%,720px)}
+  .home-analysis-thread .dm-card,
+  .home-analysis-thread .dm-actions{max-width:min(100%,720px)}
+  .hp-actions{display:flex;gap:8px;align-items:center;margin-top:4px}
+  .hp-inline-card{margin-top:4px}
+  /* 分析对话进行中：收起建议 chips，避免输入框上方空白条 */
+  body.has-home-analysis .chips{display:none}
+  body.has-home-analysis .askwrap{padding:10px 30px 8px}
+  .hp-replace{display:flex;flex-direction:column;gap:8px}
+  .hp-rep{display:flex;align-items:center;gap:8px;font-size:13px;padding:8px 10px;border:1px solid var(--border);
+    border-radius:8px;cursor:pointer}
+  .hp-rep:hover{background:var(--soft)}
+  @media (max-width:960px){.hp-grid{grid-template-columns:1fr 1fr}}
+  @media (max-width:640px){.hp-grid{grid-template-columns:1fr}}
   /* My Tasks 视图下隐藏 Overview 侧栏；有 PARSE 会话时保留一条入口 */
   body.taskview .histwrap{display:none}
   body.taskview.has-parse-session .histwrap{display:block;flex:none;max-height:120px;border-bottom:1px solid var(--border)}
@@ -591,8 +696,8 @@
   .feed{padding:2px 17px 8px}
 
   /* ask bar */
-  .askwrap{position:absolute;left:0;right:0;bottom:0;padding:16px 30px 20px;
-    background:linear-gradient(180deg,rgba(255,255,255,0),#fff 34%)}
+  .askwrap{position:absolute;left:0;right:0;bottom:0;padding:16px 30px 8px;
+    background:linear-gradient(180deg,rgba(255,255,255,0),#fff 28%)}
   .ask{max-width:1080px;margin:0 auto;position:relative}
   .chips{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap}
   .ask-stack{position:relative}
@@ -890,14 +995,9 @@
   .view-task .center-body{flex:1;overflow-y:auto;padding:16px 120px 20px;scroll-behavior:smooth;min-height:0}
   .view-task .task-thread{display:flex;flex-direction:column;gap:14px;align-items:stretch;width:100%}
   .view-task .task-ai{width:100%;max-width:none;align-self:stretch}
-  .view-task .task-ai .ai-lead,.view-task .task-thread .ai-lead{display:flex;gap:12px;margin-bottom:12px;align-self:stretch;max-width:none;width:100%}
+  .view-task .task-ai .ai-lead,.view-task .task-thread .ai-lead{align-self:stretch;max-width:none;width:100%}
   .view-task .task-thread .ai-lead.task-follow{margin-bottom:0;max-width:calc(100% - 120px);width:fit-content;align-self:flex-start}
-  .view-task .ai-lead .ai{width:24px;height:24px;flex:none;border-radius:6px;background:linear-gradient(135deg,#0D9488,#2CB3A6);
-    color:#fff;display:grid;place-items:center;font-size:10px;font-weight:600}
-  .view-task .ai-lead .txt{font-size:13.5px;font-weight:400;color:var(--ink);line-height:1.7;min-width:0;flex:1}
   .view-task .task-thread .ai-lead.task-follow .txt{flex:none;max-width:100%}
-  .view-task .ai-lead .txt b{font-weight:500}
-  .view-task .ai-lead .txt .muted{color:var(--ink-2)}
   .view-task .task-thread .bub.me{align-self:flex-end;max-width:min(78%,640px)}
 
   .view-task .block{background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;
@@ -1100,6 +1200,8 @@
   .view-task .br-sum{margin-top:8px;font-size:12px;color:var(--ink-2)}
   .view-task .br-retry{padding:2px 8px;font-size:11px}
 
+  /* DialogueMotion shared — also in shell; keep task-scoped tweaks here if needed */
+
   /* ══ Approval History timeline ══ */
   .view-task .tb-review{flex:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;
     background:var(--soft);color:var(--ink-2);border:1px solid var(--border)}
@@ -1266,11 +1368,7 @@
     </div>
         <div class="histwrap" id="overview-rail-hist"></div>
 
-    <div class="pinned" id="overview-rail-pinned">
-      <div class="hgroup" style="padding:2px 9px 6px">Pinned to Home</div>
-      <button class="pitem"><svg class="i" style="width:13px;height:13px"><path d="M8 2v6M5 5l3-3 3 3M3 11h10v3H3z"/></svg>X1 线撞期看板</button>
-      <button class="pitem"><svg class="i" style="width:13px;height:13px"><path d="M8 2v6M5 5l3-3 3 3M3 11h10v3H3z"/></svg>订单交付项目进度</button>
-    </div>
+    <div class="pinned" id="overview-rail-pinned"></div>
 
     <div class="rail-foot">
       <button class="navitem" onclick="toast('设置')"><svg class="i"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M2.5 8h2M11.5 8h2M4.1 4.1l1.4 1.4M10.5 10.5l1.4 1.4M11.9 4.1l-1.4 1.4M5.5 10.5l-1.4 1.4"/></svg>设置</button>
@@ -1533,6 +1631,12 @@
           </div>
         </div>
 
+        <!-- PINNED TO HOME -->
+        <div id="homePinsSection" class="home-pins-section" hidden></div>
+
+        <!-- Inline analysis thread (Overview 提问) -->
+        <div id="homeAnalysis" class="home-analysis" hidden></div>
+
       </div>
       <div class="parse-rest" id="parseLayer">
         <div class="parse-user" id="parseUser"></div>
@@ -1607,6 +1711,7 @@
           <button class="guide-i" data-g="write" onclick="guideCreate()">粘贴邮件、会议纪要，或直接描述</button>
           <div class="guide-g">提问与分析 <span>读取现状，不写入</span></div>
           <button class="guide-i" data-g="read" onclick="askq(this)">X1 G13 现在什么状态</button>
+          <button class="guide-i" data-g="read" onclick="askq(this)">X1 产品线现在有哪几条 PCR 会撞期?</button>
           <button class="guide-i" data-g="read" onclick="askq(this)">XX 订单交付项目为什么慢</button>
           <button class="guide-i" data-g="read" onclick="askq(this)">按产品看逾期分布</button>
           <button class="guide-i" data-g="read" onclick="askq(this)">对比 M90q 与相似案例成本</button>
@@ -1678,6 +1783,309 @@
 
 
 <script>
+/* shared: DialogueMotion — 跨场景 AI 对话动画（纯 CSS + 原生 JS） */
+(function () {
+  const DM = {
+    _skip: false,
+    _running: false,
+    _followScroll: true,
+    _scrollRoot: null,
+    _onScroll: null,
+
+    reduced() {
+      try {
+        if (window.__DM_DISABLE) return true;
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (_) {
+        return !!window.__DM_DISABLE;
+      }
+    },
+
+    skip() {
+      this._skip = true;
+    },
+
+    isSkipping() {
+      return this._skip || this.reduced();
+    },
+
+    bindSkip(root) {
+      if (!root || root.dataset.dmSkipBound) return;
+      root.dataset.dmSkipBound = '1';
+      root.addEventListener(
+        'click',
+        (e) => {
+          if (!this._running) return;
+          if (e.target.closest('a,button,input,textarea,select,label,.tipdot,[contenteditable]')) return;
+          this.skip();
+        },
+        true
+      );
+    },
+
+    _bindScrollFollow(scrollRoot) {
+      this._unfollowScroll();
+      this._scrollRoot = scrollRoot || null;
+      this._followScroll = true;
+      if (!scrollRoot) return;
+      this._onScroll = () => {
+        const el = this._scrollRoot;
+        if (!el) return;
+        const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
+        this._followScroll = dist < 48;
+      };
+      scrollRoot.addEventListener('scroll', this._onScroll, { passive: true });
+    },
+
+    _unfollowScroll() {
+      if (this._scrollRoot && this._onScroll) {
+        this._scrollRoot.removeEventListener('scroll', this._onScroll);
+      }
+      this._scrollRoot = null;
+      this._onScroll = null;
+      this._followScroll = true;
+    },
+
+    scrollToBottom(scrollRoot) {
+      const el = scrollRoot || this._scrollRoot;
+      if (!el || !this._followScroll) return;
+      el.scrollTop = el.scrollHeight;
+    },
+
+    sleep(ms) {
+      return new Promise((resolve) => {
+        if (this.isSkipping() || ms <= 0) return resolve();
+        const t0 = Date.now();
+        const tick = () => {
+          if (this.isSkipping() || Date.now() - t0 >= ms) return resolve();
+          requestAnimationFrame(tick);
+        };
+        setTimeout(tick, Math.min(ms, 50));
+      });
+    },
+
+    enter(el) {
+      if (!el) return;
+      el.classList.add('dm-enter');
+      requestAnimationFrame(() => el.classList.add('dm-in'));
+    },
+
+    thinkingHtml() {
+      return `<div class="dm-think ai-lead" aria-hidden="true">
+        <div class="ai">AI</div>
+        <div class="dm-dots"><i></i><i></i><i></i></div>
+      </div>`;
+    },
+
+    /** 流式写入纯文本；返回最终文本节点容器 */
+    async streamText(targetEl, text, scrollRoot) {
+      const raw = String(text || '');
+      targetEl.innerHTML = '';
+      const cursor = document.createElement('span');
+      cursor.className = 'dm-caret';
+      targetEl.appendChild(cursor);
+
+      const long = raw.length > 300;
+      const base = long ? 12 : 30;
+      let i = 0;
+      while (i < raw.length) {
+        if (this.isSkipping()) {
+          targetEl.textContent = raw;
+          break;
+        }
+        const ch = raw[i];
+        const isAsciiWord = /[A-Za-z0-9]/.test(ch);
+        let take = 1;
+        if (isAsciiWord) {
+          take = Math.min(3, raw.length - i);
+          while (take > 1 && !/[A-Za-z0-9]/.test(raw[i + take - 1])) take--;
+        }
+        const chunk = raw.slice(i, i + take);
+        cursor.before(document.createTextNode(chunk));
+        i += take;
+        this.scrollToBottom(scrollRoot);
+
+        let delay = base;
+        if (/[。！？；.!?]/.test(chunk)) delay += 80;
+        if (chunk.includes('\n')) delay += 150;
+        await this.sleep(delay);
+      }
+      cursor.remove();
+      if (targetEl.textContent !== raw && this.isSkipping()) targetEl.textContent = raw;
+    },
+
+    async revealEl(el, scrollRoot) {
+      if (!el) return;
+      el.hidden = false;
+      el.classList.remove('dm-pending');
+      this.enter(el);
+      this.scrollToBottom(scrollRoot);
+      await this.sleep(this.isSkipping() ? 0 : 200);
+    },
+
+    /**
+     * 卡片内列表项：先 ok，后 warn/err；图标转圈→终态
+     */
+    async revealListItems(cardEl, scrollRoot) {
+      if (!cardEl) return;
+      const items = [...cardEl.querySelectorAll('.dm-li, .vrow, .tl-item, .pcheck, .ah-vrow')];
+      if (!items.length) return;
+      items.forEach((it) => {
+        it.classList.add('dm-li-pending');
+        const ic = it.querySelector('.ic, .ck, .tl-dot, .ah-vico');
+        if (ic && !ic.dataset.dmFinal) {
+          ic.dataset.dmFinal = ic.innerHTML;
+          ic.innerHTML = '<span class="dm-spin"></span>';
+          ic.classList.add('dm-ico-spin');
+        }
+      });
+      const ok = items.filter((it) => !it.classList.contains('warn') && !it.classList.contains('err') && !it.classList.contains('dis') && !it.classList.contains('fail'));
+      const bad = items.filter((it) => it.classList.contains('warn') || it.classList.contains('err') || it.classList.contains('dis') || it.classList.contains('fail'));
+      const order = ok.concat(bad);
+      for (let i = 0; i < order.length; i++) {
+        const it = order[i];
+        const isBad = bad.includes(it);
+        if (isBad && i === ok.length) await this.sleep(this.isSkipping() ? 0 : 400);
+        it.classList.remove('dm-li-pending');
+        it.classList.add('dm-li-in');
+        const ic = it.querySelector('.ic, .ck, .tl-dot, .ah-vico');
+        if (ic && ic.dataset.dmFinal != null) {
+          await this.sleep(this.isSkipping() ? 0 : 180);
+          ic.innerHTML = ic.dataset.dmFinal;
+          ic.classList.remove('dm-ico-spin');
+        }
+        this.scrollToBottom(scrollRoot);
+        await this.sleep(this.isSkipping() ? 0 : 220);
+      }
+    },
+
+    /**
+     * 播放一轮 AI 回复动画
+     * @param {object} opts
+     * @param {HTMLElement} opts.mount - 插入 AI 块的容器
+     * @param {HTMLElement} [opts.scrollRoot]
+     * @param {string} opts.text - 流式纯文本
+     * @param {string} [opts.htmlSuffix] - 文本后追加的 HTML（tipdot 等）
+     * @param {string[]} [opts.cardsHtml] - 卡片 HTML 列表
+     * @param {string} [opts.actionsHtml] - 动作区 HTML
+     * @param {boolean} [opts.animate=true]
+     */
+    async playAssistant(opts) {
+      const {
+        mount,
+        scrollRoot,
+        text,
+        htmlSuffix = '',
+        cardsHtml = [],
+        actionsHtml = '',
+        animate = true,
+      } = opts || {};
+      if (!mount) return;
+
+      this.bindSkip(scrollRoot || mount.closest('.center-body, .scroll, .parse-chat') || mount);
+      this._bindScrollFollow(scrollRoot);
+      this._skip = false;
+      this._running = true;
+
+      const wrap = document.createElement('div');
+      wrap.className = 'dm-ai-turn';
+      mount.appendChild(wrap);
+
+      const useAnim = animate && !this.reduced();
+
+      try {
+        if (!useAnim) {
+          wrap.innerHTML = `<div class="ai-lead task-follow"><div class="ai">AI</div><div class="txt"></div></div>`;
+          const txt = wrap.querySelector('.txt');
+          txt.innerHTML = escDm(text).replace(/\n/g, '<br>') + (htmlSuffix || '');
+          cardsHtml.forEach((h) => {
+            const d = document.createElement('div');
+            d.className = 'dm-card';
+            d.innerHTML = h;
+            wrap.appendChild(d);
+          });
+          if (actionsHtml) {
+            const a = document.createElement('div');
+            a.className = 'dm-actions';
+            a.innerHTML = actionsHtml;
+            wrap.appendChild(a);
+          }
+          this.scrollToBottom(scrollRoot);
+          return wrap;
+        }
+
+        // thinking
+        await this.sleep(150);
+        if (!this.isSkipping()) {
+          wrap.innerHTML = this.thinkingHtml();
+          this.scrollToBottom(scrollRoot);
+          const thinkMs = 600 + Math.floor(Math.random() * 600);
+          await this.sleep(thinkMs);
+        }
+
+        // stream
+        wrap.innerHTML = `<div class="ai-lead task-follow dm-enter dm-in"><div class="ai">AI</div><div class="txt"></div></div>`;
+        const txt = wrap.querySelector('.txt');
+        await this.streamText(txt, text, scrollRoot);
+        if (htmlSuffix) txt.insertAdjacentHTML('beforeend', htmlSuffix);
+
+        // cards
+        for (const h of cardsHtml) {
+          if (!h) continue;
+          const d = document.createElement('div');
+          d.className = 'dm-card dm-pending';
+          d.hidden = true;
+          d.innerHTML = h;
+          wrap.appendChild(d);
+        }
+        const cards = [...wrap.querySelectorAll('.dm-card')];
+        for (const c of cards) {
+          await this.revealEl(c, scrollRoot);
+          await this.revealListItems(c, scrollRoot);
+        }
+
+        // actions
+        if (actionsHtml) {
+          await this.sleep(this.isSkipping() ? 0 : 200);
+          const a = document.createElement('div');
+          a.className = 'dm-actions dm-fade';
+          a.innerHTML = actionsHtml;
+          wrap.appendChild(a);
+          requestAnimationFrame(() => a.classList.add('dm-in'));
+          this.scrollToBottom(scrollRoot);
+        }
+        return wrap;
+      } finally {
+        this._running = false;
+        this._skip = false;
+        this._unfollowScroll();
+      }
+    },
+
+    /** 用户气泡立即进入 */
+    appendUser(mount, text, scrollRoot) {
+      const el = document.createElement('div');
+      el.className = 'bub me';
+      el.textContent = text;
+      mount.appendChild(el);
+      if (!this.reduced()) this.enter(el);
+      this._followScroll = true;
+      this.scrollToBottom(scrollRoot);
+      return el;
+    },
+  };
+
+  function escDm(t) {
+    return String(t || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  window.DialogueMotion = DM;
+  window.escDm = escDm;
+})();
+
 /* shell: navigation, tips, mode, shared chrome */
 const TIPS_TASK={
  rail:{t:'左侧任务导航：按 PACE 主流程组织',
@@ -1800,6 +2208,22 @@ const TIPS_TASK={
    ix:'完整显示退回原因与重提时间，以及后续再次 Approve 的呼应。',
    fn:'被退回过的经历最能说明这条 PCR 的问题所在，对当前审批人的判断极有帮助。',
    ref:['审批历史']},
+ dmStream:{t:'流式输出是 AI 产品的基本特征',
+   ix:'AI 回复逐字输出，配合等待态三点与闪烁光标。',
+   fn:'一次性蹦出全部内容，观感等同于查询数据库；逐字输出的那两秒是用户感觉到「它在思考」的时刻，这是区别于传统面板的基本特征而非装饰。',
+   ref:['对话动画规范']},
+ dmWarnLast:{t:'警告项最后出现',
+   ix:'校验清单中的 ⚠ 与 ✗ 放在最后，出现前有停顿。',
+   fn:'最需要被注意的内容用出现顺序与节奏形成视觉重音，比单纯用颜色标红更有效。',
+   ref:['对话动画规范']},
+ dmScroll:{t:'用户上滚后停止自动跟随',
+   ix:'流式输出时自动滚到底，但用户手动上滚后暂停跟随，回到底部后恢复。',
+   fn:'用户上滚说明正在看前面的内容，强行拉回底部会打断阅读。',
+   ref:['对话动画规范']},
+ dmSkip:{t:'必须能跳过',
+   ix:'点击对话区任意位置立即显示完整结果；动画只影响呈现，不影响功能。',
+   fn:'动画会累积拖慢演示节奏，需要能随时跳过。',
+   ref:['对话动画规范']},
 };
 
 
@@ -1961,6 +2385,22 @@ const TIPS_HOME={
    ix:'批量提示放在任务列表顶部与工作区卡片，不进入首页的 AI 判断三件事。',
    fn:'首页判断段留给需要决策的风险；批量是「可以更快干完」的事，混在一起会冲淡紧迫感。',
    ref:['信息架构']},
+ pinCustom:{t:'用对话替代面板自定义',
+   ix:'对话中问出想看的分析，一键钉到首页成为常驻卡片。',
+   fn:'传统 BI 要走「新建视图→配置图表→选维度→保存」，这里用一次提问加一次点击完成，是 AI 原生交互替代传统配置的典型场景。',
+   ref:['AI 原生交互']},
+ pinVsHist:{t:'会话是过程，钉住是结果',
+   ix:'左栏 Pinned to Home 与会话历史分区显示。',
+   fn:'会话历史记录「我问过什么」，钉住的是「我要一直看什么」，两者性质不同不应混排。',
+   ref:['信息架构']},
+ pinLive:{t:'实时与快照要区分标注',
+   ix:'可重复执行的分析标「实时」，一次性分析标「快照+日期」。',
+   fn:'若一次性分析被当作实时数据展示，用户会基于过期结论做判断，必须显式区分。',
+   ref:['钉到首页']},
+ pinLimit:{t:'限制钉住数量',
+   ix:'最多 4 个，达上限时要求先替换。',
+   fn:'首页空间有限，无限制钉住会让自定义区喧宾夺主，反而失去「一眼看到重点」的价值。',
+   ref:['钉到首页']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -2028,6 +2468,9 @@ function switchView(v){
   document.getElementById('view-home').style.display = v==='home'?'':'none';
   document.getElementById('view-task').style.display = v==='task'?'':'none';
   document.getElementById('crumb').textContent = v==='home'?'Overview':'My Tasks';
+  if(v==='home'){
+    if(window.HomePins&&HomePins.renderHomeSection) HomePins.renderHomeSection();
+  }
   if(v==='task'){ if(window.MyTasks&&MyTasks.ensureInit) MyTasks.ensureInit(); else if(!window.__taskInit){window.__taskInit=1;renderTaskAll();} }
   document.body.classList.toggle('taskview', v==='task');
   syncRailTip();
@@ -2166,7 +2609,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -2300,6 +2743,11 @@ function askPreset(q){
   switchView('home');
   const i=document.getElementById('askin');
   if(i){i.value=q;i.focus();}
+  if(window.HomePins && HomePins.matchCatalog(q)){
+    HomePins.runAnalysis(q);
+    if(i){i.value='';if(window.AskComposer) AskComposer.autoGrow(i);}
+    return;
+  }
   toast('已填入提问，回车即可开始分析');
 }
 function askq(b){document.getElementById('askin').value=b.textContent;document.getElementById('askin').focus();hideGuide();}
@@ -2483,9 +2931,13 @@ const Sessions=(function(){
       }
       return;
     }
-    // ask session: go home, toast restore
+    // ask session: go home; 分析类恢复钉到首页对话
     if(typeof switchView==='function') switchView('home');
     if(typeof PARSE!=='undefined' && PARSE.active) suspendParse();
+    if(window.HomePins && HomePins.matchCatalog(s.title)){
+      HomePins.runAnalysis(s.title, { fromPin:true });
+      return;
+    }
     toast('已打开会话：'+s.title);
   }
   function togglePin(){
@@ -2676,11 +3128,21 @@ function sendq(){const v=document.getElementById('askin').value.trim();
   if(typeof PARSE!=='undefined' && PARSE.active){
     const host=document.getElementById('parseUser');
     const el=document.createElement('div');el.className='bub me';el.textContent=v;
-    host.appendChild(el);document.getElementById('askin').value='';
+    host.appendChild(el);
+    if(window.DialogueMotion) DialogueMotion.enter(el);
+    document.getElementById('askin').value='';
     if(window.AskComposer) AskComposer.autoGrow(document.getElementById('askin'));
+    const sc=document.querySelector('.scroll'); if(sc) sc.scrollTop=sc.scrollHeight;
     toast('已补充信息');return;
   }
   if(typeof PARSE!=='undefined' && PARSE.createIntent){startParse(v);return;}
+  // 分析类提问 → 钉到首页能力
+  if(window.HomePins && HomePins.matchCatalog(v)){
+    document.getElementById('askin').value='';
+    if(window.AskComposer) AskComposer.autoGrow(document.getElementById('askin'));
+    HomePins.runAnalysis(v);
+    return;
+  }
   const id='ask-'+Date.now();
   Sessions.upsert({id,kind:'ask',title:v.length>40?v.slice(0,40)+'…':v,meta:'刚刚',group:'today',pinned:false,status:null,accent:'var(--blue)'});
   Sessions.setCurrent(id);
@@ -3104,13 +3566,13 @@ function sendTaskAsk(){
   s.chat=s.chat||[];
   s.chat.push({role:'user',text:v});
   let reply='已记录你的补充。你可以继续完善 Comment，或选择 Vote 立场后写回。';
-  let html=null;
+  let tipSuffix='';
   if(/Comment|严谨|改写|修改草稿/i.test(v)){
     s.comment=`开发侧确认：Ultra 155U→165U 为同封装 pin-to-pin 替代，主板无硬件改动。参考 X1 Carbon G12（PCR-2025-07612）结论为无影响。
 
 补充说明：① BIOS microcode 兼容性验证计划（含回归范围）；② 满载功耗与散热余量的量化验证数据与窗口。结论：建议 Agree，并在 Comment 中保留上述两项跟踪项。`;
     reply='已把上方 Comment 草稿改得更严谨：补强了验证范围表述，并明确建议 Agree。';
-    html=reply+`<span class="tipdot" onclick="showTip(event,'taskUpdate',55)">55</span>`;
+    tipSuffix=`<span class="tipdot" onclick="showTip(event,'taskUpdate',55)">55</span><span class="tipdot" onclick="showTip(event,'dmStream',66)">66</span>`;
   }else if(/Disagree|不同意/i.test(v)){
     reply='若投 Disagree：任务将回到提出方补充材料，OTM 可见你的 Comment 与阻碍点；不会直接写回 Agree。建议在 Comment 中写清阻断原因（如认证窗口）。';
   }else if(/Schedule|校验|补什么/i.test(v)){
@@ -3118,9 +3580,26 @@ function sendTaskAsk(){
   }else if(/G12|相似|案例|BIOS/i.test(v)){
     reply='参考 G12（PCR-2025-07612）是因为同产品线、同类 CPU 换代且已 Closed。右侧 Similar PCR 还有 T14s 案例（含 BIOS Return 记录），可一并对照。';
   }
-  s.chat.push({role:'ai',text:reply,html:html||escTask(reply)});
+  s.chat.push({role:'ai',text:reply,html:escTask(reply)+tipSuffix});
   if(inp){inp.value='';if(window.AskComposer) AskComposer.autoGrow(inp);}
   hideTaskGuide();closeTaskPlus();
+
+  const thread=document.getElementById('taskThread');
+  const scrollRoot=document.getElementById('centerBody');
+  if(thread && window.DialogueMotion){
+    // 静默更新 Comment 草稿（不整页重绘，避免打断动画）
+    const cmt=document.querySelector('#centerBody .comment.edit');
+    if(cmt && s.comment!=null) cmt.innerHTML=escTask(s.comment).replace(/\n/g,'<br>');
+    DialogueMotion.appendUser(thread,v,scrollRoot);
+    DialogueMotion.playAssistant({
+      mount:thread,
+      scrollRoot,
+      text:reply,
+      htmlSuffix:tipSuffix,
+      animate:true
+    }).then(()=>{ if(typeof paintDots==='function') paintDots(); });
+    return;
+  }
   renderCenter();
 }
 
@@ -4910,6 +5389,7 @@ function newChatSession(){
   if(PARSE.active||PARSE.suspended||PARSE.text){
     exitParseMode();
   }
+  if(window.HomePins&&HomePins.clearAnalysis) HomePins.clearAnalysis();
   document.querySelector('.scroll').scrollTop=0;
   toast('已新建会话');
   const inp=document.getElementById('askin');if(inp){inp.value='';inp.focus();}
@@ -4918,6 +5398,7 @@ function clearParseTimers(){PARSE.timers.forEach(id=>clearTimeout(id));PARSE.tim
 function later(ms,fn){PARSE.timers.push(setTimeout(fn,ms));}
 
 function startParse(text){
+  if(window.HomePins&&HomePins.clearAnalysis) HomePins.clearAnalysis();
   PARSE.text=text||DEMO_MAIL;PARSE.createIntent=false;PARSE.skipped=false;
   PARSE.split=/vPro/i.test(PARSE.text)&&/non-vPro/i.test(PARSE.text);
   PARSE.typeConfirmed=false;PARSE.pcrType=null;PARSE.typePick='Hardware/SBB';
@@ -5140,6 +5621,63 @@ function renderConclusion(){
   }
   html+='</div>';
   host.innerHTML=html;
+  if(PARSE._animateConclusion && window.DialogueMotion){
+    PARSE._animateConclusion=false;
+    animateParseConclusion(host);
+  }
+}
+
+async function animateParseConclusion(host){
+  const DM=window.DialogueMotion;
+  if(!DM||DM.reduced()||window.__DM_DISABLE) return;
+  const scrollRoot=document.querySelector('.scroll');
+  DM.bindSkip(host);
+  DM._bindScrollFollow(scrollRoot);
+  DM._skip=false; DM._running=true;
+  try{
+    const lead=host.querySelector('.ai-lead');
+    const tl=host.querySelector('.tl-wrap');
+    const docks=[...host.querySelectorAll('.submit-dock')];
+    const fullLead=lead?lead.textContent.trim():'';
+    if(tl){tl.hidden=true;tl.classList.add('dm-pending');}
+    docks.forEach(d=>{d.hidden=true;d.classList.add('dm-pending');});
+    if(lead && fullLead){
+      lead.textContent='';
+      await DM.streamText(lead, fullLead, scrollRoot);
+    }
+    if(tl){
+      await DM.revealEl(tl, scrollRoot);
+      // 警告/错误项后出现：先 info，再 warn，再 err
+      const items=[...tl.querySelectorAll('.tl-item')];
+      items.forEach(it=>{
+        it.classList.add('dm-li-pending');
+        const dot=it.querySelector('.tl-dot');
+        if(dot){dot.dataset.dmFinal=dot.innerHTML;dot.innerHTML='<span class="dm-spin"></span>';}
+      });
+      const rank=it=>it.classList.contains('err')?2:it.classList.contains('warn')?1:0;
+      items.sort((a,b)=>rank(a)-rank(b));
+      let seenBad=false;
+      for(const it of items){
+        if(rank(it)>0 && !seenBad){seenBad=true;await DM.sleep(DM.isSkipping()?0:400);}
+        it.classList.remove('dm-li-pending');it.classList.add('dm-li-in');
+        const dot=it.querySelector('.tl-dot');
+        if(dot&&dot.dataset.dmFinal!=null){
+          await DM.sleep(DM.isSkipping()?0:160);
+          dot.innerHTML=dot.dataset.dmFinal;
+        }
+        DM.scrollToBottom(scrollRoot);
+        await DM.sleep(DM.isSkipping()?0:220);
+      }
+    }
+    for(const d of docks){
+      await DM.sleep(DM.isSkipping()?0:200);
+      d.hidden=false;d.classList.remove('dm-pending');
+      d.classList.add('dm-fade');requestAnimationFrame(()=>d.classList.add('dm-in'));
+      DM.scrollToBottom(scrollRoot);
+    }
+  } finally {
+    DM._running=false;DM._skip=false;DM._unfollowScroll();
+  }
 }
 
 function resolveIssue(id,act){
@@ -5490,6 +6028,7 @@ function finishParse(ex){
   collapseAllSteps();
   fillAllStepBodies(ex);
   renderPlist();
+  PARSE._animateConclusion=true;
   renderConclusion();
 }
 
@@ -5771,6 +6310,495 @@ window.Overview = {
   resumeParse: typeof resumeParse === 'function' ? resumeParse : null,
   suspendParse: typeof suspendParse === 'function' ? suspendParse : null
 };
+
+/* overview/home-pins: 钉到首页（Pinned to Home）补全 */
+(function () {
+  const PIN_MAX = 4;
+  const PIN_ICON = `<svg class="i pin-ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M5.8 2.2h4.4c.8 0 1.4.7 1.2 1.5l-.4 2.4 1.8 1.4v1H4.2v-1l1.8-1.4-.4-2.4c-.2-.8.4-1.5 1.2-1.5z"/><path d="M8 8.5V14"/></svg>`;
+
+  /** 演示分析模板（与既有 PCR / 首页数字一致） */
+  const CATALOG = {
+    'x1-clash': {
+      id: 'x1-clash',
+      title: 'X1 线撞期看板',
+      live: true,
+      sessionId: 'ask-2',
+      query: 'X1 产品线 PCR 撞期情况',
+      keywords: [/撞期/, /X1.*产品线/, /实施日集中/],
+      insight: '3 条集中在 11 月中旬，同一产品线资源撞期，建议错开至少 1 周',
+      full: 'X1 产品线当前有 3 条 PCR 目标实施日集中在 11 月中旬，存在资源撞期风险。建议将至少一条调整到 11 月下旬或 12 月初，错开至少 1 周。',
+      rowsHtml() {
+        return `<div class="hp-rows">
+          <div class="hp-row"><span class="hp-d">11/10</span><span class="mono">PCR-2026-08871</span><span>X1 Carbon G13 · CPU Ultra 165U 换代</span></div>
+          <div class="hp-row"><span class="hp-d">11/15</span><span class="mono">PCR-2026-08903</span><span>X1 Yoga G9 · 面板供应商切换</span></div>
+          <div class="hp-row"><span class="hp-d">11/18</span><span class="mono">CP-2026-04455</span><span>Legion Pro 7i Gen10 · 散热方案变更</span></div>
+        </div>`;
+      },
+      // CP-2026-04455 在任务里是 Legion；提示词写 X1 Nano — 以既有 My Tasks 为准用 Legion，但标题保持撞期看板
+    },
+    'order-progress': {
+      id: 'order-progress',
+      title: '订单交付项目进度',
+      live: true,
+      sessionId: 'ask-4',
+      query: 'XX 订单交付项目进度',
+      keywords: [/订单交付/, /项目进度/, /XX 客户/],
+      insight: '瓶颈在 ODM 侧 BOM 建立未回写，3 项 Work Item 已超期',
+      full: 'XX 客户订单交付项目下 8 条 PCR，整体进度 61%，落后计划 9 天。瓶颈在 ODM 侧 BOM 建立未回写。',
+      rowsHtml() {
+        return `<div class="hp-proj">
+          <div class="hp-proj-t">XX 客户订单交付 <span>8 条 PCR</span></div>
+          <div class="hp-bar"><i style="width:61%"></i></div>
+          <div class="hp-proj-m">61% · 落后计划 9 天</div>
+          <div class="hp-stat"><span>已完成 3</span><span>进行中 4</span><span>未开始 1</span></div>
+        </div>`;
+      },
+    },
+    'm90q-cost': {
+      id: 'm90q-cost',
+      title: 'M90q 成本对比',
+      live: false,
+      snapshotAt: '01-12',
+      sessionId: 'ask-5',
+      query: 'M90q 二供成本对比',
+      keywords: [/M90q.*成本/, /二供成本/, /成本对比/],
+      insight: '本次成本上浮高于两条相似案例，建议 Cost 团队确认二供报价',
+      full: '对比 CP-2026-04412 与相似案例：本次成本影响 ▲ +2.1%，高于 SP20250612_0031（持平）与 CP20250408_0117（▼ -0.8%）。',
+      rowsHtml() {
+        return `<div class="hp-rows">
+          <div class="hp-row mono">CP-2026-04412 · DDR5 颗粒二供导入</div>
+          <div class="hp-row"><span>本次成本影响</span><span class="hp-up">▲ +2.1%</span></div>
+          <div class="hp-row"><span>相似案例 SP20250612_0031</span><span class="hp-flat">● 持平</span></div>
+          <div class="hp-row"><span>相似案例 CP20250408_0117</span><span class="hp-dn">▼ -0.8%</span></div>
+        </div>`;
+      },
+    },
+    'cert-backlog': {
+      id: 'cert-backlog',
+      title: '认证积压趋势',
+      live: true,
+      sessionId: 'ask-cert',
+      query: '认证积压趋势',
+      keywords: [/认证积压/, /积压趋势/],
+      insight: '认证积压是当前主瓶颈，较上周增加 9 条',
+      full: 'Certification 环节积压较上周增加 9 条，主要来自 X1 与 M90q 产品线。',
+      rowsHtml() {
+        return `<div class="hp-rows">
+          <div class="hp-row"><span>本周积压</span><span class="hp-up">▲ +9</span></div>
+          <div class="hp-row"><span>Vote 阶段</span><span>41 条</span></div>
+          <div class="hp-row"><span>主因</span><span>Certification Disagree</span></div>
+        </div>`;
+      },
+    },
+  };
+
+  // 修正卡片一第三行产品：提示词写 Nano，但既有 Review 任务是 Legion Pro — 按既有数据
+  // 已在 rowsHtml 使用 Legion
+
+  let pins = [
+    { catalogId: 'x1-clash', pinnedAt: Date.now() - 86400000 },
+    { catalogId: 'order-progress', pinnedAt: Date.now() - 43200000 },
+    { catalogId: 'm90q-cost', pinnedAt: Date.now() - 3600000 },
+  ];
+  let justPinnedId = null;
+  let menuOpenId = null;
+  let pendingPinId = null; // for replace modal
+
+  function esc(t) {
+    return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  }
+
+  function getPin(catalogId) {
+    return pins.find((p) => p.catalogId === catalogId);
+  }
+
+  function isPinned(catalogId) {
+    return !!getPin(catalogId);
+  }
+
+  function matchCatalog(query) {
+    const q = String(query || '');
+    return Object.values(CATALOG).find((c) => c.keywords.some((re) => re.test(q)) || q.includes(c.title) || q.includes(c.query));
+  }
+
+  function freshness(c) {
+    if (c.live) return `<span class="hp-fresh live">⟳ 实时</span>`;
+    return `<span class="hp-fresh snap">快照 · ${esc(c.snapshotAt || '')}</span>`;
+  }
+
+  function cardHtml(p, opts = {}) {
+    const c = CATALOG[p.catalogId];
+    if (!c) return '';
+    const hi = opts.highlight || justPinnedId === c.id;
+    return `<div class="hp-card${hi ? ' hp-new' : ''}" id="hp-card-${c.id}" data-hpid="${c.id}">
+      <div class="hp-card-h">
+        <h3>${esc(c.title)}</h3>
+        ${freshness(c)}
+        <button type="button" class="hp-more" data-hpmenu="${c.id}" title="更多">⋮</button>
+        <div class="hp-menu" id="hp-menu-${c.id}" hidden>
+          <button type="button" data-hpact="full" data-hpid="${c.id}">↗  查看完整分析</button>
+          <button type="button" data-hpact="session" data-hpid="${c.id}">💬 回到原对话</button>
+          <button type="button" data-hpact="refresh" data-hpid="${c.id}">⟳  立即刷新</button>
+          <div class="hp-menu-div"></div>
+          <button type="button" class="danger" data-hpact="unpin" data-hpid="${c.id}">📌 取消钉住</button>
+        </div>
+      </div>
+      <div class="hp-body">${c.rowsHtml()}</div>
+      <div class="hp-ai"><span class="sp">AI</span><span>${esc(c.insight)}</span></div>
+    </div>`;
+  }
+
+  function renderHomeSection() {
+    const host = document.getElementById('homePinsSection');
+    if (!host) return;
+    if (!pins.length) {
+      host.hidden = true;
+      host.innerHTML = '';
+      return;
+    }
+    host.hidden = false;
+    host.innerHTML = `
+      <div class="sechead"><h2>我钉住的</h2>
+        <span class="tipdot" onclick="showTip(event,'pinCustom',70)">70</span>
+        <span class="tipdot" onclick="showTip(event,'pinVsHist',71)">71</span>
+        <span class="tipdot" onclick="showTip(event,'pinLive',72)">72</span>
+        <span class="tipdot" onclick="showTip(event,'pinLimit',73)">73</span>
+        <span class="cn" id="homePinsCount">${pins.length} / ${PIN_MAX}</span>
+      </div>
+      <div class="hp-grid" id="homePinsGrid">
+        ${pins.map((p) => cardHtml(p)).join('')}
+      </div>`;
+    wireHomeCards();
+    if (justPinnedId) {
+      const el = document.getElementById('hp-card-' + justPinnedId);
+      if (el) {
+        requestAnimationFrame(() => el.classList.add('hp-in'));
+        setTimeout(() => {
+          el.classList.remove('hp-new', 'hp-in');
+          justPinnedId = null;
+        }, 1600);
+      } else justPinnedId = null;
+    }
+  }
+
+  function clearAnalysis() {
+    const panel = document.getElementById('homeAnalysis');
+    if (panel) { panel.hidden = true; panel.innerHTML = ''; }
+    document.body.classList.remove('has-home-analysis');
+  }
+
+  function renderRail() {
+    const host = document.getElementById('overview-rail-pinned');
+    if (!host) return;
+    host.innerHTML = `<div class="hgroup" style="padding:2px 9px 6px">Pinned to Home<span class="tipdot" onclick="showTip(event,'pinVsHist',71)">71</span></div>
+      <div class="pin-list" id="pinList">
+        ${pins.map((p, idx) => {
+          const c = CATALOG[p.catalogId];
+          if (!c) return '';
+          return `<div class="pitem-wrap" draggable="true" data-hpidx="${idx}" data-hpid="${c.id}">
+            <button type="button" class="pitem" data-hpjump="${c.id}">${PIN_ICON}<span class="pitem-t">${esc(c.title)}</span></button>
+            <button type="button" class="pitem-more" data-hpmenu="rail-${c.id}" title="更多">⋮</button>
+            <div class="hp-menu rail" id="hp-menu-rail-${c.id}" hidden>
+              <button type="button" data-hpact="full" data-hpid="${c.id}">↗  查看完整分析</button>
+              <button type="button" data-hpact="session" data-hpid="${c.id}">💬 回到原对话</button>
+              <button type="button" data-hpact="refresh" data-hpid="${c.id}">⟳  立即刷新</button>
+              <div class="hp-menu-div"></div>
+              <button type="button" class="danger" data-hpact="unpin" data-hpid="${c.id}">📌 取消钉住</button>
+            </div>
+          </div>`;
+        }).join('') || '<div class="pin-empty">暂无钉住分析</div>'}
+      </div>`;
+    wireRail();
+  }
+
+  function closeMenus() {
+    document.querySelectorAll('.hp-menu').forEach((m) => { m.hidden = true; });
+    menuOpenId = null;
+  }
+
+  function wireHomeCards() {
+    document.querySelectorAll('#homePinsGrid .hp-card').forEach((card) => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.hp-more, .hp-menu')) return;
+        openFull(card.dataset.hpid);
+      });
+    });
+    wireMenus();
+  }
+
+  function wireMenus() {
+    document.querySelectorAll('[data-hpmenu]').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.hpmenu;
+        const menu = document.getElementById('hp-menu-' + id);
+        const open = menu && menu.hidden;
+        closeMenus();
+        if (menu && open) { menu.hidden = false; menuOpenId = id; }
+      };
+    });
+    document.querySelectorAll('[data-hpact]').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        const act = btn.dataset.hpact;
+        const id = btn.dataset.hpid;
+        closeMenus();
+        if (act === 'full') openFull(id);
+        else if (act === 'session') goSession(id);
+        else if (act === 'refresh') refreshPin(id);
+        else if (act === 'unpin') unpin(id);
+      };
+    });
+  }
+
+  function wireRail() {
+    wireMenus();
+    document.querySelectorAll('[data-hpjump]').forEach((btn) => {
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        jumpToCard(btn.dataset.hpjump);
+      };
+    });
+    const list = document.getElementById('pinList');
+    if (!list) return;
+    let dragIdx = null;
+    list.querySelectorAll('.pitem-wrap').forEach((row) => {
+      row.addEventListener('dragstart', () => { dragIdx = +row.dataset.hpidx; row.classList.add('dragging'); });
+      row.addEventListener('dragend', () => { row.classList.remove('dragging'); dragIdx = null; });
+      row.addEventListener('dragover', (e) => { e.preventDefault(); });
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const to = +row.dataset.hpidx;
+        if (dragIdx == null || dragIdx === to) return;
+        const [item] = pins.splice(dragIdx, 1);
+        pins.splice(to, 0, item);
+        renderAll();
+      });
+    });
+  }
+
+  function jumpToCard(id) {
+    if (typeof switchView === 'function') switchView('home');
+    renderHomeSection();
+    setTimeout(() => {
+      const el = document.getElementById('hp-card-' + id);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('hp-flash');
+      setTimeout(() => el.classList.remove('hp-flash'), 1500);
+    }, 80);
+  }
+
+  function openFull(id) {
+    const c = CATALOG[id];
+    if (!c) return;
+    const host = document.getElementById('modalHost');
+    const scrim = document.getElementById('scrim');
+    if (!host || !scrim) { toast(c.full); return; }
+    host.innerHTML = `<div class="modal" style="width:520px">
+      <div class="modal-h"><h3>${esc(c.title)}</h3><p>${c.live ? '⟳ 实时数据' : '快照 · ' + esc(c.snapshotAt)}</p></div>
+      <div class="modal-b">${c.rowsHtml()}<div class="hp-ai" style="margin-top:12px"><span class="sp">AI</span><span>${esc(c.full)}</span></div></div>
+      <div class="modal-f"><button class="btn btn-ghost" data-x>关闭</button>
+        <button class="btn btn-primary" data-sess>回到原对话</button></div>
+    </div>`;
+    scrim.classList.add('show');
+    host.querySelector('[data-x]').onclick = closeModal;
+    host.querySelector('[data-sess]').onclick = () => { closeModal(); goSession(id); };
+  }
+
+  function goSession(id) {
+    const c = CATALOG[id];
+    if (!c) return;
+    if (typeof switchView === 'function') switchView('home');
+    if (window.Sessions && c.sessionId) {
+      try { Sessions.setCurrent(c.sessionId); } catch (_) {}
+    }
+    runAnalysis(c.query, { fromPin: true, catalogId: c.id });
+  }
+
+  function refreshPin(id) {
+    const c = CATALOG[id];
+    if (!c) return;
+    if (!c.live) { toast('快照数据不会自动更新'); return; }
+    toast('已刷新「' + c.title + '」');
+    renderHomeSection();
+  }
+
+  function unpin(id) {
+    pins = pins.filter((p) => p.catalogId !== id);
+    toast('已取消钉住');
+    renderAll();
+    updateAnalysisPinButtons();
+  }
+
+  function pin(catalogId) {
+    const c = CATALOG[catalogId];
+    if (!c) return;
+    if (isPinned(catalogId)) {
+      unpin(catalogId);
+      return;
+    }
+    if (pins.length >= PIN_MAX) {
+      pendingPinId = catalogId;
+      openReplaceModal();
+      return;
+    }
+    doPin(catalogId);
+  }
+
+  function doPin(catalogId, replaceId) {
+    const c = CATALOG[catalogId];
+    if (!c) return;
+    if (replaceId) pins = pins.filter((p) => p.catalogId !== replaceId);
+    pins.push({ catalogId, pinnedAt: Date.now() });
+    justPinnedId = catalogId;
+    if (!c.live) toast('该结果为快照，不会自动更新');
+    else toast('已钉到首页：' + c.title);
+    renderAll();
+    updateAnalysisPinButtons();
+    if (typeof VIEW !== 'undefined' && VIEW === 'home') {
+      setTimeout(() => jumpToCard(catalogId), 100);
+    }
+  }
+
+  function openReplaceModal() {
+    const host = document.getElementById('modalHost');
+    const scrim = document.getElementById('scrim');
+    if (!host || !scrim) return;
+    host.innerHTML = `<div class="modal">
+      <div class="modal-h"><h3>已达钉住上限</h3>
+        <p>首页最多可钉住 ${PIN_MAX} 个分析。请先取消一个：</p></div>
+      <div class="modal-b">
+        <div class="hp-replace">
+          ${pins.map((p) => {
+            const c = CATALOG[p.catalogId];
+            return `<label class="hp-rep"><input type="radio" name="hprep" value="${c.id}"> ${esc(c.title)}</label>`;
+          }).join('')}
+        </div>
+      </div>
+      <div class="modal-f">
+        <button class="btn btn-ghost" data-x>取消</button>
+        <button class="btn btn-primary" data-ok>替换所选</button>
+      </div>
+    </div>`;
+    scrim.classList.add('show');
+    host.querySelector('[data-x]').onclick = () => { pendingPinId = null; closeModal(); };
+    host.querySelector('[data-ok]').onclick = () => {
+      const sel = host.querySelector('input[name=hprep]:checked');
+      if (!sel) { toast('请选择要替换的卡片'); return; }
+      const add = pendingPinId;
+      pendingPinId = null;
+      closeModal();
+      doPin(add, sel.value);
+    };
+  }
+
+  function pinActionsHtml(catalogId) {
+    const on = isPinned(catalogId);
+    return `<button type="button" class="btn btn-ghost hp-pinbtn" data-pinid="${catalogId}">${on ? '已钉住 ✓' : '📌 钉到首页'}</button>
+      <button type="button" class="btn btn-ghost" data-reanalyze="${catalogId}">⟳ 重新分析</button>
+      <span class="tipdot" onclick="showTip(event,'pinCustom',70)">70</span>`;
+  }
+
+  function updateAnalysisPinButtons() {
+    document.querySelectorAll('[data-pinid]').forEach((btn) => {
+      const id = btn.dataset.pinid;
+      btn.textContent = isPinned(id) ? '已钉住 ✓' : '📌 钉到首页';
+    });
+  }
+
+  async function runAnalysis(query, opts = {}) {
+    const c = opts.catalogId ? CATALOG[opts.catalogId] : matchCatalog(query);
+    if (!c) {
+      toast('已记录提问（演示：请试「X1 撞期」或「订单交付进度」）');
+      return false;
+    }
+    if (typeof switchView === 'function') switchView('home');
+    const panel = document.getElementById('homeAnalysis');
+    const scroll = document.querySelector('.scroll');
+    if (!panel) return false;
+
+    // 会话
+    if (window.Sessions) {
+      Sessions.upsert({
+        id: c.sessionId,
+        kind: 'ask',
+        title: c.query,
+        meta: '刚刚',
+        group: 'today',
+        pinned: false,
+        status: null,
+        accent: 'var(--accent)',
+      });
+      Sessions.setCurrent(c.sessionId);
+    }
+
+    panel.hidden = false;
+    document.body.classList.add('has-home-analysis');
+    panel.innerHTML = '';
+    const mount = document.createElement('div');
+    mount.className = 'home-analysis-thread';
+    panel.appendChild(mount);
+
+    if (window.DialogueMotion) {
+      DialogueMotion.appendUser(mount, query || c.query, scroll);
+      const card = `<div class="block hp-inline-card"><div class="block-h"><h4>${esc(c.title)}</h4>${freshness(c)}</div>
+        <div class="block-b">${c.rowsHtml()}</div></div>`;
+      await DialogueMotion.playAssistant({
+        mount,
+        scrollRoot: scroll,
+        text: c.full,
+        cardsHtml: [card],
+        actionsHtml: pinActionsHtml(c.id),
+        animate: !window.__DM_DISABLE && !opts.fromPin,
+      });
+    } else {
+      mount.innerHTML = `<div class="bub me">${esc(query || c.query)}</div>
+        <div class="ai-lead"><div class="ai">AI</div><div class="txt">${esc(c.full)}</div></div>
+        ${c.rowsHtml()}${pinActionsHtml(c.id)}`;
+    }
+    mount.querySelectorAll('[data-pinid]').forEach((btn) => {
+      btn.onclick = () => pin(btn.dataset.pinid);
+    });
+    mount.querySelectorAll('[data-reanalyze]').forEach((btn) => {
+      btn.onclick = () => runAnalysis(CATALOG[btn.dataset.reanalyze].query, { catalogId: btn.dataset.reanalyze });
+    });
+    if (typeof paintDots === 'function') paintDots();
+    return true;
+  }
+
+  function renderAll() {
+    renderRail();
+    renderHomeSection();
+  }
+
+  function init() {
+    renderAll();
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.hp-menu, [data-hpmenu], .pitem-more')) closeMenus();
+    });
+  }
+
+  window.HomePins = {
+    init,
+    renderAll,
+    renderHomeSection,
+    renderRail,
+    clearAnalysis,
+    pin,
+    unpin,
+    isPinned,
+    matchCatalog,
+    runAnalysis,
+    jumpToCard,
+    get pins() { return pins; },
+    CATALOG,
+    PIN_MAX,
+  };
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else setTimeout(init, 0);
+})();
 </script>
 </body>
 </html>

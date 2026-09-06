@@ -33,6 +33,8 @@ const parts = [
   read('src/mytasks/mytasks.html'),
   read('src/shell/shell-after.html'),
   '<script>\n',
+  read('src/shared/dialogue-motion.js'),
+  '\n',
   read('src/shell/shell.js'),
   '\n',
   read('src/mytasks/mytasks.js'),
@@ -42,6 +44,8 @@ const parts = [
   read('src/mytasks/batch.js'),
   '\n',
   read('src/overview/overview.js'),
+  '\n',
+  read('src/overview/home-pins.js'),
   read('src/shell/tail.html'),
 ];
 

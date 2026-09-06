@@ -120,6 +120,22 @@ const TIPS_TASK={
    ix:'完整显示退回原因与重提时间，以及后续再次 Approve 的呼应。',
    fn:'被退回过的经历最能说明这条 PCR 的问题所在，对当前审批人的判断极有帮助。',
    ref:['审批历史']},
+ dmStream:{t:'流式输出是 AI 产品的基本特征',
+   ix:'AI 回复逐字输出，配合等待态三点与闪烁光标。',
+   fn:'一次性蹦出全部内容，观感等同于查询数据库；逐字输出的那两秒是用户感觉到「它在思考」的时刻，这是区别于传统面板的基本特征而非装饰。',
+   ref:['对话动画规范']},
+ dmWarnLast:{t:'警告项最后出现',
+   ix:'校验清单中的 ⚠ 与 ✗ 放在最后，出现前有停顿。',
+   fn:'最需要被注意的内容用出现顺序与节奏形成视觉重音，比单纯用颜色标红更有效。',
+   ref:['对话动画规范']},
+ dmScroll:{t:'用户上滚后停止自动跟随',
+   ix:'流式输出时自动滚到底，但用户手动上滚后暂停跟随，回到底部后恢复。',
+   fn:'用户上滚说明正在看前面的内容，强行拉回底部会打断阅读。',
+   ref:['对话动画规范']},
+ dmSkip:{t:'必须能跳过',
+   ix:'点击对话区任意位置立即显示完整结果；动画只影响呈现，不影响功能。',
+   fn:'动画会累积拖慢演示节奏，需要能随时跳过。',
+   ref:['对话动画规范']},
 };
 
 
@@ -281,6 +297,22 @@ const TIPS_HOME={
    ix:'批量提示放在任务列表顶部与工作区卡片，不进入首页的 AI 判断三件事。',
    fn:'首页判断段留给需要决策的风险；批量是「可以更快干完」的事，混在一起会冲淡紧迫感。',
    ref:['信息架构']},
+ pinCustom:{t:'用对话替代面板自定义',
+   ix:'对话中问出想看的分析，一键钉到首页成为常驻卡片。',
+   fn:'传统 BI 要走「新建视图→配置图表→选维度→保存」，这里用一次提问加一次点击完成，是 AI 原生交互替代传统配置的典型场景。',
+   ref:['AI 原生交互']},
+ pinVsHist:{t:'会话是过程，钉住是结果',
+   ix:'左栏 Pinned to Home 与会话历史分区显示。',
+   fn:'会话历史记录「我问过什么」，钉住的是「我要一直看什么」，两者性质不同不应混排。',
+   ref:['信息架构']},
+ pinLive:{t:'实时与快照要区分标注',
+   ix:'可重复执行的分析标「实时」，一次性分析标「快照+日期」。',
+   fn:'若一次性分析被当作实时数据展示，用户会基于过期结论做判断，必须显式区分。',
+   ref:['钉到首页']},
+ pinLimit:{t:'限制钉住数量',
+   ix:'最多 4 个，达上限时要求先替换。',
+   fn:'首页空间有限，无限制钉住会让自定义区喧宾夺主，反而失去「一眼看到重点」的价值。',
+   ref:['钉到首页']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -348,6 +380,9 @@ function switchView(v){
   document.getElementById('view-home').style.display = v==='home'?'':'none';
   document.getElementById('view-task').style.display = v==='task'?'':'none';
   document.getElementById('crumb').textContent = v==='home'?'Overview':'My Tasks';
+  if(v==='home'){
+    if(window.HomePins&&HomePins.renderHomeSection) HomePins.renderHomeSection();
+  }
   if(v==='task'){ if(window.MyTasks&&MyTasks.ensureInit) MyTasks.ensureInit(); else if(!window.__taskInit){window.__taskInit=1;renderTaskAll();} }
   document.body.classList.toggle('taskview', v==='task');
   syncRailTip();
@@ -486,7 +521,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -620,6 +655,11 @@ function askPreset(q){
   switchView('home');
   const i=document.getElementById('askin');
   if(i){i.value=q;i.focus();}
+  if(window.HomePins && HomePins.matchCatalog(q)){
+    HomePins.runAnalysis(q);
+    if(i){i.value='';if(window.AskComposer) AskComposer.autoGrow(i);}
+    return;
+  }
   toast('已填入提问，回车即可开始分析');
 }
 function askq(b){document.getElementById('askin').value=b.textContent;document.getElementById('askin').focus();hideGuide();}
@@ -803,9 +843,13 @@ const Sessions=(function(){
       }
       return;
     }
-    // ask session: go home, toast restore
+    // ask session: go home; 分析类恢复钉到首页对话
     if(typeof switchView==='function') switchView('home');
     if(typeof PARSE!=='undefined' && PARSE.active) suspendParse();
+    if(window.HomePins && HomePins.matchCatalog(s.title)){
+      HomePins.runAnalysis(s.title, { fromPin:true });
+      return;
+    }
     toast('已打开会话：'+s.title);
   }
   function togglePin(){
@@ -996,11 +1040,21 @@ function sendq(){const v=document.getElementById('askin').value.trim();
   if(typeof PARSE!=='undefined' && PARSE.active){
     const host=document.getElementById('parseUser');
     const el=document.createElement('div');el.className='bub me';el.textContent=v;
-    host.appendChild(el);document.getElementById('askin').value='';
+    host.appendChild(el);
+    if(window.DialogueMotion) DialogueMotion.enter(el);
+    document.getElementById('askin').value='';
     if(window.AskComposer) AskComposer.autoGrow(document.getElementById('askin'));
+    const sc=document.querySelector('.scroll'); if(sc) sc.scrollTop=sc.scrollHeight;
     toast('已补充信息');return;
   }
   if(typeof PARSE!=='undefined' && PARSE.createIntent){startParse(v);return;}
+  // 分析类提问 → 钉到首页能力
+  if(window.HomePins && HomePins.matchCatalog(v)){
+    document.getElementById('askin').value='';
+    if(window.AskComposer) AskComposer.autoGrow(document.getElementById('askin'));
+    HomePins.runAnalysis(v);
+    return;
+  }
   const id='ask-'+Date.now();
   Sessions.upsert({id,kind:'ask',title:v.length>40?v.slice(0,40)+'…':v,meta:'刚刚',group:'today',pinned:false,status:null,accent:'var(--blue)'});
   Sessions.setCurrent(id);
