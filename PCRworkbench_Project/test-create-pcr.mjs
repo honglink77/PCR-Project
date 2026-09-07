@@ -861,6 +861,25 @@ try {
     return ok;
   }));
 
+  // ── Agent 选择器 ──
+  await page.evaluate(() => { switchView('home'); HomePins.clearAnalysis?.(); });
+  check('Overview 输入框有 PCR Agent 胶囊', await page.evaluate(() => {
+    const chip = document.getElementById('agentChip');
+    return !!chip && /PCR Agent/.test(chip.textContent || '');
+  }));
+  await page.evaluate(() => document.getElementById('agentChip').click());
+  check('点击胶囊展开选择菜单', await page.evaluate(() => {
+    const menu = document.getElementById('agentMenu');
+    return menu && !menu.hidden && /选择 Agent/.test(menu.innerText) && /当前使用/.test(menu.innerText) && /浏览其他 Agent/.test(menu.innerText);
+  }));
+  await page.evaluate(() => document.querySelector('#agentMenu [data-agent-browse]').click());
+  check('浏览其他 Agent 可点且关闭菜单', await page.evaluate(() => document.getElementById('agentMenu').hidden));
+  await page.evaluate(() => { switchView('task'); if (window.MyTasks?.ensureInit) MyTasks.ensureInit(); });
+  check('My Tasks 输入框同样有 Agent 胶囊', await page.evaluate(() => {
+    const chip = document.getElementById('taskAgentChip');
+    return !!chip && /PCR Agent/.test(chip.textContent || '') && !!document.getElementById('taskAgentMenu');
+  }));
+
 } catch (e) {
   check('测试未抛异常', false, e.message);
 } finally {

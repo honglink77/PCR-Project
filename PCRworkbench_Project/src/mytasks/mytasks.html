@@ -29,6 +29,26 @@
             </div>
             <div class="askbox" id="taskAskbox">
               <button class="plusbtn" id="taskPlusbtn" type="button" title="更多">+</button>
+              <div class="agent-wrap" id="taskAgentWrap">
+                <button type="button" class="agent-chip" id="taskAgentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'task')">
+                  <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                  <span class="agent-chip-lab" id="taskAgentChipLab">PCR Agent</span>
+                  <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
+                </button>
+                <div class="agent-menu" id="taskAgentMenu" hidden role="listbox" aria-label="选择 Agent">
+                  <div class="agent-menu-h">选择 Agent</div>
+                  <button type="button" class="agent-opt on" data-agent="pcr" role="option" aria-selected="true">
+                    <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                    <span class="agent-opt-t"><b>PCR Agent</b><small>当前使用</small></span>
+                    <svg class="agent-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                  </button>
+                  <button type="button" class="agent-opt browse" data-agent-browse role="option">
+                    <svg class="agent-grid" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                    <span class="agent-opt-t"><b>浏览其他 Agent</b></span>
+                    <svg class="agent-next" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6 4.5 9"/></svg>
+                  </button>
+                </div>
+              </div>
               <textarea class="askin" id="taskAskin" rows="1" placeholder="补充信息…"></textarea>
               <button class="send" id="taskSend" type="button"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
             </div>

@@ -59,7 +59,7 @@ const PARSE={
   submitted:false,pcrNumber:null,submitAt:null,histMark:null,
   fillEditing:false,fillSnapshot:null,withdrawLog:null
 };
-const PH_ASK='问点什么，或让我分析某个产品、项目…';
+const PH_ASK='描述你的变更需求，或粘贴邮件、会议纪要…';
 const PH_CREATE='描述你的变更需求，或粘贴邮件、会议纪要…';
 const PH_MORE='补充信息…';
 
@@ -472,7 +472,9 @@ function syncStepStates(){
 function closePlus(){const m=document.getElementById('plusmenu'),b=document.getElementById('plusbtn');
   if(m)m.classList.remove('show');if(b)b.classList.remove('on');}
 function togglePlus(e){e.stopPropagation();const m=document.getElementById('plusmenu');
-  const on=!m.classList.contains('show');closePlus();if(on){m.classList.add('show');document.getElementById('plusbtn').classList.add('on');hideGuide();}}
+  const on=!m.classList.contains('show');closePlus();
+  if(window.AgentPicker) AgentPicker.closeAll();
+  if(on){m.classList.add('show');document.getElementById('plusbtn').classList.add('on');hideGuide();}}
 function hideGuide(){const g=document.getElementById('guide');if(g)g.classList.remove('show');}
 function showGuide(){if(PARSE.active)return;document.getElementById('guide').classList.add('show');filterGuide();}
 function filterGuide(){

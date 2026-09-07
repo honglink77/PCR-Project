@@ -1091,6 +1091,101 @@ window.AskComposer=AskComposer;
   if(el) AskComposer.bindTextarea(el,{onSend:()=>sendq()});
 })();
 
+/* ══════════ Agent 选择器（Overview / My Tasks 共用） ══════════ */
+const AgentPicker={
+  current:'pcr',
+  labels:{pcr:'PCR Agent'},
+  ids:{
+    home:{wrap:'agentWrap',chip:'agentChip',menu:'agentMenu',lab:'agentChipLab'},
+    task:{wrap:'taskAgentWrap',chip:'taskAgentChip',menu:'taskAgentMenu',lab:'taskAgentChipLab'},
+  },
+  els(scope){
+    const id=this.ids[scope]||this.ids.home;
+    return {
+      wrap:document.getElementById(id.wrap),
+      chip:document.getElementById(id.chip),
+      menu:document.getElementById(id.menu),
+      lab:document.getElementById(id.lab),
+    };
+  },
+  closeAll(){
+    Object.keys(this.ids).forEach(scope=>{
+      const {chip,menu}=this.els(scope);
+      if(menu) menu.hidden=true;
+      if(chip){chip.classList.remove('open');chip.setAttribute('aria-expanded','false');}
+    });
+  },
+  open(scope){
+    this.closeAll();
+    if(typeof closePlus==='function') closePlus();
+    if(typeof closeTaskPlus==='function') closeTaskPlus();
+    if(typeof hideGuide==='function') hideGuide();
+    const g=document.getElementById('taskGuide'); if(g) g.classList.remove('show');
+    const {chip,menu}=this.els(scope);
+    if(!chip||!menu) return;
+    menu.hidden=false;
+    chip.classList.add('open');
+    chip.setAttribute('aria-expanded','true');
+  },
+  toggle(scope,ev){
+    if(ev) ev.stopPropagation();
+    const {menu}=this.els(scope);
+    if(!menu) return;
+    if(menu.hidden) this.open(scope); else this.closeAll();
+  },
+  select(id){
+    this.current=id;
+    const name=this.labels[id]||'PCR Agent';
+    Object.keys(this.ids).forEach(scope=>{
+      const {lab,menu}=this.els(scope);
+      if(lab) lab.textContent=name;
+      if(menu){
+        menu.querySelectorAll('[data-agent]').forEach(btn=>{
+          const on=btn.dataset.agent===id;
+          btn.classList.toggle('on',on);
+          btn.setAttribute('aria-selected',on?'true':'false');
+        });
+      }
+    });
+    this.closeAll();
+    if(typeof toast==='function') toast('已切换至 '+name);
+  },
+  browse(){
+    this.closeAll();
+    if(typeof toast==='function') toast('更多 Agent 即将开放（原型）');
+  },
+  bind(){
+    Object.keys(this.ids).forEach(scope=>{
+      const {menu}=this.els(scope);
+      if(!menu||menu.dataset.bound) return;
+      menu.dataset.bound='1';
+      menu.querySelectorAll('[data-agent]').forEach(btn=>{
+        btn.addEventListener('click',e=>{e.stopPropagation();AgentPicker.select(btn.dataset.agent);});
+      });
+      menu.querySelectorAll('[data-agent-browse]').forEach(btn=>{
+        btn.addEventListener('click',e=>{e.stopPropagation();AgentPicker.browse();});
+      });
+    });
+    if(!this._docBound){
+      this._docBound=1;
+      document.addEventListener('click',e=>{
+        if(e.target.closest('.agent-wrap')) return;
+        AgentPicker.closeAll();
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape') AgentPicker.closeAll();
+      });
+    }
+  },
+};
+window.AgentPicker=AgentPicker;
+window.toggleAgentMenu=function(ev,scope){AgentPicker.toggle(scope||'home',ev);};
+(function(){
+  const run=()=>AgentPicker.bind();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run);
+  else setTimeout(run,0);
+})();
+
 /* ══════════ 启动初始化 ══════════ */
 (function init(){
   // 若是「导出批注版」打开的文件，优先载入其中携带的结论

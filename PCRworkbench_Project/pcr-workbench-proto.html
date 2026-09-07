@@ -282,7 +282,7 @@
   .lrow .lv{width:44px;text-align:right;font-size:11.5px;color:var(--ink-2);flex:none}
   .chip{font-size:12px;color:var(--ink-2);background:var(--bg);border:1px solid var(--border);padding:5px 11px;border-radius:20px;transition:.12s}
   .chip:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
-  .askbox{display:flex;align-items:flex-end;gap:11px;border:1px solid var(--border-2);border-radius:13px;
+  .askbox{display:flex;align-items:flex-end;gap:8px;border:1px solid var(--border-2);border-radius:13px;
     padding:11px 15px;background:var(--bg);box-shadow:0 2px 10px rgba(26,26,24,.05);transition:.14s}
   .askbox:focus-within{border-color:var(--accent);box-shadow:0 2px 14px rgba(13,148,136,.15)}
   .askbox.drop-on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
@@ -299,6 +299,33 @@
   .clipbtn:hover{background:var(--soft);color:var(--ink)}
   .btn-force{font-size:12.5px;color:var(--ink-3);background:none;border:none;padding:4px 2px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
   .btn-force:hover{color:var(--warn)}
+  /* Agent 选择器 */
+  .agent-wrap{position:relative;flex:none;align-self:flex-end}
+  .agent-chip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px 0 8px;border-radius:999px;
+    border:none;background:var(--accent-soft);color:var(--accent-ink);font-size:12.5px;font-weight:600;
+    font-family:inherit;cursor:pointer;transition:.12s;max-width:160px}
+  .agent-chip:hover,.agent-chip.open{background:#C5EBE6}
+  .agent-chip-lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .agent-mark{width:14px;height:14px;flex:none;fill:currentColor}
+  .agent-caret{width:12px;height:12px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+  .agent-chip.open .agent-caret{transform:rotate(180deg)}
+  .agent-menu{position:absolute;left:0;bottom:calc(100% + 8px);z-index:45;min-width:220px;padding:8px;
+    background:var(--panel,#fff);border:1px solid var(--border);border-radius:12px;
+    box-shadow:0 10px 28px rgba(16,24,40,.14);display:flex;flex-direction:column;gap:4px}
+  .agent-menu[hidden]{display:none!important}
+  .agent-menu-h{font-size:11.5px;color:var(--ink-3);padding:4px 8px 6px;font-weight:500}
+  .agent-opt{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 10px;border-radius:9px;
+    border:none;background:transparent;font-family:inherit;color:var(--ink);cursor:pointer;transition:.1s}
+  .agent-opt:hover{background:var(--soft)}
+  .agent-opt.on{background:var(--accent-soft)}
+  .agent-opt .agent-mark{color:var(--accent-ink);fill:var(--accent-ink)}
+  .agent-opt-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .agent-opt-t b{font-size:13px;font-weight:600;color:var(--ink)}
+  .agent-opt-t small{font-size:11px;font-weight:400;color:var(--ink-3)}
+  .agent-check{width:16px;height:16px;flex:none;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .agent-grid{width:15px;height:15px;flex:none;stroke:var(--ink-2);fill:none;stroke-width:1.4}
+  .agent-next{width:12px;height:12px;flex:none;stroke:var(--ink-3);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .agent-opt.browse .agent-opt-t b{font-weight:500;color:var(--ink-2)}
   .plusmenu{display:none;position:absolute;left:0;bottom:46px;width:280px;background:var(--bg);border:1px solid var(--border-2);
     border-radius:12px;box-shadow:0 12px 32px rgba(30,41,59,.16);padding:6px;z-index:40}
   .plusmenu.show{display:block}
@@ -1681,6 +1708,26 @@
             </div>
             <div class="askbox" id="taskAskbox">
               <button class="plusbtn" id="taskPlusbtn" type="button" title="更多">+</button>
+              <div class="agent-wrap" id="taskAgentWrap">
+                <button type="button" class="agent-chip" id="taskAgentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'task')">
+                  <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                  <span class="agent-chip-lab" id="taskAgentChipLab">PCR Agent</span>
+                  <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
+                </button>
+                <div class="agent-menu" id="taskAgentMenu" hidden role="listbox" aria-label="选择 Agent">
+                  <div class="agent-menu-h">选择 Agent</div>
+                  <button type="button" class="agent-opt on" data-agent="pcr" role="option" aria-selected="true">
+                    <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                    <span class="agent-opt-t"><b>PCR Agent</b><small>当前使用</small></span>
+                    <svg class="agent-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                  </button>
+                  <button type="button" class="agent-opt browse" data-agent-browse role="option">
+                    <svg class="agent-grid" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                    <span class="agent-opt-t"><b>浏览其他 Agent</b></span>
+                    <svg class="agent-next" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6 4.5 9"/></svg>
+                  </button>
+                </div>
+              </div>
               <textarea class="askin" id="taskAskin" rows="1" placeholder="补充信息…"></textarea>
               <button class="send" id="taskSend" type="button"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
             </div>
@@ -1744,7 +1791,27 @@
           </div>
             <div class="askbox" id="askbox">
             <button class="plusbtn" id="plusbtn" title="创建与更多" onclick="togglePlus(event)">+</button>
-            <textarea class="askin" id="askin" rows="1" placeholder="问点什么，或让我分析某个产品、项目…"></textarea>
+            <div class="agent-wrap" id="agentWrap">
+              <button type="button" class="agent-chip" id="agentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'home')">
+                <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                <span class="agent-chip-lab" id="agentChipLab">PCR Agent</span>
+                <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
+              </button>
+              <div class="agent-menu" id="agentMenu" hidden role="listbox" aria-label="选择 Agent">
+                <div class="agent-menu-h">选择 Agent</div>
+                <button type="button" class="agent-opt on" data-agent="pcr" role="option" aria-selected="true">
+                  <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                  <span class="agent-opt-t"><b>PCR Agent</b><small>当前使用</small></span>
+                  <svg class="agent-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                </button>
+                <button type="button" class="agent-opt browse" data-agent-browse role="option">
+                  <svg class="agent-grid" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                  <span class="agent-opt-t"><b>浏览其他 Agent</b></span>
+                  <svg class="agent-next" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6 4.5 9"/></svg>
+                </button>
+              </div>
+            </div>
+            <textarea class="askin" id="askin" rows="1" placeholder="描述你的变更需求，或粘贴邮件、会议纪要…"></textarea>
             <button class="send" onclick="sendq()"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
           </div>
         </div>
@@ -3183,6 +3250,101 @@ window.AskComposer=AskComposer;
   if(el) AskComposer.bindTextarea(el,{onSend:()=>sendq()});
 })();
 
+/* ══════════ Agent 选择器（Overview / My Tasks 共用） ══════════ */
+const AgentPicker={
+  current:'pcr',
+  labels:{pcr:'PCR Agent'},
+  ids:{
+    home:{wrap:'agentWrap',chip:'agentChip',menu:'agentMenu',lab:'agentChipLab'},
+    task:{wrap:'taskAgentWrap',chip:'taskAgentChip',menu:'taskAgentMenu',lab:'taskAgentChipLab'},
+  },
+  els(scope){
+    const id=this.ids[scope]||this.ids.home;
+    return {
+      wrap:document.getElementById(id.wrap),
+      chip:document.getElementById(id.chip),
+      menu:document.getElementById(id.menu),
+      lab:document.getElementById(id.lab),
+    };
+  },
+  closeAll(){
+    Object.keys(this.ids).forEach(scope=>{
+      const {chip,menu}=this.els(scope);
+      if(menu) menu.hidden=true;
+      if(chip){chip.classList.remove('open');chip.setAttribute('aria-expanded','false');}
+    });
+  },
+  open(scope){
+    this.closeAll();
+    if(typeof closePlus==='function') closePlus();
+    if(typeof closeTaskPlus==='function') closeTaskPlus();
+    if(typeof hideGuide==='function') hideGuide();
+    const g=document.getElementById('taskGuide'); if(g) g.classList.remove('show');
+    const {chip,menu}=this.els(scope);
+    if(!chip||!menu) return;
+    menu.hidden=false;
+    chip.classList.add('open');
+    chip.setAttribute('aria-expanded','true');
+  },
+  toggle(scope,ev){
+    if(ev) ev.stopPropagation();
+    const {menu}=this.els(scope);
+    if(!menu) return;
+    if(menu.hidden) this.open(scope); else this.closeAll();
+  },
+  select(id){
+    this.current=id;
+    const name=this.labels[id]||'PCR Agent';
+    Object.keys(this.ids).forEach(scope=>{
+      const {lab,menu}=this.els(scope);
+      if(lab) lab.textContent=name;
+      if(menu){
+        menu.querySelectorAll('[data-agent]').forEach(btn=>{
+          const on=btn.dataset.agent===id;
+          btn.classList.toggle('on',on);
+          btn.setAttribute('aria-selected',on?'true':'false');
+        });
+      }
+    });
+    this.closeAll();
+    if(typeof toast==='function') toast('已切换至 '+name);
+  },
+  browse(){
+    this.closeAll();
+    if(typeof toast==='function') toast('更多 Agent 即将开放（原型）');
+  },
+  bind(){
+    Object.keys(this.ids).forEach(scope=>{
+      const {menu}=this.els(scope);
+      if(!menu||menu.dataset.bound) return;
+      menu.dataset.bound='1';
+      menu.querySelectorAll('[data-agent]').forEach(btn=>{
+        btn.addEventListener('click',e=>{e.stopPropagation();AgentPicker.select(btn.dataset.agent);});
+      });
+      menu.querySelectorAll('[data-agent-browse]').forEach(btn=>{
+        btn.addEventListener('click',e=>{e.stopPropagation();AgentPicker.browse();});
+      });
+    });
+    if(!this._docBound){
+      this._docBound=1;
+      document.addEventListener('click',e=>{
+        if(e.target.closest('.agent-wrap')) return;
+        AgentPicker.closeAll();
+      });
+      document.addEventListener('keydown',e=>{
+        if(e.key==='Escape') AgentPicker.closeAll();
+      });
+    }
+  },
+};
+window.AgentPicker=AgentPicker;
+window.toggleAgentMenu=function(ev,scope){AgentPicker.toggle(scope||'home',ev);};
+(function(){
+  const run=()=>AgentPicker.bind();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run);
+  else setTimeout(run,0);
+})();
+
 /* ══════════ 启动初始化 ══════════ */
 (function init(){
   // 若是「导出批注版」打开的文件，优先载入其中携带的结论
@@ -3626,6 +3788,7 @@ function bindTaskAskOnce(){
     const m=document.getElementById('taskPlusmenu');
     const on=!m.classList.contains('show');
     closeTaskPlus();hideTaskGuide();
+    if(window.AgentPicker) AgentPicker.closeAll();
     if(on){m.classList.add('show');document.getElementById('taskPlusbtn').classList.add('on');}
   });
   file?.addEventListener('change',()=>{if(file.files?.length) toast('已添加 '+file.files.length+' 个附件');});
@@ -4913,7 +5076,7 @@ const PARSE={
   submitted:false,pcrNumber:null,submitAt:null,histMark:null,
   fillEditing:false,fillSnapshot:null,withdrawLog:null
 };
-const PH_ASK='问点什么，或让我分析某个产品、项目…';
+const PH_ASK='描述你的变更需求，或粘贴邮件、会议纪要…';
 const PH_CREATE='描述你的变更需求，或粘贴邮件、会议纪要…';
 const PH_MORE='补充信息…';
 
@@ -5326,7 +5489,9 @@ function syncStepStates(){
 function closePlus(){const m=document.getElementById('plusmenu'),b=document.getElementById('plusbtn');
   if(m)m.classList.remove('show');if(b)b.classList.remove('on');}
 function togglePlus(e){e.stopPropagation();const m=document.getElementById('plusmenu');
-  const on=!m.classList.contains('show');closePlus();if(on){m.classList.add('show');document.getElementById('plusbtn').classList.add('on');hideGuide();}}
+  const on=!m.classList.contains('show');closePlus();
+  if(window.AgentPicker) AgentPicker.closeAll();
+  if(on){m.classList.add('show');document.getElementById('plusbtn').classList.add('on');hideGuide();}}
 function hideGuide(){const g=document.getElementById('guide');if(g)g.classList.remove('show');}
 function showGuide(){if(PARSE.active)return;document.getElementById('guide').classList.add('show');filterGuide();}
 function filterGuide(){

@@ -423,6 +423,7 @@ function bindTaskAskOnce(){
     const m=document.getElementById('taskPlusmenu');
     const on=!m.classList.contains('show');
     closeTaskPlus();hideTaskGuide();
+    if(window.AgentPicker) AgentPicker.closeAll();
     if(on){m.classList.add('show');document.getElementById('taskPlusbtn').classList.add('on');}
   });
   file?.addEventListener('change',()=>{if(file.files?.length) toast('已添加 '+file.files.length+' 个附件');});
