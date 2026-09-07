@@ -874,7 +874,7 @@ function renderPlist(){
   const mini=host.classList.contains('mini');
   const steps=PARSE.steps.filter(s=>!mini||s.st==='run'||s.st==='warn'||s.st==='pending'||s.st==='err');
   host.innerHTML=`<div class="plist-h" onclick="togglePlistMini()">
-    <h3>${mini?('Submit PCR · '+(cur?cur.title:'')):'Submit PCR'}</h3>
+    <h3>${mini?('PCR agent analyzing request… · '+(cur?cur.title:'')):'PCR agent analyzing request…'}</h3>
     <span class="pcnt">${mini?((cur&&cur.sum)||''):(done+'/'+total+' 已完成')}</span>
     <button type="button" class="plist-toggle" title="展开/收起步骤" onclick="event.stopPropagation();toggleAllSteps()">${PARSE.steps.some(s=>s.open)?'▴':'▾'}</button>
     <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrList',38)">38</span>

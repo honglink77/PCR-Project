@@ -1299,7 +1299,7 @@
       </div>
       <span class="tipdot" onclick="showTip(event,'mode',1)">1</span>
       <button class="sel" onclick="toast('切换时间范围')">近 90 天<svg class="i" style="width:13px;height:13px"><path d="M4 6.5L8 10l4-3.5"/></svg></button>
-      <button class="sel" onclick="toast('切换 BU')">全部 BU<svg class="i" style="width:13px;height:13px"><path d="M4 6.5L8 10l4-3.5"/></svg></button>
+      <button class="sel" onclick="toast('切换项目/产品')">项目/产品<svg class="i" style="width:13px;height:13px"><path d="M4 6.5L8 10l4-3.5"/></svg></button>
       <button class="ibtn" onclick="toast('3 条未读通知')"><svg class="i"><path d="M8 2a4 4 0 0 0-4 4v3l-1.4 2.4h10.8L12 9V6a4 4 0 0 0-4-4z"/><path d="M6.6 13a1.5 1.5 0 0 0 2.8 0"/></svg><span class="bd">3</span></button>
       <div class="usermenu">
         <button class="av" onclick="toggleMenu(event)">JC</button>
@@ -1397,7 +1397,7 @@
         <!-- AI BRIEFING -->
         <div class="brief">
           <div class="brief-h">
-            <span class="ai">AI</span><span class="bt">现在需要你定的三件事</span><span class="tipdot" onclick="showTip(event,'brief',4)">4</span>
+            <span class="ai">AI</span><span class="bt">Important Message</span><span class="tipdot" onclick="showTip(event,'brief',4)">4</span>
             <span class="live"><span class="pulse"></span>数据更新至 2 分钟前</span>
           </div>
 
@@ -5724,7 +5724,7 @@ function renderPlist(){
   const mini=host.classList.contains('mini');
   const steps=PARSE.steps.filter(s=>!mini||s.st==='run'||s.st==='warn'||s.st==='pending'||s.st==='err');
   host.innerHTML=`<div class="plist-h" onclick="togglePlistMini()">
-    <h3>${mini?('Submit PCR · '+(cur?cur.title:'')):'Submit PCR'}</h3>
+    <h3>${mini?('PCR agent analyzing request… · '+(cur?cur.title:'')):'PCR agent analyzing request…'}</h3>
     <span class="pcnt">${mini?((cur&&cur.sum)||''):(done+'/'+total+' 已完成')}</span>
     <button type="button" class="plist-toggle" title="展开/收起步骤" onclick="event.stopPropagation();toggleAllSteps()">${PARSE.steps.some(s=>s.open)?'▴':'▾'}</button>
     <span class="tipdot" onclick="event.stopPropagation();showTip(event,'pcrList',38)">38</span>
