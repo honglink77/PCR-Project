@@ -72,7 +72,7 @@
 
         <!-- MODULES -->
         <div class="sechead"><h2>工作区</h2><span class="tipdot" onclick="showTip(event,'mods',8)">8</span><span class="cn">点击进入完整视图</span></div>
-        <div class="mods">
+        <div class="mods mods-2">
           <button class="mod" onclick="switchView('task')">
             <div class="mh"><span class="mi t"><svg class="i" style="width:17px;height:17px"><path d="M5.5 2h5a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 10.5 14h-5A1.5 1.5 0 0 1 4 12.5v-9A1.5 1.5 0 0 1 5.5 2z"/><path d="M6.5 6h3M6.5 9h3"/></svg></span>
               <div><div class="mt">我的任务</div><div class="ms">Task Workbench</div></div></div>
@@ -87,7 +87,7 @@
             <div class="tags"><span class="tg">产品维度</span><span class="tg">项目维度</span><span class="tg">趋势与周期</span></div>
           </button>
 
-          <button class="mod" onclick="askPreset('查看进行中的 ODM 执行项目健康度')">
+          <button class="mod" hidden onclick="askPreset('查看进行中的 ODM 执行项目健康度')">
             <div class="mh"><span class="mi o"><svg class="i" style="width:17px;height:17px"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg></span>
               <div><div class="mt">执行管理</div><div class="ms">ODM Execution</div></div></div>
             <div class="md">把每条进入实施的 PCR 当作小项目管理：进度、里程碑、风险与 Work Item。</div>
@@ -98,7 +98,7 @@
         <!-- WATCH + HEALTH -->
         <div class="sechead"><h2>我关注的 PCR</h2><span class="tipdot" onclick="showTip(event,'watch',9)">9</span><span class="cn">12 条 · 按需要注意的程度排序</span>
           <button class="lk" onclick="toast('管理订阅规则')">管理订阅<svg class="i" style="width:13px;height:13px"><path d="M6 4l3.5 4L6 12"/></svg></button></div>
-        <div class="cards">
+        <div class="cards cards-watch-only">
           <div class="card">
             <div class="ai-line"><span class="sp">AI</span><span>3 条关注中的 PCR 都卡在认证或 ODM 回写，属于同一类瓶颈；建议优先处理 X1 G13。</span></div>
 
@@ -182,7 +182,7 @@
             </div>
           </div>
 
-          <div class="card">
+          <div class="card" hidden>
             <div class="card-h"><h3>执行健康度</h3><span class="tipdot" onclick="showTip(event,'health',15)">15</span><span class="ct">9 个进行中</span></div>
             <div class="hstat">
               <button class="hs r" onclick="toast('查看 2 个风险项目')"><div class="hv">2</div><div class="hl">风险</div></button>
@@ -201,7 +201,8 @@
           </div>
         </div>
 
-        <!-- MATRIX + FEED -->
+        <!-- MATRIX + FEED（暂隐） -->
+        <div class="home-dist-block" hidden>
         <div class="sechead"><h2>分布与动态</h2>
           <button class="lk" onclick="toast('进入「统计分析」完整视图')">完整分析<svg class="i" style="width:13px;height:13px"><path d="M6 4l3.5 4L6 12"/></svg></button></div>
         <div class="cards">
@@ -249,6 +250,7 @@
                 <div class="fc"><div class="ft">Vote 环节积压增加 9 条</div><div class="fm">2 天前 · 主要来自 Certification</div></div></div>
             </div>
           </div>
+        </div>
         </div>
 
         <!-- PINNED TO HOME -->
