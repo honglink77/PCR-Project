@@ -23,6 +23,10 @@ export function WorkspaceView() {
   const { openDraft } = useChat();
 
   function handleWorkbenchClick(agent: Agent) {
+    if (agent.externalUrl) {
+      window.location.assign(agent.externalUrl);
+      return;
+    }
     openDraft(agent.id);
     appDispatch({ type: 'NAVIGATE', view: 'chat' });
   }

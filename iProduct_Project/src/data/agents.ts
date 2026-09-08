@@ -45,6 +45,7 @@ export const agents: Agent[] = [
     color: 'bg-teal-600',
     status: 'active',
     capabilities: ['Process Optimization', 'Tool Management', 'Data Governance'],
+    externalUrl: '/workbench/pcr-workbench-proto.html',
   },
   {
     id: 'knowledge-management',

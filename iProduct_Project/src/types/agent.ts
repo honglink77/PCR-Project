@@ -8,6 +8,7 @@ export interface Agent {
   color: string;
   status: AgentStatus;
   capabilities: string[];
+  externalUrl?: string; // 若存在，Workbench 卡片外跳而非 openDraft
 }
 
 export interface AgentRun {
