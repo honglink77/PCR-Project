@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "sync:workbench": "node scripts/sync-workbench.mjs",
+    "predev": "npm run sync:workbench",
+    "prebuild": "npm run sync:workbench",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
