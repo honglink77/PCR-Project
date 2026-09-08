@@ -80,9 +80,11 @@
   .topbar{grid-column:1/-1;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;
     background:var(--bg);border-bottom:1px solid var(--border);z-index:40}
   .logo{display:flex;align-items:center;gap:8px;min-width:0}
+  .logo-home{display:flex;align-items:center;gap:8px;min-width:0;text-decoration:none;color:inherit;border-radius:8px}
+  .logo-home:hover .brand-name{color:var(--accent-ink)}
+  .logo-home:hover .brand-mark{filter:brightness(1.06)}
   .logo .brand-mark{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;
     display:grid;place-items:center;font-size:13px;font-weight:700;flex:none;letter-spacing:-.02em}
-  .logo .brand-text{display:flex;align-items:baseline;gap:6px;min-width:0;line-height:1.2}
   .logo .brand-name{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
   .logo .brand-sub{font-size:12px;font-weight:400;color:var(--ink-3);white-space:nowrap}
   .logo small{color:var(--ink-3);font-weight:400;font-size:12px;padding-left:8px;border-left:1px solid var(--border);line-height:1.2;white-space:nowrap}
@@ -1349,11 +1351,11 @@
   <!-- TOPBAR -->
   <div class="topbar">
       <div class="logo">
-        <span class="brand-mark" aria-hidden="true">iP</span>
-        <span class="brand-text">
+        <a class="logo-home" href="/" title="返回 iProduct">
+          <span class="brand-mark" aria-hidden="true">iP</span>
           <span class="brand-name">iProduct</span>
-          <span class="brand-sub">Ops Workbench</span>
-        </span>
+        </a>
+        <span class="brand-sub">Ops Workbench</span>
         <small id="crumb">Overview</small>
       </div>
       <div class="sp"></div>
