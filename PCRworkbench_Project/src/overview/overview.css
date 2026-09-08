@@ -71,11 +71,59 @@
   .home-analysis-thread .ai-lead{align-self:flex-start;max-width:min(100%,720px)}
   .home-analysis-thread .dm-card,
   .home-analysis-thread .dm-actions{max-width:min(100%,720px)}
+  .home-analysis-thread .dm-card:has(.gantt-card){max-width:min(100%,980px);width:100%}
+  /* ODM 甘特图 */
+  .gantt-card{border:1px solid var(--border);border-radius:12px;background:var(--panel,#fff);overflow:hidden}
+  .gantt-card-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .gantt-card-h h4{font-size:13.5px;font-weight:650;margin:0}
+  .gantt-range{margin-left:auto;font-size:11.5px;color:var(--ink-3)}
+  .gantt-insight{display:flex;gap:8px;align-items:flex-start;margin:10px 14px;padding:10px 12px;
+    background:#FFF8EB;border:1px solid #F0D5A8;border-radius:9px;font-size:12.5px;line-height:1.5;color:var(--ink)}
+  .gantt-insight .gi-ico{flex:none;color:var(--amber,#B45309)}
+  .gantt-scroll{overflow-x:auto;padding:0 0 8px}
+  .gantt-table{min-width:720px;position:relative}
+  .gantt-head,.gantt-row{display:grid;grid-template-columns:200px 1fr;align-items:stretch}
+  .gantt-row{min-height:44px;border-top:1px solid var(--border)}
+  .gantt-row.open{background:#FAFAF8}
+  .gantt-lab{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;text-align:left;
+    background:var(--panel,#fff);position:sticky;left:0;z-index:2;border-right:1px solid var(--border);width:200px;box-sizing:border-box}
+  .gantt-lab-h{font-size:11.5px;font-weight:600;color:var(--ink-3);align-items:center;padding:8px 12px}
+  .gantt-dot{font-size:11px;line-height:1.2;flex:none;margin-top:2px}
+  .gantt-lab-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .gantt-name{font-size:12px;font-weight:550;color:var(--ink);line-height:1.35}
+  .gantt-pcr{font-size:10.5px;color:var(--ink-3)}
+  .gantt-weeks{display:grid;grid-template-columns:repeat(12,minmax(40px,1fr));position:relative;
+    height:28px;align-items:center;padding:0 4px;font-size:10.5px;color:var(--ink-3);border-bottom:1px solid var(--border)}
+  .gantt-wlab{text-align:center}
+  .gantt-track{position:relative;height:44px;padding:0 4px}
+  .gantt-bar{position:absolute;top:13px;height:18px;border-radius:4px;opacity:.92;cursor:pointer;
+    display:flex;align-items:center;justify-content:flex-end;padding:0 4px;box-sizing:border-box;
+    transition:opacity .12s,filter .12s;z-index:1}
+  .gantt-bar:hover{filter:brightness(.92);opacity:1;z-index:3}
+  .gantt-bar.is-filtered{opacity:.12;pointer-events:none}
+  .gantt-bar-overdue{box-shadow:inset 0 0 0 1.5px var(--red,#DC2626);
+    background-image:repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(220,38,38,.22) 3px,rgba(220,38,38,.22) 6px)!important}
+  .gantt-overdue-lab{font-size:9.5px;font-weight:600;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.25);white-space:nowrap}
+  .gantt-today{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed var(--accent);z-index:2;pointer-events:none}
+  .gantt-today span{position:absolute;top:-2px;left:4px;font-size:9.5px;color:var(--accent-ink);font-weight:600;white-space:nowrap}
+  .gantt-track .gantt-today-mark{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed rgba(13,148,136,.55);z-index:0;pointer-events:none}
+  .gantt-detail{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+    padding:8px 14px 12px 44px;background:var(--soft);border-top:1px dashed var(--border);font-size:12px}
+  .gantt-detail[hidden]{display:none!important}
+  .gantt-det-col b{display:block;font-size:11.5px;color:var(--ink-2);margin-bottom:4px}
+  .gantt-det-col ul{margin:0;padding-left:16px;color:var(--ink-2);line-height:1.5}
+  .gantt-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px 12px;border-top:1px solid var(--border)}
+  .gantt-leg{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);
+    padding:4px 8px;border-radius:7px;border:1px solid transparent;background:transparent;cursor:pointer}
+  .gantt-leg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .gantt-leg:hover{background:var(--soft)}
+  .gantt-leg.on{background:var(--accent-soft);border-color:#BFE3DF;color:var(--accent-ink)}
   .hp-actions{display:flex;gap:8px;align-items:center;margin-top:4px}
   .hp-inline-card{margin-top:4px}
-  /* 分析对话进行中：收起建议 chips，避免输入框上方空白条 */
+  /* 分析对话进行中：收起建议 chips，并收紧页底留白（原 140px 按 chips+输入框预留） */
   body.has-home-analysis .chips{display:none}
-  body.has-home-analysis .askwrap{padding:10px 30px 8px}
+  body.has-home-analysis .askwrap{padding:8px 30px 8px}
+  body.has-home-analysis .page{padding-bottom:72px}
   .hp-replace{display:flex;flex-direction:column;gap:8px}
   .hp-rep{display:flex;align-items:center;gap:8px;font-size:13px;padding:8px 10px;border:1px solid var(--border);
     border-radius:8px;cursor:pointer}

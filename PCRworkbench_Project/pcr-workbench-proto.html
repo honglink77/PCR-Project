@@ -678,11 +678,59 @@
   .home-analysis-thread .ai-lead{align-self:flex-start;max-width:min(100%,720px)}
   .home-analysis-thread .dm-card,
   .home-analysis-thread .dm-actions{max-width:min(100%,720px)}
+  .home-analysis-thread .dm-card:has(.gantt-card){max-width:min(100%,980px);width:100%}
+  /* ODM 甘特图 */
+  .gantt-card{border:1px solid var(--border);border-radius:12px;background:var(--panel,#fff);overflow:hidden}
+  .gantt-card-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--border)}
+  .gantt-card-h h4{font-size:13.5px;font-weight:650;margin:0}
+  .gantt-range{margin-left:auto;font-size:11.5px;color:var(--ink-3)}
+  .gantt-insight{display:flex;gap:8px;align-items:flex-start;margin:10px 14px;padding:10px 12px;
+    background:#FFF8EB;border:1px solid #F0D5A8;border-radius:9px;font-size:12.5px;line-height:1.5;color:var(--ink)}
+  .gantt-insight .gi-ico{flex:none;color:var(--amber,#B45309)}
+  .gantt-scroll{overflow-x:auto;padding:0 0 8px}
+  .gantt-table{min-width:720px;position:relative}
+  .gantt-head,.gantt-row{display:grid;grid-template-columns:200px 1fr;align-items:stretch}
+  .gantt-row{min-height:44px;border-top:1px solid var(--border)}
+  .gantt-row.open{background:#FAFAF8}
+  .gantt-lab{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;text-align:left;
+    background:var(--panel,#fff);position:sticky;left:0;z-index:2;border-right:1px solid var(--border);width:200px;box-sizing:border-box}
+  .gantt-lab-h{font-size:11.5px;font-weight:600;color:var(--ink-3);align-items:center;padding:8px 12px}
+  .gantt-dot{font-size:11px;line-height:1.2;flex:none;margin-top:2px}
+  .gantt-lab-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .gantt-name{font-size:12px;font-weight:550;color:var(--ink);line-height:1.35}
+  .gantt-pcr{font-size:10.5px;color:var(--ink-3)}
+  .gantt-weeks{display:grid;grid-template-columns:repeat(12,minmax(40px,1fr));position:relative;
+    height:28px;align-items:center;padding:0 4px;font-size:10.5px;color:var(--ink-3);border-bottom:1px solid var(--border)}
+  .gantt-wlab{text-align:center}
+  .gantt-track{position:relative;height:44px;padding:0 4px}
+  .gantt-bar{position:absolute;top:13px;height:18px;border-radius:4px;opacity:.92;cursor:pointer;
+    display:flex;align-items:center;justify-content:flex-end;padding:0 4px;box-sizing:border-box;
+    transition:opacity .12s,filter .12s;z-index:1}
+  .gantt-bar:hover{filter:brightness(.92);opacity:1;z-index:3}
+  .gantt-bar.is-filtered{opacity:.12;pointer-events:none}
+  .gantt-bar-overdue{box-shadow:inset 0 0 0 1.5px var(--red,#DC2626);
+    background-image:repeating-linear-gradient(-45deg,transparent,transparent 3px,rgba(220,38,38,.22) 3px,rgba(220,38,38,.22) 6px)!important}
+  .gantt-overdue-lab{font-size:9.5px;font-weight:600;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.25);white-space:nowrap}
+  .gantt-today{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed var(--accent);z-index:2;pointer-events:none}
+  .gantt-today span{position:absolute;top:-2px;left:4px;font-size:9.5px;color:var(--accent-ink);font-weight:600;white-space:nowrap}
+  .gantt-track .gantt-today-mark{position:absolute;top:0;bottom:0;width:0;border-left:1.5px dashed rgba(13,148,136,.55);z-index:0;pointer-events:none}
+  .gantt-detail{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+    padding:8px 14px 12px 44px;background:var(--soft);border-top:1px dashed var(--border);font-size:12px}
+  .gantt-detail[hidden]{display:none!important}
+  .gantt-det-col b{display:block;font-size:11.5px;color:var(--ink-2);margin-bottom:4px}
+  .gantt-det-col ul{margin:0;padding-left:16px;color:var(--ink-2);line-height:1.5}
+  .gantt-legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px 12px;border-top:1px solid var(--border)}
+  .gantt-leg{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2);
+    padding:4px 8px;border-radius:7px;border:1px solid transparent;background:transparent;cursor:pointer}
+  .gantt-leg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+  .gantt-leg:hover{background:var(--soft)}
+  .gantt-leg.on{background:var(--accent-soft);border-color:#BFE3DF;color:var(--accent-ink)}
   .hp-actions{display:flex;gap:8px;align-items:center;margin-top:4px}
   .hp-inline-card{margin-top:4px}
-  /* 分析对话进行中：收起建议 chips，避免输入框上方空白条 */
+  /* 分析对话进行中：收起建议 chips，并收紧页底留白（原 140px 按 chips+输入框预留） */
   body.has-home-analysis .chips{display:none}
-  body.has-home-analysis .askwrap{padding:10px 30px 8px}
+  body.has-home-analysis .askwrap{padding:8px 30px 8px}
+  body.has-home-analysis .page{padding-bottom:72px}
   .hp-replace{display:flex;flex-direction:column;gap:8px}
   .hp-rep{display:flex;align-items:center;gap:8px;font-size:13px;padding:8px 10px;border:1px solid var(--border);
     border-radius:8px;cursor:pointer}
@@ -1496,7 +1544,7 @@
 
           <button class="mod" onclick="askPreset('查看进行中的 ODM 执行项目健康度')">
             <div class="mh"><span class="mi o"><svg class="i" style="width:17px;height:17px"><circle cx="8" cy="8" r="6"/><path d="M8 4.5V8l2.5 1.5"/></svg></span>
-              <div><div class="mt">执行管理</div><div class="ms">ODM Execution</div></div></div>
+              <div><div class="mt">执行管理</div><div class="ms">ODM Execution</div><span class="tipdot" onclick="event.stopPropagation();showTip(event,'ganttEntry',76)">76</span></div></div>
             <div class="md">把每条进入实施的 PCR 当作小项目管理：进度、里程碑、风险与 Work Item。</div>
             <div class="tags"><span class="tg">进行中 9</span><span class="tg hot">风险 2</span><span class="tg">ODM 回写</span></div>
           </button>
@@ -1709,7 +1757,7 @@
               <div class="agent-wrap" id="taskAgentWrap">
                 <button type="button" class="agent-chip" id="taskAgentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'task')">
                   <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
-                  <span class="agent-chip-lab" id="taskAgentChipLab">PCR Agent</span>
+                  <span class="agent-chip-lab" id="taskAgentChipLab">@Agent</span>
                   <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
                 </button>
                 <div class="agent-menu" id="taskAgentMenu" hidden role="listbox" aria-label="选择 Agent">
@@ -1792,7 +1840,7 @@
             <div class="agent-wrap" id="agentWrap">
               <button type="button" class="agent-chip" id="agentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'home')">
                 <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
-                <span class="agent-chip-lab" id="agentChipLab">PCR Agent</span>
+                <span class="agent-chip-lab" id="agentChipLab">@Agent</span>
                 <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
               </button>
               <div class="agent-menu" id="agentMenu" hidden role="listbox" aria-label="选择 Agent">
@@ -2466,10 +2514,22 @@ const TIPS_HOME={
    ix:'可重复执行的分析标「实时」，一次性分析标「快照+日期」。',
    fn:'若一次性分析被当作实时数据展示，用户会基于过期结论做判断，必须显式区分。',
    ref:['钉到首页']},
- pinLimit:{t:'限制钉住数量',
+  pinLimit:{t:'限制钉住数量',
    ix:'最多 4 个，达上限时要求先替换。',
    fn:'首页空间有限，无限制钉住会让自定义区喧宾夺主，反而失去「一眼看到重点」的价值。',
    ref:['钉到首页']},
+ ganttInsight:{t:'甘特图的价值在于看出冲突',
+   ix:'图上方必须给出跨项目的 AI 判断，而非复述健康度数字。',
+   fn:'画一张甘特图是数据可视化，看出「两个项目的试产撞在同一周」才是 AI 的价值；单看项目列表无法发现跨项目的资源冲突。',
+   ref:['执行管理','AI 洞察']},
+ ganttColor:{t:'活动类型色与状态色分离',
+   ix:'活动类型用低饱和冷色（蓝灰/紫灰/青灰），健康状态用红黄绿圆点。',
+   fn:'若活动条本身是绿色，又用红色表示逾期，两套语义会打架，用户无法判断颜色的含义。',
+   ref:['执行管理','视觉规范']},
+ ganttEntry:{t:'卡片入口改为对话预设问题',
+   ix:'点击「执行管理」卡片不跳转新页面，而是向对话框回填问题并由 AI 以甘特图响应。',
+   fn:'避免为每个分析视图新增一个导航项，把「统计分析」「执行管理」这类需求收敛到对话中，导航保持两项。',
+   ref:['少按钮原则','P-03 单页面完成']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -2678,7 +2738,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73,ganttInsight:74,ganttColor:75,ganttEntry:76};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -3251,7 +3311,7 @@ window.AskComposer=AskComposer;
 /* ══════════ Agent 选择器（Overview / My Tasks 共用） ══════════ */
 const AgentPicker={
   current:'pcr',
-  labels:{pcr:'PCR Agent'},
+  labels:{pcr:'@Agent'},
   ids:{
     home:{wrap:'agentWrap',chip:'agentChip',menu:'agentMenu',lab:'agentChipLab'},
     task:{wrap:'taskAgentWrap',chip:'taskAgentChip',menu:'taskAgentMenu',lab:'taskAgentChipLab'},
@@ -3292,7 +3352,7 @@ const AgentPicker={
   },
   select(id){
     this.current=id;
-    const name=this.labels[id]||'PCR Agent';
+    const name=this.labels[id]||'@Agent';
     Object.keys(this.ids).forEach(scope=>{
       const {lab,menu}=this.els(scope);
       if(lab) lab.textContent=name;
@@ -6478,6 +6538,282 @@ window.Overview = {
   suspendParse: typeof suspendParse === 'function' ? suspendParse : null
 };
 
+/* overview/odm-gantt: ODM 执行项目健康度甘特图（纯 CSS/HTML） */
+(function () {
+  const ACT = {
+    geo: { key: 'geo', label: 'Geo related', color: '#7A93B8' },
+    pa: { key: 'pa', label: 'PA test', color: '#8B7FA8' },
+    mfg: { key: 'mfg', label: 'Mfg Control run', color: '#6E9B9B' },
+  };
+  const WEEKS = 12;
+  const TODAY_WEEK = 6; // 1-based，对齐演示冲突周
+
+  /** 9 个进行中项目：与首页健康度 4/3/2 及既有 PCR 一致 */
+  const PROJECTS = [
+    {
+      id: 'p1', name: 'X1 Carbon G13 CPU 换代', pcr: 'PCR-2026-08871', health: 'watch',
+      acts: [
+        { type: 'geo', w0: 1, w1: 3, owner: 'ODM-A', status: '进行中' },
+        { type: 'pa', w0: 4, w1: 7, owner: 'QA / ODM', status: '进行中' },
+        { type: 'mfg', w0: 8, w1: 9, owner: 'ODM-A', status: '未开始' },
+      ],
+      milestones: ['BOM 冻结', 'PA 抽样完成', '试产'],
+      wis: ['认证矩阵更新', 'BIOS 验证', 'ODM 回写'],
+      risks: ['认证窗口紧张'],
+    },
+    {
+      id: 'p2', name: 'M90q G6 DDR5 二供导入', pcr: 'CP-2026-04412', health: 'risk',
+      acts: [
+        { type: 'geo', w0: 1, w1: 2, owner: 'ODM-B', status: '已完成' },
+        { type: 'pa', w0: 3, w1: 8, owner: 'QA', status: '进行中' },
+        { type: 'mfg', w0: 9, w1: 11, owner: 'ODM-B', status: '未开始' },
+      ],
+      milestones: ['二供 BOM', 'PA 通过', '量产切换'],
+      wis: ['BOM 建立（逾期）', '物料认证', '采购计划'],
+      risks: ['ODM 侧 BOM 回写滞后'],
+    },
+    {
+      id: 'p3', name: 'T14 G6 面板二供', pcr: 'PCR-2026-08830', health: 'risk',
+      acts: [
+        { type: 'geo', w0: 1, w1: 4, owner: 'ODM-C', status: '已完成' },
+        { type: 'pa', w0: 5, w1: 7, owner: 'OD', status: '逾期', overdue: 4 },
+      ],
+      milestones: ['面板导入', '采购计划'],
+      wis: ['OD 采购计划（逾期 4 天）', 'ODM 状态回写'],
+      risks: ['ODM 连续两周未更新状态'],
+    },
+    {
+      id: 'p4', name: 'T14p CPU SKU 变更', pcr: 'SP20250825_0001', health: 'ok',
+      acts: [
+        { type: 'geo', w0: 2, w1: 4, owner: 'ODM-A', status: '已完成' },
+        { type: 'pa', w0: 5, w1: 8, owner: 'QA', status: '进行中' },
+        { type: 'mfg', w0: 9, w1: 10, owner: 'ODM-A', status: '未开始' },
+      ],
+      milestones: ['SKU 清单确认', '试产'],
+      wis: ['工程变更单', '测试计划'],
+      risks: [],
+    },
+    {
+      id: 'p5', name: 'X1 Yoga G9 面板切换', pcr: 'PCR-2026-08903', health: 'watch',
+      acts: [
+        { type: 'pa', w0: 3, w1: 6, owner: 'QA', status: '进行中' },
+        { type: 'mfg', w0: 6, w1: 8, owner: 'ODM-A', status: '进行中' },
+      ],
+      milestones: ['面板切换验证', '试产'],
+      wis: ['供应商切换评估'],
+      risks: ['与 T16p 试产同周'],
+    },
+    {
+      id: 'p6', name: 'Legion Pro 7i 散热升级', pcr: 'CP-2026-04455', health: 'ok',
+      acts: [
+        { type: 'geo', w0: 1, w1: 2, owner: 'Portfolio', status: '已完成' },
+        { type: 'pa', w0: 4, w1: 6, owner: 'Thermal', status: '进行中' },
+        { type: 'mfg', w0: 7, w1: 9, owner: 'ODM-D', status: '未开始' },
+      ],
+      milestones: ['散热方案确认', '试产'],
+      wis: ['三风扇模块导入'],
+      risks: [],
+    },
+    {
+      id: 'p7', name: 'T16p CPU SKU 替换', pcr: 'CP20260730_0011', health: 'ok',
+      acts: [
+        { type: 'pa', w0: 2, w1: 5, owner: 'QA', status: '已完成' },
+        { type: 'mfg', w0: 6, w1: 8, owner: 'ODM-B', status: '进行中' },
+      ],
+      milestones: ['SKU 替换', '试产'],
+      wis: ['投票汇总', '试产排程'],
+      risks: [],
+    },
+    {
+      id: 'p8', name: 'SR650 V3 认证扩展', pcr: 'SP-2026-11938', health: 'watch',
+      acts: [
+        { type: 'geo', w0: 1, w1: 6, owner: 'Certification', status: '进行中' },
+        { type: 'pa', w0: 7, w1: 10, owner: 'Certification', status: '未开始' },
+      ],
+      milestones: ['ANATEL/BIS 送测', '证书回写'],
+      wis: ['认证范围评估'],
+      risks: ['跨 GEO 认证周期长'],
+    },
+    {
+      id: 'p9', name: 'X1 Nano G7 结构件变更', pcr: 'CP-2026-04481', health: 'ok',
+      acts: [
+        { type: 'geo', w0: 3, w1: 5, owner: 'ODM-A', status: '进行中' },
+        { type: 'pa', w0: 6, w1: 9, owner: 'QA', status: '未开始' },
+        { type: 'mfg', w0: 10, w1: 12, owner: 'ODM-A', status: '未开始' },
+      ],
+      milestones: ['结构件打样', '试产'],
+      wis: ['模具变更', '装配验证'],
+      risks: [],
+    },
+  ];
+
+  const HEALTH = {
+    risk: { cls: 'risk', lab: '风险', dot: '🔴' },
+    watch: { cls: 'watch', lab: '关注', dot: '🟡' },
+    ok: { cls: 'ok', lab: '健康', dot: '🟢' },
+  };
+
+  let filterType = null; // null | geo | pa | mfg
+
+  function esc(t) {
+    return String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  }
+
+  function weekLabel(w) {
+    return 'W' + w;
+  }
+
+  function barStyle(act) {
+    const left = ((act.w0 - 1) / WEEKS) * 100;
+    const width = ((act.w1 - act.w0 + 1) / WEEKS) * 100;
+    const color = ACT[act.type].color;
+    const overdue = act.overdue ? ' gantt-bar-overdue' : '';
+    return { left, width, color, overdue, type: act.type };
+  }
+
+  function tipText(p, act) {
+    const a = ACT[act.type];
+    return `${a.label} · W${act.w0}–W${act.w1} · ${act.owner} · ${act.status}${act.overdue ? ' · 逾期 ' + act.overdue + ' 天' : ''}`;
+  }
+
+  function compactHtml() {
+    const nOk = PROJECTS.filter((p) => p.health === 'ok').length;
+    const nWatch = PROJECTS.filter((p) => p.health === 'watch').length;
+    const nRisk = PROJECTS.filter((p) => p.health === 'risk').length;
+    return `<div class="hp-rows">
+      <div class="hp-stat"><span>🟢 健康 ${nOk}</span><span>🟡 关注 ${nWatch}</span><span>🔴 风险 ${nRisk}</span></div>
+      <div class="hp-row"><span class="hp-up">⚠</span><span>W6 有 2 项 Mfg Control run 重叠</span></div>
+    </div>`;
+  }
+
+  function fullHtml() {
+    const headWeeks = Array.from({ length: WEEKS }, (_, i) =>
+      `<div class="gantt-wlab">${weekLabel(i + 1)}</div>`
+    ).join('');
+    const todayLeft = ((TODAY_WEEK - 1) / WEEKS) * 100;
+    const todayMark = `<div class="gantt-today-mark" style="left:${todayLeft}%"></div>`;
+
+    const rows = PROJECTS.map((p) => {
+      const h = HEALTH[p.health];
+      const bars = p.acts.map((act) => {
+        const s = barStyle(act);
+        const hide = filterType && filterType !== act.type ? ' is-filtered' : '';
+        const overdueLab = act.overdue
+          ? `<span class="gantt-overdue-lab">⚠ 逾期 ${act.overdue} 天</span>`
+          : '';
+        return `<div class="gantt-bar gantt-bar-${act.type}${s.overdue}${hide}"
+          data-type="${act.type}" data-pid="${p.id}"
+          style="left:${s.left}%;width:${s.width}%;background:${s.color}"
+          title="${esc(tipText(p, act))}">${overdueLab}</div>`;
+      }).join('');
+      return `<div class="gantt-row" data-pid="${p.id}">
+        <button type="button" class="gantt-lab" data-expand="${p.id}">
+          <span class="gantt-dot ${h.cls}" title="${h.lab}">${h.dot}</span>
+          <span class="gantt-lab-t">
+            <span class="gantt-name">${esc(p.name)}</span>
+            <span class="gantt-pcr mono">${esc(p.pcr)}</span>
+          </span>
+        </button>
+        <div class="gantt-track">
+          ${todayMark}
+          ${bars}
+        </div>
+        <div class="gantt-detail" id="gantt-det-${p.id}" hidden>
+          <div class="gantt-det-col"><b>里程碑</b><ul>${p.milestones.map((m) => `<li>${esc(m)}</li>`).join('')}</ul></div>
+          <div class="gantt-det-col"><b>Work Item</b><ul>${p.wis.map((m) => `<li>${esc(m)}</li>`).join('')}</ul></div>
+          <div class="gantt-det-col"><b>风险</b><ul>${(p.risks.length ? p.risks : ['无开放风险']).map((m) => `<li>${esc(m)}</li>`).join('')}</ul></div>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="gantt-card" id="odmGanttCard">
+      <div class="gantt-card-h">
+        <h4>ODM 执行项目健康度</h4>
+        <span class="gantt-range">近 12 周</span>
+        <span class="tipdot" onclick="showTip(event,'ganttInsight',74)">74</span>
+        <span class="tipdot" onclick="showTip(event,'ganttColor',75)">75</span>
+      </div>
+      <div class="gantt-insight"><span class="gi-ico">⚠</span>
+        <span>2 个项目的 Mfg Control run 排在同一周（W6），ODM 产能可能不足，建议错开</span>
+      </div>
+      <div class="gantt-scroll">
+        <div class="gantt-table">
+          <div class="gantt-head">
+            <div class="gantt-lab gantt-lab-h">项目 / PCR</div>
+            <div class="gantt-weeks">
+              ${headWeeks}
+              <div class="gantt-today" style="left:${todayLeft}%"><span>今天</span></div>
+            </div>
+          </div>
+          <div class="gantt-rows">${rows}</div>
+        </div>
+      </div>
+      <div class="gantt-legend">
+        ${Object.values(ACT).map((a) =>
+          `<button type="button" class="gantt-leg${filterType === a.key ? ' on' : ''}" data-leg="${a.key}">
+            <i style="background:${a.color}"></i>${esc(a.label)}
+          </button>`
+        ).join('')}
+        <span class="tipdot" onclick="showTip(event,'ganttColor',75)">75</span>
+      </div>
+    </div>`;
+  }
+
+  function wire(root) {
+    const host = root || document.getElementById('odmGanttCard');
+    if (!host || host.dataset.wired) return;
+    host.dataset.wired = '1';
+
+    host.querySelectorAll('[data-expand]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.expand;
+        const det = document.getElementById('gantt-det-' + id);
+        if (!det) return;
+        const open = det.hidden;
+        host.querySelectorAll('.gantt-detail').forEach((d) => { d.hidden = true; });
+        host.querySelectorAll('.gantt-row').forEach((r) => r.classList.remove('open'));
+        if (open) {
+          det.hidden = false;
+          btn.closest('.gantt-row')?.classList.add('open');
+        }
+      });
+    });
+
+    host.querySelectorAll('.gantt-bar').forEach((bar) => {
+      bar.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const pid = bar.dataset.pid;
+        const btn = host.querySelector(`[data-expand="${pid}"]`);
+        if (btn) btn.click();
+        toast(bar.getAttribute('title') || '活动详情');
+      });
+    });
+
+    host.querySelectorAll('[data-leg]').forEach((leg) => {
+      leg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const t = leg.dataset.leg;
+        filterType = filterType === t ? null : t;
+        host.querySelectorAll('[data-leg]').forEach((b) => b.classList.toggle('on', b.dataset.leg === filterType));
+        host.querySelectorAll('.gantt-bar').forEach((b) => {
+          b.classList.toggle('is-filtered', !!(filterType && b.dataset.type !== filterType));
+        });
+      });
+    });
+  }
+
+  window.OdmGantt = {
+    PROJECTS,
+    ACT,
+    TODAY_WEEK,
+    compactHtml,
+    fullHtml,
+    wire,
+    query: '查看进行中的 ODM 执行项目健康度',
+  };
+})();
+
 /* overview/home-pins: 钉到首页（Pinned to Home）补全 */
 (function () {
   const PIN_MAX = 4;
@@ -6555,6 +6891,26 @@ window.Overview = {
           <div class="hp-row"><span>Vote 阶段</span><span>41 条</span></div>
           <div class="hp-row"><span>主因</span><span>Certification Disagree</span></div>
         </div>`;
+      },
+    },
+    'odm-gantt': {
+      id: 'odm-gantt',
+      title: 'ODM 执行项目健康度',
+      live: true,
+      sessionId: 'ask-odm',
+      query: '查看进行中的 ODM 执行项目健康度',
+      keywords: [/ODM 执行/, /执行项目健康/, /执行管理/, /甘特/],
+      insight: 'W6 有 2 项 Mfg Control run 重叠，建议错开；两风险项均因 ODM 回写滞后',
+      full: '9 个进行中的 ODM 执行项目，整体 4 个健康、3 个需关注、2 个有风险。两个风险项目均因 ODM 侧回写滞后，非技术问题。',
+      rowsHtml() {
+        // 钉到首页：压缩版
+        return window.OdmGantt ? OdmGantt.compactHtml() : '';
+      },
+      dialogueCardHtml() {
+        return window.OdmGantt ? OdmGantt.fullHtml() : '';
+      },
+      afterRender(root) {
+        if (window.OdmGantt) OdmGantt.wire(root);
       },
     },
   };
@@ -6762,15 +7118,18 @@ window.Overview = {
     const host = document.getElementById('modalHost');
     const scrim = document.getElementById('scrim');
     if (!host || !scrim) { toast(c.full); return; }
-    host.innerHTML = `<div class="modal" style="width:520px">
+    const wide = !!c.dialogueCardHtml;
+    const body = wide ? c.dialogueCardHtml() : c.rowsHtml();
+    host.innerHTML = `<div class="modal" style="width:${wide ? 'min(960px,94vw)' : '520px'}">
       <div class="modal-h"><h3>${esc(c.title)}</h3><p>${c.live ? '⟳ 实时数据' : '快照 · ' + esc(c.snapshotAt)}</p></div>
-      <div class="modal-b">${c.rowsHtml()}<div class="hp-ai" style="margin-top:12px"><span class="sp">AI</span><span>${esc(c.full)}</span></div></div>
+      <div class="modal-b">${body}<div class="hp-ai" style="margin-top:12px"><span class="sp">AI</span><span>${esc(c.full)}</span></div></div>
       <div class="modal-f"><button class="btn btn-ghost" data-x>关闭</button>
         <button class="btn btn-primary" data-sess>回到原对话</button></div>
     </div>`;
     scrim.classList.add('show');
     host.querySelector('[data-x]').onclick = closeModal;
     host.querySelector('[data-sess]').onclick = () => { closeModal(); goSession(id); };
+    if (typeof c.afterRender === 'function') c.afterRender(host);
   }
 
   function goSession(id) {
@@ -6909,8 +7268,11 @@ window.Overview = {
 
     if (window.DialogueMotion) {
       DialogueMotion.appendUser(mount, query || c.query, scroll);
-      const card = `<div class="block hp-inline-card"><div class="block-h"><h4>${esc(c.title)}</h4>${freshness(c)}</div>
-        <div class="block-b">${c.rowsHtml()}</div></div>`;
+      const body = typeof c.dialogueCardHtml === 'function' ? c.dialogueCardHtml() : c.rowsHtml();
+      const card = c.dialogueCardHtml
+        ? body
+        : `<div class="block hp-inline-card"><div class="block-h"><h4>${esc(c.title)}</h4>${freshness(c)}</div>
+        <div class="block-b">${body}</div></div>`;
       await DialogueMotion.playAssistant({
         mount,
         scrollRoot: scroll,
@@ -6920,9 +7282,10 @@ window.Overview = {
         animate: !window.__DM_DISABLE && !opts.fromPin,
       });
     } else {
+      const body = typeof c.dialogueCardHtml === 'function' ? c.dialogueCardHtml() : c.rowsHtml();
       mount.innerHTML = `<div class="bub me">${esc(query || c.query)}</div>
         <div class="ai-lead"><div class="ai">AI</div><div class="txt">${esc(c.full)}</div></div>
-        ${c.rowsHtml()}${pinActionsHtml(c.id)}`;
+        ${body}${pinActionsHtml(c.id)}`;
     }
     mount.querySelectorAll('[data-pinid]').forEach((btn) => {
       btn.onclick = () => pin(btn.dataset.pinid);
@@ -6930,6 +7293,7 @@ window.Overview = {
     mount.querySelectorAll('[data-reanalyze]').forEach((btn) => {
       btn.onclick = () => runAnalysis(CATALOG[btn.dataset.reanalyze].query, { catalogId: btn.dataset.reanalyze });
     });
+    if (typeof c.afterRender === 'function') c.afterRender(mount);
     if (typeof paintDots === 'function') paintDots();
     return true;
   }

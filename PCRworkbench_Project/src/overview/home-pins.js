@@ -77,6 +77,26 @@
         </div>`;
       },
     },
+    'odm-gantt': {
+      id: 'odm-gantt',
+      title: 'ODM 执行项目健康度',
+      live: true,
+      sessionId: 'ask-odm',
+      query: '查看进行中的 ODM 执行项目健康度',
+      keywords: [/ODM 执行/, /执行项目健康/, /执行管理/, /甘特/],
+      insight: 'W6 有 2 项 Mfg Control run 重叠，建议错开；两风险项均因 ODM 回写滞后',
+      full: '9 个进行中的 ODM 执行项目，整体 4 个健康、3 个需关注、2 个有风险。两个风险项目均因 ODM 侧回写滞后，非技术问题。',
+      rowsHtml() {
+        // 钉到首页：压缩版
+        return window.OdmGantt ? OdmGantt.compactHtml() : '';
+      },
+      dialogueCardHtml() {
+        return window.OdmGantt ? OdmGantt.fullHtml() : '';
+      },
+      afterRender(root) {
+        if (window.OdmGantt) OdmGantt.wire(root);
+      },
+    },
   };
 
   // 修正卡片一第三行产品：提示词写 Nano，但既有 Review 任务是 Legion Pro — 按既有数据
@@ -282,15 +302,18 @@
     const host = document.getElementById('modalHost');
     const scrim = document.getElementById('scrim');
     if (!host || !scrim) { toast(c.full); return; }
-    host.innerHTML = `<div class="modal" style="width:520px">
+    const wide = !!c.dialogueCardHtml;
+    const body = wide ? c.dialogueCardHtml() : c.rowsHtml();
+    host.innerHTML = `<div class="modal" style="width:${wide ? 'min(960px,94vw)' : '520px'}">
       <div class="modal-h"><h3>${esc(c.title)}</h3><p>${c.live ? '⟳ 实时数据' : '快照 · ' + esc(c.snapshotAt)}</p></div>
-      <div class="modal-b">${c.rowsHtml()}<div class="hp-ai" style="margin-top:12px"><span class="sp">AI</span><span>${esc(c.full)}</span></div></div>
+      <div class="modal-b">${body}<div class="hp-ai" style="margin-top:12px"><span class="sp">AI</span><span>${esc(c.full)}</span></div></div>
       <div class="modal-f"><button class="btn btn-ghost" data-x>关闭</button>
         <button class="btn btn-primary" data-sess>回到原对话</button></div>
     </div>`;
     scrim.classList.add('show');
     host.querySelector('[data-x]').onclick = closeModal;
     host.querySelector('[data-sess]').onclick = () => { closeModal(); goSession(id); };
+    if (typeof c.afterRender === 'function') c.afterRender(host);
   }
 
   function goSession(id) {
@@ -429,8 +452,11 @@
 
     if (window.DialogueMotion) {
       DialogueMotion.appendUser(mount, query || c.query, scroll);
-      const card = `<div class="block hp-inline-card"><div class="block-h"><h4>${esc(c.title)}</h4>${freshness(c)}</div>
-        <div class="block-b">${c.rowsHtml()}</div></div>`;
+      const body = typeof c.dialogueCardHtml === 'function' ? c.dialogueCardHtml() : c.rowsHtml();
+      const card = c.dialogueCardHtml
+        ? body
+        : `<div class="block hp-inline-card"><div class="block-h"><h4>${esc(c.title)}</h4>${freshness(c)}</div>
+        <div class="block-b">${body}</div></div>`;
       await DialogueMotion.playAssistant({
         mount,
         scrollRoot: scroll,
@@ -440,9 +466,10 @@
         animate: !window.__DM_DISABLE && !opts.fromPin,
       });
     } else {
+      const body = typeof c.dialogueCardHtml === 'function' ? c.dialogueCardHtml() : c.rowsHtml();
       mount.innerHTML = `<div class="bub me">${esc(query || c.query)}</div>
         <div class="ai-lead"><div class="ai">AI</div><div class="txt">${esc(c.full)}</div></div>
-        ${c.rowsHtml()}${pinActionsHtml(c.id)}`;
+        ${body}${pinActionsHtml(c.id)}`;
     }
     mount.querySelectorAll('[data-pinid]').forEach((btn) => {
       btn.onclick = () => pin(btn.dataset.pinid);
@@ -450,6 +477,7 @@
     mount.querySelectorAll('[data-reanalyze]').forEach((btn) => {
       btn.onclick = () => runAnalysis(CATALOG[btn.dataset.reanalyze].query, { catalogId: btn.dataset.reanalyze });
     });
+    if (typeof c.afterRender === 'function') c.afterRender(mount);
     if (typeof paintDots === 'function') paintDots();
     return true;
   }

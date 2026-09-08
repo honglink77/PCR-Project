@@ -309,10 +309,22 @@ const TIPS_HOME={
    ix:'可重复执行的分析标「实时」，一次性分析标「快照+日期」。',
    fn:'若一次性分析被当作实时数据展示，用户会基于过期结论做判断，必须显式区分。',
    ref:['钉到首页']},
- pinLimit:{t:'限制钉住数量',
+  pinLimit:{t:'限制钉住数量',
    ix:'最多 4 个，达上限时要求先替换。',
    fn:'首页空间有限，无限制钉住会让自定义区喧宾夺主，反而失去「一眼看到重点」的价值。',
    ref:['钉到首页']},
+ ganttInsight:{t:'甘特图的价值在于看出冲突',
+   ix:'图上方必须给出跨项目的 AI 判断，而非复述健康度数字。',
+   fn:'画一张甘特图是数据可视化，看出「两个项目的试产撞在同一周」才是 AI 的价值；单看项目列表无法发现跨项目的资源冲突。',
+   ref:['执行管理','AI 洞察']},
+ ganttColor:{t:'活动类型色与状态色分离',
+   ix:'活动类型用低饱和冷色（蓝灰/紫灰/青灰），健康状态用红黄绿圆点。',
+   fn:'若活动条本身是绿色，又用红色表示逾期，两套语义会打架，用户无法判断颜色的含义。',
+   ref:['执行管理','视觉规范']},
+ ganttEntry:{t:'卡片入口改为对话预设问题',
+   ix:'点击「执行管理」卡片不跳转新页面，而是向对话框回填问题并由 AI 以甘特图响应。',
+   fn:'避免为每个分析视图新增一个导航项，把「统计分析」「执行管理」这类需求收敛到对话中，导航保持两项。',
+   ref:['少按钮原则','P-03 单页面完成']},
 };
 
 /* ══════════ 模式切换 ══════════ */
@@ -521,7 +533,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73,ganttInsight:74,ganttColor:75,ganttEntry:76};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -1094,7 +1106,7 @@ window.AskComposer=AskComposer;
 /* ══════════ Agent 选择器（Overview / My Tasks 共用） ══════════ */
 const AgentPicker={
   current:'pcr',
-  labels:{pcr:'PCR Agent'},
+  labels:{pcr:'@Agent'},
   ids:{
     home:{wrap:'agentWrap',chip:'agentChip',menu:'agentMenu',lab:'agentChipLab'},
     task:{wrap:'taskAgentWrap',chip:'taskAgentChip',menu:'taskAgentMenu',lab:'taskAgentChipLab'},
@@ -1135,7 +1147,7 @@ const AgentPicker={
   },
   select(id){
     this.current=id;
-    const name=this.labels[id]||'PCR Agent';
+    const name=this.labels[id]||'@Agent';
     Object.keys(this.ids).forEach(scope=>{
       const {lab,menu}=this.els(scope);
       if(lab) lab.textContent=name;

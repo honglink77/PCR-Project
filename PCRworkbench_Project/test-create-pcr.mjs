@@ -863,9 +863,9 @@ try {
 
   // ── Agent 选择器 ──
   await page.evaluate(() => { switchView('home'); HomePins.clearAnalysis?.(); });
-  check('Overview 输入框有 PCR Agent 胶囊', await page.evaluate(() => {
+  check('Overview 输入框有 @Agent 胶囊', await page.evaluate(() => {
     const chip = document.getElementById('agentChip');
-    return !!chip && /PCR Agent/.test(chip.textContent || '');
+    return !!chip && /@Agent/.test(chip.textContent || '');
   }));
   await page.evaluate(() => document.getElementById('agentChip').click());
   check('点击胶囊展开选择菜单', await page.evaluate(() => {
@@ -875,10 +875,46 @@ try {
   await page.evaluate(() => document.querySelector('#agentMenu [data-agent-browse]').click());
   check('浏览其他 Agent 可点且关闭菜单', await page.evaluate(() => document.getElementById('agentMenu').hidden));
   await page.evaluate(() => { switchView('task'); if (window.MyTasks?.ensureInit) MyTasks.ensureInit(); });
-  check('My Tasks 输入框同样有 Agent 胶囊', await page.evaluate(() => {
+  check('My Tasks 输入框同样有 @Agent 胶囊', await page.evaluate(() => {
     const chip = document.getElementById('taskAgentChip');
-    return !!chip && /PCR Agent/.test(chip.textContent || '') && !!document.getElementById('taskAgentMenu');
+    return !!chip && /@Agent/.test(chip.textContent || '') && !!document.getElementById('taskAgentMenu');
   }));
+
+  // ── ODM 甘特图 ──
+  await page.evaluate(() => { switchView('home'); window.__DM_DISABLE = true; HomePins.clearAnalysis?.(); });
+  check('OdmGantt 模块存在', await page.evaluate(() =>
+    !!(window.OdmGantt && OdmGantt.fullHtml && OdmGantt.PROJECTS.length === 9)
+  ));
+  check('执行管理问题可匹配甘特分析', await page.evaluate(() =>
+    HomePins.matchCatalog('查看进行中的 ODM 执行项目健康度')?.id === 'odm-gantt'
+  ));
+  await page.evaluate(async () => {
+    await HomePins.runAnalysis('查看进行中的 ODM 执行项目健康度');
+  });
+  check('发送后出现甘特图卡片', await page.evaluate(() => {
+    const g = document.getElementById('odmGanttCard');
+    const t = g?.innerText || '';
+    return !!g && /近 12 周/.test(t) && /W6/.test(t) && /Mfg Control run/.test(t) &&
+      document.querySelectorAll('.gantt-row').length === 9;
+  }));
+  check('甘特含今天竖线与逾期标记', await page.evaluate(() =>
+    !!document.querySelector('.gantt-today') && /逾期 4 天/.test(document.getElementById('odmGanttCard')?.innerText || '')
+  ));
+  check('甘特有跨项目 AI 洞察', await page.evaluate(() =>
+    /产能可能不足|错开/.test(document.querySelector('.gantt-insight')?.innerText || '')
+  ));
+  check('甘特响应含钉到首页', await page.evaluate(() =>
+    !!document.querySelector('#homeAnalysis [data-pinid="odm-gantt"]')
+  ));
+  check('TIP 74–76 存在', await page.evaluate(() =>
+    !!(TIPS_HOME.ganttInsight && TIPS_HOME.ganttColor && TIPS_HOME.ganttEntry)
+  ));
+  await page.evaluate(() => {
+    document.querySelector('#odmGanttCard [data-expand="p3"]')?.click();
+  });
+  check('点击行可展开执行详情', await page.evaluate(() =>
+    !document.getElementById('gantt-det-p3')?.hidden
+  ));
 
 } catch (e) {
   check('测试未抛异常', false, e.message);

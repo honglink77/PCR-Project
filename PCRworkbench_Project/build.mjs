@@ -45,6 +45,8 @@ const parts = [
   '\n',
   read('src/overview/overview.js'),
   '\n',
+  read('src/overview/odm-gantt.js'),
+  '\n',
   read('src/overview/home-pins.js'),
   read('src/shell/tail.html'),
 ];
