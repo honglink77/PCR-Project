@@ -466,6 +466,19 @@ function renderActionBar(){ /* 动作已并入对话内容 */ }
 
 /* ---------- right panel ---------- */
 let ctxTab='detail';
+let ctxOpen=true;
+function setCtxOpen(open){
+  ctxOpen=!!open;
+  const view=document.getElementById('view-task');
+  if(view) view.classList.toggle('ctx-collapsed',!ctxOpen);
+  const rail=document.getElementById('ctxRailBtn');
+  const hide=document.getElementById('ctxCollapseBtn');
+  if(rail){
+    rail.setAttribute('aria-expanded',ctxOpen?'true':'false');
+    rail.title=ctxOpen?'PCR Details 已展开':'显示 PCR Details';
+  }
+  if(hide) hide.setAttribute('aria-expanded',ctxOpen?'true':'false');
+}
 const PCR_STAGES=['Create','Review','Screen','Assessment','Implementation','Benefit Tracking','Close'];
 function pcrStageInfo(t){
   const stages=PCR_STAGES;
@@ -564,8 +577,12 @@ function renderCtx(){
 document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
   ctxTab=b.dataset.t;
   document.querySelectorAll('.ctx-tab').forEach(x=>x.classList.toggle('on',x===b));
+  setCtxOpen(true);
   renderCtx();
 });
+document.getElementById('ctxCollapseBtn')?.addEventListener('click',()=>setCtxOpen(false));
+document.getElementById('ctxRailBtn')?.addEventListener('click',()=>setCtxOpen(true));
+setCtxOpen(true);
 
 /* ---------- modals ---------- */
 const scrim=document.getElementById('scrim'),modalHost=document.getElementById('modalHost');

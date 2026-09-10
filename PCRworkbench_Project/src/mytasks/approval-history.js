@@ -382,6 +382,7 @@ function wireApprovalHistory() {
 function openApprovalHistoryTab(stepId) {
   ctxTab = 'approval';
   ahFocusStep = stepId || 'tpm';
+  if (typeof setCtxOpen === 'function') setCtxOpen(true);
   document.querySelectorAll('.ctx-tab').forEach((x) => x.classList.toggle('on', x.dataset.t === 'approval'));
   renderCtx();
 }

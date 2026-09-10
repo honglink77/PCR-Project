@@ -58,13 +58,22 @@
       </div>
     </main>
 
-    <!-- RIGHT -->
-    <aside class="ctx">
-      <div class="ctx-tabs">
-        <button class="ctx-tab on" data-t="detail">PCR Details</button><span class="tipdot" onclick="showTip(event,'ctx',31)">31</span>
-        <button class="ctx-tab" data-t="similar">Similar PCR</button><span class="tipdot" onclick="showTip(event,'sim',32)">32</span>
-        <button class="ctx-tab" data-t="evidence">AI Evidence</button><span class="tipdot" onclick="showTip(event,'tevi',33)">33</span>
-        <button class="ctx-tab" data-t="approval">Approval History</button><span class="tipdot" onclick="showTip(event,'ahSplit',62)">62</span>
+    <!-- RIGHT：收起后显示窄条，点一下即可再展开 PCR Details -->
+    <button type="button" class="ctx-rail" id="ctxRailBtn" title="显示 PCR Details" aria-label="显示 PCR Details" aria-expanded="true">
+      <svg class="ctx-rail-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M10 3v10"/><path d="M6.8 6.2L4.8 8l2 1.8"/></svg>
+      <span class="ctx-rail-lab">PCR Details</span>
+    </button>
+    <aside class="ctx" id="taskCtx">
+      <div class="ctx-head">
+        <div class="ctx-tabs">
+          <button class="ctx-tab on" data-t="detail">PCR Details</button><span class="tipdot" onclick="showTip(event,'ctx',31)">31</span>
+          <button class="ctx-tab" data-t="similar">Similar PCR</button><span class="tipdot" onclick="showTip(event,'sim',32)">32</span>
+          <button class="ctx-tab" data-t="evidence">AI Evidence</button><span class="tipdot" onclick="showTip(event,'tevi',33)">33</span>
+          <button class="ctx-tab" data-t="approval">Approval History</button><span class="tipdot" onclick="showTip(event,'ahSplit',62)">62</span>
+        </div>
+        <button type="button" class="ctx-collapse" id="ctxCollapseBtn" title="隐藏 PCR Details" aria-label="隐藏 PCR Details" aria-expanded="true">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M10 3v10"/><path d="M6.8 6.2L4.8 8l2 1.8"/></svg>
+        </button>
       </div>
       <div class="ctx-body" id="ctxBody"></div>
     </aside>

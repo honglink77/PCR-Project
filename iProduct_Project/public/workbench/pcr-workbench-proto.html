@@ -1146,11 +1146,22 @@
   .view-task .task-askwrap .plusmenu{bottom:46px}
   .view-task #actionbar{display:none !important}
   .view-task .ctx{width:372px;flex:none;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
-  .view-task .ctx-tabs{flex:none;display:flex;border-bottom:1px solid var(--border);padding:0 4px;flex-wrap:wrap;gap:0}
+  .view-task .ctx-head{flex:none;display:flex;align-items:stretch;border-bottom:1px solid var(--border);gap:0}
+  .view-task .ctx-tabs{flex:1;min-width:0;display:flex;padding:0 2px 0 4px;flex-wrap:wrap;gap:0;border-bottom:none}
   .view-task .ctx-tab{font-size:11.5px;font-weight:600;color:var(--ink-3);padding:11px 8px;border-bottom:2px solid transparent;transition:.12s}
   .view-task .ctx-tab:hover{color:var(--ink-2)}
   .view-task .ctx-tab.on{color:var(--ink);border-bottom-color:var(--accent)}
+  .view-task .ctx-collapse{width:32px;flex:none;display:grid;place-items:center;color:var(--ink-3);border-left:1px solid transparent;transition:.12s}
+  .view-task .ctx-collapse:hover{color:var(--ink);background:var(--soft)}
+  .view-task .ctx-collapse svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .view-task .ctx-body{flex:1;overflow-y:auto;padding:14px}
+  .view-task .ctx-rail{display:none;width:36px;flex:none;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;
+    padding:12px 0;background:var(--panel);border-left:1px solid var(--border);color:var(--ink-2);cursor:pointer;transition:.12s}
+  .view-task .ctx-rail:hover{background:var(--soft);color:var(--accent-ink)}
+  .view-task .ctx-rail-ico{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+  .view-task .ctx-rail-lab{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11.5px;font-weight:600;letter-spacing:.06em;line-height:1}
+  .view-task.ctx-collapsed .ctx{display:none}
+  .view-task.ctx-collapsed .ctx-rail{display:flex}
 
   .view-task .sec{margin-bottom:18px}
   .view-task .sec-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:9px;cursor:pointer;user-select:none}
@@ -1785,13 +1796,22 @@
       </div>
     </main>
 
-    <!-- RIGHT -->
-    <aside class="ctx">
-      <div class="ctx-tabs">
-        <button class="ctx-tab on" data-t="detail">PCR Details</button><span class="tipdot" onclick="showTip(event,'ctx',31)">31</span>
-        <button class="ctx-tab" data-t="similar">Similar PCR</button><span class="tipdot" onclick="showTip(event,'sim',32)">32</span>
-        <button class="ctx-tab" data-t="evidence">AI Evidence</button><span class="tipdot" onclick="showTip(event,'tevi',33)">33</span>
-        <button class="ctx-tab" data-t="approval">Approval History</button><span class="tipdot" onclick="showTip(event,'ahSplit',62)">62</span>
+    <!-- RIGHT：收起后显示窄条，点一下即可再展开 PCR Details -->
+    <button type="button" class="ctx-rail" id="ctxRailBtn" title="显示 PCR Details" aria-label="显示 PCR Details" aria-expanded="true">
+      <svg class="ctx-rail-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M10 3v10"/><path d="M6.8 6.2L4.8 8l2 1.8"/></svg>
+      <span class="ctx-rail-lab">PCR Details</span>
+    </button>
+    <aside class="ctx" id="taskCtx">
+      <div class="ctx-head">
+        <div class="ctx-tabs">
+          <button class="ctx-tab on" data-t="detail">PCR Details</button><span class="tipdot" onclick="showTip(event,'ctx',31)">31</span>
+          <button class="ctx-tab" data-t="similar">Similar PCR</button><span class="tipdot" onclick="showTip(event,'sim',32)">32</span>
+          <button class="ctx-tab" data-t="evidence">AI Evidence</button><span class="tipdot" onclick="showTip(event,'tevi',33)">33</span>
+          <button class="ctx-tab" data-t="approval">Approval History</button><span class="tipdot" onclick="showTip(event,'ahSplit',62)">62</span>
+        </div>
+        <button type="button" class="ctx-collapse" id="ctxCollapseBtn" title="隐藏 PCR Details" aria-label="隐藏 PCR Details" aria-expanded="true">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M10 3v10"/><path d="M6.8 6.2L4.8 8l2 1.8"/></svg>
+        </button>
       </div>
       <div class="ctx-body" id="ctxBody"></div>
     </aside>
@@ -3891,6 +3911,19 @@ function renderActionBar(){ /* 动作已并入对话内容 */ }
 
 /* ---------- right panel ---------- */
 let ctxTab='detail';
+let ctxOpen=true;
+function setCtxOpen(open){
+  ctxOpen=!!open;
+  const view=document.getElementById('view-task');
+  if(view) view.classList.toggle('ctx-collapsed',!ctxOpen);
+  const rail=document.getElementById('ctxRailBtn');
+  const hide=document.getElementById('ctxCollapseBtn');
+  if(rail){
+    rail.setAttribute('aria-expanded',ctxOpen?'true':'false');
+    rail.title=ctxOpen?'PCR Details 已展开':'显示 PCR Details';
+  }
+  if(hide) hide.setAttribute('aria-expanded',ctxOpen?'true':'false');
+}
 const PCR_STAGES=['Create','Review','Screen','Assessment','Implementation','Benefit Tracking','Close'];
 function pcrStageInfo(t){
   const stages=PCR_STAGES;
@@ -3989,8 +4022,12 @@ function renderCtx(){
 document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
   ctxTab=b.dataset.t;
   document.querySelectorAll('.ctx-tab').forEach(x=>x.classList.toggle('on',x===b));
+  setCtxOpen(true);
   renderCtx();
 });
+document.getElementById('ctxCollapseBtn')?.addEventListener('click',()=>setCtxOpen(false));
+document.getElementById('ctxRailBtn')?.addEventListener('click',()=>setCtxOpen(true));
+setCtxOpen(true);
 
 /* ---------- modals ---------- */
 const scrim=document.getElementById('scrim'),modalHost=document.getElementById('modalHost');
@@ -4495,6 +4532,7 @@ function wireApprovalHistory() {
 function openApprovalHistoryTab(stepId) {
   ctxTab = 'approval';
   ahFocusStep = stepId || 'tpm';
+  if (typeof setCtxOpen === 'function') setCtxOpen(true);
   document.querySelectorAll('.ctx-tab').forEach((x) => x.classList.toggle('on', x.dataset.t === 'approval'));
   renderCtx();
 }
