@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PACE PRE - To Do List</title>
+  <style>
+    :root {
+      --navy: #0b1f3a;
+      --navy-2: #14325a;
+      --navy-3: #1a3d6d;
+      --blue: #1677ff;
+      --blue-hover: #4096ff;
+      --link: #1677ff;
+      --border: #e5e7eb;
+      --bg: #f0f2f5;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --row-alt: #f5f9ff;
+      --danger: #e11d48;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    a { color: var(--link); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Top bar */
+    .topbar {
+      height: 48px;
+      background: var(--navy);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+      color: #fff;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      flex: none;
+      white-space: nowrap;
+      line-height: 0;
+    }
+    .logo img {
+      height: 28px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+    }
+    .global-search {
+      flex: 1;
+      max-width: 520px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .global-search input {
+      width: 100%;
+      height: 32px;
+      border: none;
+      border-radius: 16px;
+      padding: 0 36px 0 14px;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      outline: none;
+    }
+    .global-search input::placeholder { color: rgba(255,255,255,0.55); }
+    .global-search .search-ico {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.7;
+      font-size: 14px;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-left: auto;
+    }
+    .icon-btn {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -6px;
+      min-width: 14px;
+      height: 14px;
+      padding: 0 3px;
+      border-radius: 7px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 10px;
+      line-height: 14px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .user-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .user-chip .caret { font-size: 10px; opacity: 0.8; }
+
+    /* Sub nav */
+    .subnav {
+      height: 40px;
+      background: var(--navy-2);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 4px;
+      color: #fff;
+    }
+    .pm-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 10px;
+      height: 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .pm-dropdown:hover { background: rgba(255,255,255,0.08); }
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex: 1;
+    }
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 4px 4px 0 0;
+      font-size: 13px;
+      cursor: pointer;
+      color: rgba(255,255,255,0.85);
+    }
+    .nav-tab.active {
+      background: rgba(255,255,255,0.14);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-tab:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .iproduct-brand {
+      margin-left: auto;
+      height: 30px;
+      padding: 0 8px;
+      border: none;
+      border-radius: 4px;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      flex: none;
+      text-decoration: none;
+    }
+    .iproduct-brand:hover { background: rgba(255,255,255,0.08); }
+    .iproduct-brand .ip-mark {
+      width: 22px;
+      height: 22px;
+      flex: none;
+      display: block;
+    }
+    .iproduct-brand .ip-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+    }
+    .iproduct-brand--light .ip-text { color: #1f2937; }
+    .iproduct-brand--light:hover { background: #f3f4f6; }
+
+    /* Layout */
+    .page {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 12px;
+      padding: 12px;
+      min-height: calc(100vh - 88px);
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+    .main-card { padding: 12px 14px 8px; overflow: auto; }
+    .main-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 12px;
+    }
+    .main-head h1 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .head-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      height: 28px;
+      padding: 0 12px;
+      border: none;
+      border-radius: 2px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--blue-hover); }
+    .obj-count {
+      font-size: 12px;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    thead th {
+      background: #fafafa;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 8px;
+      text-align: left;
+      font-weight: 600;
+      color: #374151;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+    }
+    thead th .sort {
+      margin-left: 4px;
+      color: #9ca3af;
+      font-size: 10px;
+    }
+    tbody td {
+      padding: 8px 8px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+    tbody tr:nth-child(even) { background: var(--row-alt); }
+    tbody tr:hover { background: #e8f1ff; }
+    .chk { width: 28px; text-align: center; }
+    .status-pill {
+      display: inline-block;
+      padding: 1px 8px;
+      border: 1px solid #91caff;
+      border-radius: 10px;
+      color: var(--blue);
+      background: #e6f4ff;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .subject-red { color: var(--danger); }
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--link);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0;
+      font-family: inherit;
+    }
+    .link-btn:hover { text-decoration: underline; }
+    .reassign {
+      height: 24px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    /* Right column */
+    .side-col { display: flex; flex-direction: column; gap: 12px; }
+    .side-card { padding: 10px 12px; }
+    .side-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .side-card h3 a { font-size: 12px; font-weight: 500; }
+    .shortcut-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .shortcut-btn {
+      height: 56px;
+      border: none;
+      border-radius: 2px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .shortcut-btn:hover { background: var(--blue-hover); }
+    .empty-fav {
+      text-align: center;
+      padding: 28px 8px;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+    .empty-fav .folder { font-size: 36px; margin-bottom: 6px; opacity: 0.45; }
+    .recent-list { list-style: none; }
+    .recent-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 12px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .recent-list li:last-child { border-bottom: none; }
+    .folder-ico {
+      width: 16px;
+      height: 16px;
+      border-radius: 2px;
+      background: #1677ff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 1100px) {
+      .page { grid-template-columns: 1fr; }
+      .side-col { order: -1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo"><img src="assets/pace-logo.png" alt="PACE PRE" /></div>
+    <div class="global-search">
+      <input type="text" placeholder="Global Search..." />
+      <span class="search-ico">🔍</span>
+    </div>
+    <div class="top-actions">
+      <div class="icon-btn" title="Tasks">☑<span class="badge">4</span></div>
+      <div class="icon-btn" title="Messages">💬<span class="badge">1</span></div>
+      <div class="icon-btn" title="Help">❓</div>
+      <div class="user-chip">Ancao AC1 Yuan <span class="caret">▼</span></div>
+    </div>
+  </header>
+
+  <nav class="subnav">
+    <div class="pm-dropdown">▦ Product Management ▾</div>
+    <div class="nav-tabs">
+      <div class="nav-tab active">⌂ Overview</div>
+      <div class="nav-tab">📚 Libraries</div>
+      <div class="nav-tab">📊 Dashboard</div>
+      <div class="nav-tab">🧩 Parts</div>
+      <div class="nav-tab">📄 Documents</div>
+      <div class="nav-tab">🔄 Changes</div>
+    </div>
+    <button type="button" class="iproduct-brand" title="iProduct">
+      <img class="ip-mark" src="assets/iproduct-mark.svg" alt="" />
+      <span class="ip-text">iProduct</span>
+    </button>
+  </nav>
+
+  <div class="page">
+    <section class="card main-card">
+      <div class="main-head">
+        <h1>To Do List</h1>
+        <div class="head-right">
+          <button type="button" class="btn">My Delegate</button>
+          <button type="button" class="btn">Batch Reassign</button>
+          <button type="button" class="btn">Batch Complete</button>
+          <button type="button" class="btn">My Assign Task</button>
+          <span class="obj-count">8 objects</span>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th class="chk"><input type="checkbox" id="checkAll" /></th>
+            <th>Task Name <span class="sort">⇅</span></th>
+            <th>Subject <span class="sort">⇅</span></th>
+            <th>Number <span class="sort">⇅</span></th>
+            <th>Impacted Products <span class="sort">⇅</span></th>
+            <th>Status <span class="sort">⇅</span></th>
+            <th>Critical Flag <span class="sort">⇅</span></th>
+            <th>Start Date <span class="sort">⇅</span></th>
+            <th>Target Date <span class="sort">⇅</span></th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="todoBody">
+          <!-- rows injected -->
+        </tbody>
+      </table>
+    </section>
+
+    <aside class="side-col">
+      <div class="card side-card">
+        <h3>Shortcut <a href="javascript:void(0)">Edit</a></h3>
+        <div class="shortcut-row">
+          <button type="button" class="shortcut-btn"><span>📄</span>Add PCR</button>
+          <button type="button" class="shortcut-btn"><span>🔎</span>PCR Search</button>
+        </div>
+      </div>
+      <div class="card side-card">
+        <h3>My Favorites</h3>
+        <div class="empty-fav">
+          <div class="folder">📁</div>
+          No data
+        </div>
+      </div>
+      <div class="card side-card">
+        <h3>Recently Visit</h3>
+        <ul class="recent-list">
+          <li><span class="folder-ico">📁</span><a href="javascript:void(0)">ThinkReality</a></li>
+          <li><span class="folder-ico">📁</span><a href="javascript:void(0)">ThinkReality &gt; Product</a></li>
+          <li><span class="folder-ico">📁</span><a href="javascript:void(0)">ThinkReality &gt; Team</a></li>
+          <li><span class="folder-ico">📁</span><a href="javascript:void(0)">DT_Commercial</a></li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const rows = [
+      {
+        task: "Sponsor Review",
+        subject: "Lenovo Legion Y9000K2021H PCR",
+        number: "SP20260910_0001",
+        product: "Lenovo Legion Y9000K2021H",
+        status: "Under_Review",
+        critical: "No",
+        start: "2026-09-01 09:12:33",
+        target: "2026-09-15 18:00:00",
+        subjectClass: ""
+      },
+      {
+        task: "OTM Screen",
+        subject: "ThinkBook 16 G7 ARP Change",
+        number: "SP20260910_0002",
+        product: "ThinkBook 16 G7 ARP",
+        status: "Under_Screen",
+        critical: "No",
+        start: "2026-09-02 10:05:11",
+        target: "2026-09-16 18:00:00",
+        subjectClass: ""
+      },
+      {
+        task: "Vote Task",
+        subject: "Yoga Slim 7 Carbon Review",
+        number: "SP20260908_0011",
+        product: "Yoga Slim 7 Carbon",
+        status: "Condition_Approve",
+        critical: "No",
+        start: "2026-09-03 14:22:09",
+        target: "2026-09-20 18:00:00",
+        subjectClass: ""
+      },
+      {
+        task: "Line Manager Review",
+        subject: "测试0002",
+        number: "SP20260831_0004",
+        product: "Lenovo Legion Y9000K2021H",
+        status: "Under_Review",
+        critical: "No",
+        start: "2026-08-31 16:40:00",
+        target: "2100-01-01 07:59:59",
+        subjectClass: "",
+        detailTask: "Line Manager Review"
+      },
+      {
+        task: "Sponsor Review",
+        subject: "ThinkPad X1 Carbon Gen 12",
+        number: "SP20260905_0007",
+        product: "ThinkPad X1 Carbon Gen 12",
+        status: "Under_Review",
+        critical: "No",
+        start: "2026-09-05 08:30:00",
+        target: "2026-09-18 18:00:00",
+        subjectClass: ""
+      },
+      {
+        task: "OTM Screen",
+        subject: "IdeaPad Pro 5i Screen",
+        number: "SP20260906_0003",
+        product: "IdeaPad Pro 5i",
+        status: "Under_Screen",
+        critical: "No",
+        start: "2026-09-06 11:15:44",
+        target: "2026-09-22 18:00:00",
+        subjectClass: ""
+      },
+      {
+        task: "Vote Task",
+        subject: "逾期：Display Panel Change",
+        number: "SP20260820_0019",
+        product: "ThinkVision P27h",
+        status: "Under_Review",
+        critical: "No",
+        start: "2026-08-20 09:00:00",
+        target: "2026-08-28 18:00:00",
+        subjectClass: "subject-red"
+      },
+      {
+        task: "Line Manager Review",
+        subject: "逾期：BIOS Update Request",
+        number: "SP20260818_0008",
+        product: "ThinkBook 14 G6+",
+        status: "Condition_Approve",
+        critical: "No",
+        start: "2026-08-18 13:45:22",
+        target: "2026-08-25 18:00:00",
+        subjectClass: "subject-red"
+      }
+    ];
+
+    const tbody = document.getElementById("todoBody");
+
+    function resolveType(row) {
+      const title = String(row.detailTask || row.task || "");
+      return /vote/i.test(title) ? "vote" : "otm";
+    }
+
+    function openDetail(row) {
+      const params = new URLSearchParams({
+        task: row.detailTask || row.task,
+        number: row.number,
+        subject: row.subject,
+        product: row.product,
+        status: row.status.replace(/_/g, " "),
+        type: resolveType(row)
+      });
+      location.href = "detail.html#" + params.toString();
+    }
+
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="chk"><input type="checkbox" class="row-chk" /></td>
+        <td><button type="button" class="link-btn js-open" data-field="task">${escapeHtml(row.task)}</button></td>
+        <td class="${row.subjectClass}">${escapeHtml(row.subject)}</td>
+        <td><button type="button" class="link-btn js-open" data-field="number">${escapeHtml(row.number)}</button></td>
+        <td>${escapeHtml(row.product)}</td>
+        <td><span class="status-pill">${escapeHtml(row.status)}</span></td>
+        <td>${escapeHtml(row.critical)}</td>
+        <td>${escapeHtml(row.start)}</td>
+        <td>${escapeHtml(row.target)}</td>
+        <td><button type="button" class="btn reassign">Reassign</button></td>
+      `;
+      tr.querySelectorAll(".js-open").forEach((btn) => {
+        btn.addEventListener("click", () => openDetail(row));
+      });
+      tbody.appendChild(tr);
+    });
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    document.getElementById("checkAll").addEventListener("change", (e) => {
+      document.querySelectorAll(".row-chk").forEach((c) => {
+        c.checked = e.target.checked;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -981,7 +981,7 @@
   body.taskview .scroll{overflow:hidden}
   body.taskview #askwrap{display:none !important}
   .view-task{display:flex;height:calc(100vh - 56px);width:100%}
-  .view-task .cols{flex:1;display:flex;min-height:0;width:100%;position:relative}
+  .view-task .cols{flex:1;display:flex;min-height:0;width:100%}
 
   .view-task .mono{font-family:var(--mono);letter-spacing:-.02em}
   .view-task .app{display:flex;flex-direction:column;height:100%;width:100%;overflow:hidden}
@@ -1006,7 +1006,7 @@
   .view-task .iconbtn:hover{background:var(--canvas)}
   .view-task .iconbtn .badge{position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--disagree);border:1.5px solid var(--panel)}
 
-  .view-task .cols{flex:1;display:flex;min-height:0;position:relative}
+  .view-task .cols{flex:1;display:flex;min-height:0}
   .taskwrap .rail-head{padding:12px 14px 8px}
   .taskwrap .task-search{display:flex;align-items:center;gap:8px;border:1px solid var(--border);
     border-radius:9px;padding:7px 10px;transition:.12s;background:var(--bg)}
@@ -1145,10 +1145,7 @@
   .view-task .task-askwrap .guide{bottom:58px}
   .view-task .task-askwrap .plusmenu{bottom:46px}
   .view-task #actionbar{display:none !important}
-  .view-task .ctx-scrim{display:none;position:absolute;inset:0;background:rgba(15,23,42,.38);z-index:16;border:none;padding:0;cursor:pointer}
-  .view-task .ctx{position:absolute;top:0;right:0;bottom:0;width:min(372px,92%);flex:none;background:var(--panel);
-    border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0;z-index:18;
-    box-shadow:-12px 0 32px rgba(15,23,42,.18)}
+  .view-task .ctx{width:372px;flex:none;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
   .view-task .ctx-head{flex:none;display:flex;align-items:stretch;border-bottom:1px solid var(--border);gap:0}
   .view-task .ctx-tabs{flex:1;min-width:0;display:flex;padding:0 2px 0 4px;flex-wrap:wrap;gap:0;border-bottom:none}
   .view-task .ctx-tab{font-size:11.5px;font-weight:600;color:var(--ink-3);padding:11px 8px;border-bottom:2px solid transparent;transition:.12s}
@@ -1158,16 +1155,13 @@
   .view-task .ctx-collapse:hover{color:var(--ink);background:var(--soft)}
   .view-task .ctx-collapse svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .view-task .ctx-body{flex:1;overflow-y:auto;padding:14px}
-  .view-task .ctx-rail{display:none;position:absolute;top:0;right:0;bottom:0;width:36px;flex-direction:column;align-items:center;
-    justify-content:flex-start;gap:10px;padding:12px 0;background:var(--panel);border-left:1px solid var(--border);color:var(--ink-2);
-    cursor:pointer;transition:.12s;z-index:12}
+  .view-task .ctx-rail{display:none;width:36px;flex:none;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;
+    padding:12px 0;background:var(--panel);border-left:1px solid var(--border);color:var(--ink-2);cursor:pointer;transition:.12s}
   .view-task .ctx-rail:hover{background:var(--soft);color:var(--accent-ink)}
   .view-task .ctx-rail-ico{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .view-task .ctx-rail-lab{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11.5px;font-weight:600;letter-spacing:.06em;line-height:1}
-  .view-task:not(.ctx-collapsed) .ctx-scrim{display:block}
   .view-task.ctx-collapsed .ctx{display:none}
   .view-task.ctx-collapsed .ctx-rail{display:flex}
-  .view-task.ctx-collapsed .ctx-scrim{display:none}
 
   .view-task .sec{margin-bottom:18px}
   .view-task .sec-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:9px;cursor:pointer;user-select:none}
@@ -1773,6 +1767,26 @@
             </div>
             <div class="askbox" id="taskAskbox">
               <button class="plusbtn" id="taskPlusbtn" type="button" title="更多">+</button>
+              <div class="agent-wrap" id="taskAgentWrap">
+                <button type="button" class="agent-chip" id="taskAgentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'task')">
+                  <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                  <span class="agent-chip-lab" id="taskAgentChipLab">@Agent</span>
+                  <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
+                </button>
+                <div class="agent-menu" id="taskAgentMenu" hidden role="listbox" aria-label="选择 Agent">
+                  <div class="agent-menu-h">选择 Agent</div>
+                  <button type="button" class="agent-opt on" data-agent="pcr" role="option" aria-selected="true">
+                    <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                    <span class="agent-opt-t"><b>PCR Agent</b><small>当前使用</small></span>
+                    <svg class="agent-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                  </button>
+                  <button type="button" class="agent-opt browse" data-agent-browse role="option">
+                    <svg class="agent-grid" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                    <span class="agent-opt-t"><b>浏览其他 Agent</b></span>
+                    <svg class="agent-next" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6 4.5 9"/></svg>
+                  </button>
+                </div>
+              </div>
               <textarea class="askin" id="taskAskin" rows="1" placeholder="补充信息…"></textarea>
               <button class="send" id="taskSend" type="button"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
             </div>
@@ -1782,8 +1796,7 @@
       </div>
     </main>
 
-    <div class="ctx-scrim" id="ctxScrim" hidden></div>
-    <!-- RIGHT：叠在中间对话上，不挤开布局；收起后右侧窄条可再展开 -->
+    <!-- RIGHT：收起后显示窄条，点一下即可再展开 PCR Details -->
     <button type="button" class="ctx-rail" id="ctxRailBtn" title="显示 PCR Details" aria-label="显示 PCR Details" aria-expanded="true">
       <svg class="ctx-rail-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M10 3v10"/><path d="M6.8 6.2L4.8 8l2 1.8"/></svg>
       <span class="ctx-rail-lab">PCR Details</span>
@@ -1846,6 +1859,26 @@
           </div>
             <div class="askbox" id="askbox">
             <button class="plusbtn" id="plusbtn" title="创建与更多" onclick="togglePlus(event)">+</button>
+            <div class="agent-wrap" id="agentWrap">
+              <button type="button" class="agent-chip" id="agentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'home')">
+                <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                <span class="agent-chip-lab" id="agentChipLab">@Agent</span>
+                <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
+              </button>
+              <div class="agent-menu" id="agentMenu" hidden role="listbox" aria-label="选择 Agent">
+                <div class="agent-menu-h">选择 Agent</div>
+                <button type="button" class="agent-opt on" data-agent="pcr" role="option" aria-selected="true">
+                  <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                  <span class="agent-opt-t"><b>PCR Agent</b><small>当前使用</small></span>
+                  <svg class="agent-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                </button>
+                <button type="button" class="agent-opt browse" data-agent-browse role="option">
+                  <svg class="agent-grid" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                  <span class="agent-opt-t"><b>浏览其他 Agent</b></span>
+                  <svg class="agent-next" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6 4.5 9"/></svg>
+                </button>
+              </div>
+            </div>
             <textarea class="askin" id="askin" rows="1" placeholder="描述你的变更需求，或粘贴邮件、会议纪要…"></textarea>
             <button class="send" onclick="sendq()"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
           </div>
@@ -3869,10 +3902,7 @@ function bindTaskAskOnce(){
       document.getElementById('taskFlowMenu')?.classList.remove('show');
   });
   document.addEventListener('keydown',e=>{
-    if(e.key!=='Escape') return;
-    const menu=document.getElementById('taskFlowMenu');
-    if(menu?.classList.contains('show')){menu.classList.remove('show');return;}
-    if(ctxOpen) setCtxOpen(false);
+    if(e.key==='Escape') document.getElementById('taskFlowMenu')?.classList.remove('show');
   });
 }
 
@@ -3888,13 +3918,11 @@ function setCtxOpen(open){
   if(view) view.classList.toggle('ctx-collapsed',!ctxOpen);
   const rail=document.getElementById('ctxRailBtn');
   const hide=document.getElementById('ctxCollapseBtn');
-  const scrim=document.getElementById('ctxScrim');
   if(rail){
     rail.setAttribute('aria-expanded',ctxOpen?'true':'false');
     rail.title=ctxOpen?'PCR Details 已展开':'显示 PCR Details';
   }
   if(hide) hide.setAttribute('aria-expanded',ctxOpen?'true':'false');
-  if(scrim) scrim.hidden=!ctxOpen;
 }
 const PCR_STAGES=['Create','Review','Screen','Assessment','Implementation','Benefit Tracking','Close'];
 function pcrStageInfo(t){
@@ -3999,7 +4027,6 @@ document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
 });
 document.getElementById('ctxCollapseBtn')?.addEventListener('click',()=>setCtxOpen(false));
 document.getElementById('ctxRailBtn')?.addEventListener('click',()=>setCtxOpen(true));
-document.getElementById('ctxScrim')?.addEventListener('click',()=>setCtxOpen(false));
 setCtxOpen(true);
 
 /* ---------- modals ---------- */

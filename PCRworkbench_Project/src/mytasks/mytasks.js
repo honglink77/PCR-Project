@@ -457,7 +457,10 @@ function bindTaskAskOnce(){
       document.getElementById('taskFlowMenu')?.classList.remove('show');
   });
   document.addEventListener('keydown',e=>{
-    if(e.key==='Escape') document.getElementById('taskFlowMenu')?.classList.remove('show');
+    if(e.key!=='Escape') return;
+    const menu=document.getElementById('taskFlowMenu');
+    if(menu?.classList.contains('show')){menu.classList.remove('show');return;}
+    if(ctxOpen) setCtxOpen(false);
   });
 }
 
@@ -473,11 +476,13 @@ function setCtxOpen(open){
   if(view) view.classList.toggle('ctx-collapsed',!ctxOpen);
   const rail=document.getElementById('ctxRailBtn');
   const hide=document.getElementById('ctxCollapseBtn');
+  const scrim=document.getElementById('ctxScrim');
   if(rail){
     rail.setAttribute('aria-expanded',ctxOpen?'true':'false');
     rail.title=ctxOpen?'PCR Details 已展开':'显示 PCR Details';
   }
   if(hide) hide.setAttribute('aria-expanded',ctxOpen?'true':'false');
+  if(scrim) scrim.hidden=!ctxOpen;
 }
 const PCR_STAGES=['Create','Review','Screen','Assessment','Implementation','Benefit Tracking','Close'];
 function pcrStageInfo(t){
@@ -582,6 +587,7 @@ document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
 });
 document.getElementById('ctxCollapseBtn')?.addEventListener('click',()=>setCtxOpen(false));
 document.getElementById('ctxRailBtn')?.addEventListener('click',()=>setCtxOpen(true));
+document.getElementById('ctxScrim')?.addEventListener('click',()=>setCtxOpen(false));
 setCtxOpen(true);
 
 /* ---------- modals ---------- */

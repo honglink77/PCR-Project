@@ -981,7 +981,7 @@
   body.taskview .scroll{overflow:hidden}
   body.taskview #askwrap{display:none !important}
   .view-task{display:flex;height:calc(100vh - 56px);width:100%}
-  .view-task .cols{flex:1;display:flex;min-height:0;width:100%;position:relative}
+  .view-task .cols{flex:1;display:flex;min-height:0;width:100%}
 
   .view-task .mono{font-family:var(--mono);letter-spacing:-.02em}
   .view-task .app{display:flex;flex-direction:column;height:100%;width:100%;overflow:hidden}
@@ -1006,7 +1006,7 @@
   .view-task .iconbtn:hover{background:var(--canvas)}
   .view-task .iconbtn .badge{position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:var(--disagree);border:1.5px solid var(--panel)}
 
-  .view-task .cols{flex:1;display:flex;min-height:0;position:relative}
+  .view-task .cols{flex:1;display:flex;min-height:0}
   .taskwrap .rail-head{padding:12px 14px 8px}
   .taskwrap .task-search{display:flex;align-items:center;gap:8px;border:1px solid var(--border);
     border-radius:9px;padding:7px 10px;transition:.12s;background:var(--bg)}
@@ -1145,10 +1145,7 @@
   .view-task .task-askwrap .guide{bottom:58px}
   .view-task .task-askwrap .plusmenu{bottom:46px}
   .view-task #actionbar{display:none !important}
-  .view-task .ctx-scrim{display:none;position:absolute;inset:0;background:rgba(15,23,42,.38);z-index:16;border:none;padding:0;cursor:pointer}
-  .view-task .ctx{position:absolute;top:0;right:0;bottom:0;width:min(372px,92%);flex:none;background:var(--panel);
-    border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0;z-index:18;
-    box-shadow:-12px 0 32px rgba(15,23,42,.18)}
+  .view-task .ctx{width:372px;flex:none;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
   .view-task .ctx-head{flex:none;display:flex;align-items:stretch;border-bottom:1px solid var(--border);gap:0}
   .view-task .ctx-tabs{flex:1;min-width:0;display:flex;padding:0 2px 0 4px;flex-wrap:wrap;gap:0;border-bottom:none}
   .view-task .ctx-tab{font-size:11.5px;font-weight:600;color:var(--ink-3);padding:11px 8px;border-bottom:2px solid transparent;transition:.12s}
@@ -1158,16 +1155,112 @@
   .view-task .ctx-collapse:hover{color:var(--ink);background:var(--soft)}
   .view-task .ctx-collapse svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .view-task .ctx-body{flex:1;overflow-y:auto;padding:14px}
-  .view-task .ctx-rail{display:none;position:absolute;top:0;right:0;bottom:0;width:36px;flex-direction:column;align-items:center;
-    justify-content:flex-start;gap:10px;padding:12px 0;background:var(--panel);border-left:1px solid var(--border);color:var(--ink-2);
-    cursor:pointer;transition:.12s;z-index:12}
+  .view-task .ctx-rail{display:none;width:36px;flex:none;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;
+    padding:12px 0;background:var(--panel);border-left:1px solid var(--border);color:var(--ink-2);cursor:pointer;transition:.12s}
   .view-task .ctx-rail:hover{background:var(--soft);color:var(--accent-ink)}
   .view-task .ctx-rail-ico{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .view-task .ctx-rail-lab{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11.5px;font-weight:600;letter-spacing:.06em;line-height:1}
-  .view-task:not(.ctx-collapsed) .ctx-scrim{display:block}
   .view-task.ctx-collapsed .ctx{display:none}
   .view-task.ctx-collapsed .ctx-rail{display:flex}
-  .view-task.ctx-collapsed .ctx-scrim{display:none}
+
+  /* Embed in detail.html right pane: lock left app rail; show My Tasks + PCR Details tabs */
+  body.embed .app{grid-template-columns:1fr !important;grid-template-rows:0 1fr !important;height:100vh}
+  body.embed .app > .rail{display:none !important;width:0 !important;min-width:0 !important;pointer-events:none !important;visibility:hidden !important}
+  body.embed .app > .topbar{display:none !important;height:0 !important;overflow:hidden !important}
+  body.embed .main{min-height:0;height:100vh}
+  body.embed .main > .scroll{height:100%;overflow:hidden}
+  body.embed #view-home,
+  body.embed #askwrap{display:none !important}
+  body.embed #view-task{display:flex !important;height:100% !important;min-height:100%;position:relative}
+  body.embed .view-task .cols{height:100%;position:relative;overflow:hidden;width:100%}
+  body.embed .view-task .center{flex:1;min-width:0;width:100%;height:100%;position:relative;z-index:1}
+  body.embed .view-task .center-body{padding:12px 14px 16px}
+  /* 右侧 PCR Details：贴右边的抽屉，向左展开，不挤占中间宽度 */
+  body.embed .view-task .ctx{
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    z-index:30;
+    display:flex !important;
+    flex-direction:column;
+    width:min(360px, 90%);
+    min-width:320px;
+    max-width:380px;
+    flex:none;
+    pointer-events:auto;
+    background:var(--panel);
+    border-left:1px solid var(--border);
+    box-shadow:-10px 0 28px rgba(15,23,42,.14);
+    transform:translateX(0);
+    transition:transform .22s ease, visibility .22s ease;
+    visibility:visible;
+  }
+  body.embed .view-task .ctx-collapse{
+    display:grid !important;
+    place-items:center;
+    width:28px;
+    flex:none;
+  }
+  body.embed .view-task .ctx-head{padding-right:0}
+  body.embed .view-task .ctx-rail{
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    z-index:31;
+    display:none;
+    width:40px;
+    background:#F8FAFC;
+    color:var(--accent-ink);
+    border-left:1px solid var(--border);
+    box-shadow:-4px 0 12px rgba(15,23,42,.06);
+  }
+  body.embed .view-task .ctx-rail-lab{
+    color:var(--accent-ink);
+    font-weight:650;
+  }
+  body.embed .view-task .ctx-rail-ico{
+    color:var(--accent-ink);
+  }
+  body.embed .view-task.ctx-collapsed .ctx{
+    display:flex !important;
+    transform:translateX(100%);
+    pointer-events:none;
+    visibility:hidden;
+    box-shadow:none;
+  }
+  body.embed .view-task.ctx-collapsed .ctx-rail{display:flex !important}
+  body.embed .view-task .ctx-tabs{
+    flex:1;
+    min-width:0;
+    flex-wrap:nowrap !important;
+    overflow:hidden;
+    white-space:nowrap;
+    gap:0 !important;
+    padding:0 0 0 2px !important;
+  }
+  body.embed .view-task .ctx-tab{
+    flex:0 0 auto !important;
+    white-space:nowrap !important;
+    font-size:10px !important;
+    padding:10px 5px !important;
+    letter-spacing:-0.01em;
+  }
+  body.embed .view-task .task-askwrap{padding:10px 52px 12px 14px !important}
+  body.embed .view-task:not(.ctx-collapsed) .task-askwrap{
+    padding-right:calc(min(360px, 90%) + 16px) !important;
+  }
+  body.embed .view-task .task-askwrap .ask{max-width:100% !important;width:100% !important}
+  body.embed .view-task .task-askwrap .askbox{min-width:0 !important}
+  body.embed .view-task .task-askwrap .agent-wrap,
+  body.embed .view-task .task-askwrap .plusbtn,
+  body.embed .view-task .task-askwrap .plusmenu,
+  body.embed .view-task .task-askwrap .guide{display:none !important}
+  body.embed .view-task .task-thread .ai-lead.task-follow{max-width:calc(100% - 24px)}
+  body.embed .view-task .task-thread .bub.me{max-width:min(90%,480px)}
+  body.embed .tipdot{display:none !important}
+  body.embed .railtoggle{display:none !important}
 
   .view-task .sec{margin-bottom:18px}
   .view-task .sec-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:9px;cursor:pointer;user-select:none}
@@ -1773,6 +1866,26 @@
             </div>
             <div class="askbox" id="taskAskbox">
               <button class="plusbtn" id="taskPlusbtn" type="button" title="更多">+</button>
+              <div class="agent-wrap" id="taskAgentWrap">
+                <button type="button" class="agent-chip" id="taskAgentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'task')">
+                  <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                  <span class="agent-chip-lab" id="taskAgentChipLab">@Agent</span>
+                  <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
+                </button>
+                <div class="agent-menu" id="taskAgentMenu" hidden role="listbox" aria-label="选择 Agent">
+                  <div class="agent-menu-h">选择 Agent</div>
+                  <button type="button" class="agent-opt on" data-agent="pcr" role="option" aria-selected="true">
+                    <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                    <span class="agent-opt-t"><b>PCR Agent</b><small>当前使用</small></span>
+                    <svg class="agent-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                  </button>
+                  <button type="button" class="agent-opt browse" data-agent-browse role="option">
+                    <svg class="agent-grid" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                    <span class="agent-opt-t"><b>浏览其他 Agent</b></span>
+                    <svg class="agent-next" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6 4.5 9"/></svg>
+                  </button>
+                </div>
+              </div>
               <textarea class="askin" id="taskAskin" rows="1" placeholder="补充信息…"></textarea>
               <button class="send" id="taskSend" type="button"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
             </div>
@@ -1782,8 +1895,7 @@
       </div>
     </main>
 
-    <div class="ctx-scrim" id="ctxScrim" hidden></div>
-    <!-- RIGHT：叠在中间对话上，不挤开布局；收起后右侧窄条可再展开 -->
+    <!-- RIGHT：收起后显示窄条，点一下即可再展开 PCR Details -->
     <button type="button" class="ctx-rail" id="ctxRailBtn" title="显示 PCR Details" aria-label="显示 PCR Details" aria-expanded="true">
       <svg class="ctx-rail-ico" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="11" height="10" rx="1.5"/><path d="M10 3v10"/><path d="M6.8 6.2L4.8 8l2 1.8"/></svg>
       <span class="ctx-rail-lab">PCR Details</span>
@@ -1846,6 +1958,26 @@
           </div>
             <div class="askbox" id="askbox">
             <button class="plusbtn" id="plusbtn" title="创建与更多" onclick="togglePlus(event)">+</button>
+            <div class="agent-wrap" id="agentWrap">
+              <button type="button" class="agent-chip" id="agentChip" aria-haspopup="listbox" aria-expanded="false" title="选择 Agent" onclick="toggleAgentMenu(event,'home')">
+                <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                <span class="agent-chip-lab" id="agentChipLab">@Agent</span>
+                <svg class="agent-caret" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5L6 7.5 9 4.5"/></svg>
+              </button>
+              <div class="agent-menu" id="agentMenu" hidden role="listbox" aria-label="选择 Agent">
+                <div class="agent-menu-h">选择 Agent</div>
+                <button type="button" class="agent-opt on" data-agent="pcr" role="option" aria-selected="true">
+                  <svg class="agent-mark" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.6"/><circle cx="3.2" cy="8" r="1.6"/><circle cx="12.8" cy="8" r="1.6"/><circle cx="8" cy="12.8" r="1.6"/></svg>
+                  <span class="agent-opt-t"><b>PCR Agent</b><small>当前使用</small></span>
+                  <svg class="agent-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg>
+                </button>
+                <button type="button" class="agent-opt browse" data-agent-browse role="option">
+                  <svg class="agent-grid" viewBox="0 0 16 16" aria-hidden="true"><rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/></svg>
+                  <span class="agent-opt-t"><b>浏览其他 Agent</b></span>
+                  <svg class="agent-next" viewBox="0 0 12 12" aria-hidden="true"><path d="M4.5 3L7.5 6 4.5 9"/></svg>
+                </button>
+              </div>
+            </div>
             <textarea class="askin" id="askin" rows="1" placeholder="描述你的变更需求，或粘贴邮件、会议纪要…"></textarea>
             <button class="send" onclick="sendq()"><svg class="i" style="width:14px;height:14px"><path d="M3 8h9M8.5 4l3.5 4-3.5 4"/></svg></button>
           </div>
@@ -2561,6 +2693,7 @@ function saveNotes(){
   paintDots();
 }
 function toggleRail(){
+  if(document.body.classList.contains('embed')) return;
   document.body.classList.toggle('railoff');
   railManual=true;
   syncRailTip();
@@ -3869,10 +4002,7 @@ function bindTaskAskOnce(){
       document.getElementById('taskFlowMenu')?.classList.remove('show');
   });
   document.addEventListener('keydown',e=>{
-    if(e.key!=='Escape') return;
-    const menu=document.getElementById('taskFlowMenu');
-    if(menu?.classList.contains('show')){menu.classList.remove('show');return;}
-    if(ctxOpen) setCtxOpen(false);
+    if(e.key==='Escape') document.getElementById('taskFlowMenu')?.classList.remove('show');
   });
 }
 
@@ -3888,13 +4018,15 @@ function setCtxOpen(open){
   if(view) view.classList.toggle('ctx-collapsed',!ctxOpen);
   const rail=document.getElementById('ctxRailBtn');
   const hide=document.getElementById('ctxCollapseBtn');
-  const scrim=document.getElementById('ctxScrim');
   if(rail){
+    rail.style.display='';
     rail.setAttribute('aria-expanded',ctxOpen?'true':'false');
     rail.title=ctxOpen?'PCR Details 已展开':'显示 PCR Details';
   }
-  if(hide) hide.setAttribute('aria-expanded',ctxOpen?'true':'false');
-  if(scrim) scrim.hidden=!ctxOpen;
+  if(hide){
+    hide.style.display='';
+    hide.setAttribute('aria-expanded',ctxOpen?'true':'false');
+  }
 }
 const PCR_STAGES=['Create','Review','Screen','Assessment','Implementation','Benefit Tracking','Close'];
 function pcrStageInfo(t){
@@ -3999,7 +4131,6 @@ document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
 });
 document.getElementById('ctxCollapseBtn')?.addEventListener('click',()=>setCtxOpen(false));
 document.getElementById('ctxRailBtn')?.addEventListener('click',()=>setCtxOpen(true));
-document.getElementById('ctxScrim')?.addEventListener('click',()=>setCtxOpen(false));
 setCtxOpen(true);
 
 /* ---------- modals ---------- */
@@ -7342,6 +7473,120 @@ window.Overview = {
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else setTimeout(init, 0);
+})();
+
+/* ══════════ Embed bootstrap (detail.html 右半屏 → My Tasks VOTE/OTM) ══════════ */
+(function embedBootstrap(){
+  function readEmbedParams(){
+    const fromSearch=new URLSearchParams(location.search);
+    if(fromSearch.get('embed')==='1' || fromSearch.get('type')) return fromSearch;
+    const hash=location.hash.replace(/^#/,'');
+    if(hash){
+      const fromHash=new URLSearchParams(hash);
+      if(fromHash.get('embed')==='1' || fromHash.get('type')) return fromHash;
+    }
+    return fromSearch;
+  }
+
+  const qs=readEmbedParams();
+  if(qs.get('embed')!=='1') return;
+
+  // 尽早打标，避免闪一下 Overview / 左栏
+  document.documentElement.classList.add('embed');
+  document.body.classList.add('embed','taskview','railoff');
+
+  function applyEmbed(){
+    document.body.classList.add('embed','taskview','railoff');
+    railManual=true;
+
+    // 卸掉左栏折叠按钮，杜绝再展开（仅锁定 app 左栏，不影响 PCR Details）
+    document.querySelectorAll('.railtoggle').forEach(btn=>{
+      btn.onclick=null;
+      btn.setAttribute('disabled','disabled');
+      btn.style.display='none';
+    });
+
+    const type=(qs.get('type')||'').toLowerCase()==='vote' || /vote/i.test(qs.get('task')||'')
+      ? 'vote' : 'otm';
+    // 使用独立嵌入任务 id，避免与列表/批量态互相污染，并保证 cards 按 type 分支
+    const taskId = type==='vote' ? 'embedVote' : 'embedOtm';
+    const baseId = type==='vote' ? 't1' : 't4';
+    const base = (typeof TASKS!=='undefined' && TASKS[baseId]) ? Object.assign({}, TASKS[baseId]) : null;
+    if(!base || typeof TASKS==='undefined'){
+      setTimeout(applyEmbed,50);
+      return;
+    }
+
+    const number=qs.get('number')||'';
+    const subject=qs.get('subject')||'';
+    const product=qs.get('product')||'';
+    const taskTitle=qs.get('task')||'';
+    const status=qs.get('status')||'';
+
+    base.type=type;
+    base.tt=type==='vote' ? 'VOTE' : 'OTM';
+    if(number) base.pcr=number;
+    if(product) base.product=product;
+    if(status) base.status=status;
+    if(subject){
+      base.name=subject;
+      base.ttl=taskTitle ? (taskTitle+' · '+subject) : ((type==='vote'?'Vote':'OTM')+' · '+subject);
+    }else if(taskTitle){
+      base.ttl=taskTitle;
+      base.name=taskTitle;
+    }
+
+    // OTM：挂上 Approval History 示例数据（写死），按当前 PCR Number 索引
+    if(type==='otm' && typeof buildDemoApprovalChain==='function' && typeof APPROVAL_HISTORY!=='undefined'){
+      const pcrKey=base.pcr || number || 'PCR-2026-08871';
+      base.pcr=pcrKey;
+      base.youStep='otm_assess';
+      const chain=buildDemoApprovalChain();
+      chain.pcr=pcrKey;
+      APPROVAL_HISTORY[pcrKey]=chain;
+      if(typeof ensureApprovalScreenTask==='function') ensureApprovalScreenTask();
+    }
+
+    TASKS[taskId]=base;
+    if(typeof state!=='undefined' && !state[taskId]){
+      state[taskId]={vote:null,path:null,done:false,chat:[],comment:null};
+    }
+    if(typeof ORDER!=='undefined' && !ORDER.includes(taskId)) ORDER.unshift(taskId);
+
+    // 强制进入 My Tasks 视图并渲染对应卡片（VOTE 含投票区 / OTM 含评估决策）
+    if(typeof VIEW!=='undefined') VIEW='home'; // 让 switchView 不 early-return
+    if(typeof switchView==='function') switchView('task');
+    const home=document.getElementById('view-home');
+    const taskEl=document.getElementById('view-task');
+    if(home) home.style.display='none';
+    if(taskEl) taskEl.style.display='flex';
+
+    cur=taskId;
+    if(window.MyTasks && typeof MyTasks.ensureInit==='function') MyTasks.ensureInit();
+    if(window.MyTasks && typeof MyTasks.selectTask==='function') MyTasks.selectTask(taskId);
+    else if(typeof renderTaskAll==='function') renderTaskAll();
+    else if(typeof renderCenter==='function') renderCenter();
+
+    if(typeof setCtxOpen==='function') setCtxOpen(true);
+    if(typeof renderCtx==='function') renderCtx();
+  }
+
+  function boot(){
+    // 等 TASKS / MyTasks 就绪
+    if(typeof TASKS==='undefined' || !window.MyTasks){
+      setTimeout(boot,30);
+      return;
+    }
+    applyEmbed();
+    // 再补一次，防止后续 batch 初始化覆盖
+    setTimeout(applyEmbed,120);
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,0));
+  }else{
+    setTimeout(boot,0);
+  }
 })();
 </script>
 </body>

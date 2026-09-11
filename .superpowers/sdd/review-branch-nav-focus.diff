@@ -1,0 +1,15 @@
+﻿# Review package (nav feature implementation): 8058f5ae60a3d22ef0f3bd465015f9403a72affd..HEAD
+# Excludes full HTML file bodies; lists them in stat only.
+
+## Commits
+
+
+## Files changed
+
+
+## Diff (sources only; HTML copies omitted)
+
+
+## HTML artifacts
+
+Both PCR proto and public/workbench copy should contain logo-home (verified in Task 4).

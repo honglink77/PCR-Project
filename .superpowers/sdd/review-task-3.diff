@@ -1,0 +1,197 @@
+# Review package: 4cd98133563cdeafd0c345b15fefb45095e0f3af..HEAD
+
+## Commits
+12805f4 feat: PCR 顶栏 iProduct 回退到门户首页
+
+## Files changed
+PCRworkbench_Project/pcr-workbench-proto.html              | 12 +++++++-----
+ PCRworkbench_Project/src/shell/shell-before.html           |  8 ++++----
+ PCRworkbench_Project/src/shell/shell.css                   |  4 +++-
+ iProduct_Project/public/workbench/pcr-workbench-proto.html | 12 +++++++-----
+ 4 files changed, 21 insertions(+), 15 deletions(-)
+
+## Diff
+diff --git a/PCRworkbench_Project/pcr-workbench-proto.html b/PCRworkbench_Project/pcr-workbench-proto.html
+index 7c6a7db..266444e 100644
+--- a/PCRworkbench_Project/pcr-workbench-proto.html
++++ b/PCRworkbench_Project/pcr-workbench-proto.html
+@@ -73,23 +73,25 @@
+   .navitem.on .cnt{background:#BFE3DF;color:var(--accent-ink)}
+   .navitem .cnt.hot{background:var(--red-bg);color:var(--red)}
+ 
+   .rail-foot{border-top:1px solid var(--border);padding:8px}
+ 
+   /* ══ MAIN ══ */
+   .main{min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+   .topbar{grid-column:1/-1;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;
+     background:var(--bg);border-bottom:1px solid var(--border);z-index:40}
+   .logo{display:flex;align-items:center;gap:8px;min-width:0}
++  .logo-home{display:flex;align-items:center;gap:8px;min-width:0;text-decoration:none;color:inherit;border-radius:8px}
++  .logo-home:hover .brand-name{color:var(--accent-ink)}
++  .logo-home:hover .brand-mark{filter:brightness(1.06)}
+   .logo .brand-mark{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;
+     display:grid;place-items:center;font-size:13px;font-weight:700;flex:none;letter-spacing:-.02em}
+-  .logo .brand-text{display:flex;align-items:baseline;gap:6px;min-width:0;line-height:1.2}
+   .logo .brand-name{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
+   .logo .brand-sub{font-size:12px;font-weight:400;color:var(--ink-3);white-space:nowrap}
+   .logo small{color:var(--ink-3);font-weight:400;font-size:12px;padding-left:8px;border-left:1px solid var(--border);line-height:1.2;white-space:nowrap}
+   .sesswrap{position:relative;display:flex;align-items:center;gap:6px;min-width:0;max-width:min(320px,34vw);margin-right:4px;flex:none}
+   .sesschip{display:flex;align-items:center;gap:7px;min-width:0;max-width:100%;
+     padding:5px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);
+     font-size:12.5px;color:var(--ink-2);transition:.12s;text-align:left}
+   .sesschip:hover{border-color:var(--border-2);color:var(--ink)}
+   .sesschip.empty{color:var(--ink-3)}
+   .sesschip.empty .sess-title{color:var(--ink-3);font-weight:400}
+@@ -1342,25 +1344,25 @@
+ </style>
+ </head>
+ <body>
+ 
+ 
+ <div class="app">
+ 
+   <!-- TOPBAR -->
+   <div class="topbar">
+       <div class="logo">
+-        <span class="brand-mark" aria-hidden="true">iP</span>
+-        <span class="brand-text">
++        <a class="logo-home" href="/" title="返回 iProduct">
++          <span class="brand-mark" aria-hidden="true">iP</span>
+           <span class="brand-name">iProduct</span>
+-          <span class="brand-sub">Ops Workbench</span>
+-        </span>
++        </a>
++        <span class="brand-sub">Ops Workbench</span>
+         <small id="crumb">Overview</small>
+       </div>
+       <div class="sp"></div>
+       <div class="sesswrap" id="sesswrap">
+         <button type="button" class="sesschip empty" id="sesschip" title="新会话">
+           <svg class="i sess-ico" viewBox="0 0 16 16"><path d="M3 4.5h10a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 13 12.5H7l-3 2v-2H3A1.5 1.5 0 0 1 1.5 11V6A1.5 1.5 0 0 1 3 4.5z"/></svg>
+           <span class="sess-title" id="sessTitle">新会话</span>
+           <span class="sess-status" id="sessStatus" hidden></span>
+           <span class="sess-caret" id="sessCaret" hidden>▾</span>
+         </button>
+diff --git a/PCRworkbench_Project/src/shell/shell-before.html b/PCRworkbench_Project/src/shell/shell-before.html
+index ba39429..ed290ab 100644
+--- a/PCRworkbench_Project/src/shell/shell-before.html
++++ b/PCRworkbench_Project/src/shell/shell-before.html
+@@ -1,22 +1,22 @@
+ 
+ 
+ <div class="app">
+ 
+   <!-- TOPBAR -->
+   <div class="topbar">
+       <div class="logo">
+-        <span class="brand-mark" aria-hidden="true">iP</span>
+-        <span class="brand-text">
++        <a class="logo-home" href="/" title="返回 iProduct">
++          <span class="brand-mark" aria-hidden="true">iP</span>
+           <span class="brand-name">iProduct</span>
+-          <span class="brand-sub">Ops Workbench</span>
+-        </span>
++        </a>
++        <span class="brand-sub">Ops Workbench</span>
+         <small id="crumb">Overview</small>
+       </div>
+       <div class="sp"></div>
+       <div class="sesswrap" id="sesswrap">
+         <button type="button" class="sesschip empty" id="sesschip" title="新会话">
+           <svg class="i sess-ico" viewBox="0 0 16 16"><path d="M3 4.5h10a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 13 12.5H7l-3 2v-2H3A1.5 1.5 0 0 1 1.5 11V6A1.5 1.5 0 0 1 3 4.5z"/></svg>
+           <span class="sess-title" id="sessTitle">新会话</span>
+           <span class="sess-status" id="sessStatus" hidden></span>
+           <span class="sess-caret" id="sessCaret" hidden>▾</span>
+         </button>
+diff --git a/PCRworkbench_Project/src/shell/shell.css b/PCRworkbench_Project/src/shell/shell.css
+index f8bcf1d..53bdb42 100644
+--- a/PCRworkbench_Project/src/shell/shell.css
++++ b/PCRworkbench_Project/src/shell/shell.css
+@@ -41,23 +41,25 @@
+   .navitem.on .cnt{background:#BFE3DF;color:var(--accent-ink)}
+   .navitem .cnt.hot{background:var(--red-bg);color:var(--red)}
+ 
+   .rail-foot{border-top:1px solid var(--border);padding:8px}
+ 
+   /* ══ MAIN ══ */
+   .main{min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+   .topbar{grid-column:1/-1;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;
+     background:var(--bg);border-bottom:1px solid var(--border);z-index:40}
+   .logo{display:flex;align-items:center;gap:8px;min-width:0}
++  .logo-home{display:flex;align-items:center;gap:8px;min-width:0;text-decoration:none;color:inherit;border-radius:8px}
++  .logo-home:hover .brand-name{color:var(--accent-ink)}
++  .logo-home:hover .brand-mark{filter:brightness(1.06)}
+   .logo .brand-mark{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;
+     display:grid;place-items:center;font-size:13px;font-weight:700;flex:none;letter-spacing:-.02em}
+-  .logo .brand-text{display:flex;align-items:baseline;gap:6px;min-width:0;line-height:1.2}
+   .logo .brand-name{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
+   .logo .brand-sub{font-size:12px;font-weight:400;color:var(--ink-3);white-space:nowrap}
+   .logo small{color:var(--ink-3);font-weight:400;font-size:12px;padding-left:8px;border-left:1px solid var(--border);line-height:1.2;white-space:nowrap}
+   .sesswrap{position:relative;display:flex;align-items:center;gap:6px;min-width:0;max-width:min(320px,34vw);margin-right:4px;flex:none}
+   .sesschip{display:flex;align-items:center;gap:7px;min-width:0;max-width:100%;
+     padding:5px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);
+     font-size:12.5px;color:var(--ink-2);transition:.12s;text-align:left}
+   .sesschip:hover{border-color:var(--border-2);color:var(--ink)}
+   .sesschip.empty{color:var(--ink-3)}
+   .sesschip.empty .sess-title{color:var(--ink-3);font-weight:400}
+diff --git a/iProduct_Project/public/workbench/pcr-workbench-proto.html b/iProduct_Project/public/workbench/pcr-workbench-proto.html
+index 7c6a7db..266444e 100644
+--- a/iProduct_Project/public/workbench/pcr-workbench-proto.html
++++ b/iProduct_Project/public/workbench/pcr-workbench-proto.html
+@@ -73,23 +73,25 @@
+   .navitem.on .cnt{background:#BFE3DF;color:var(--accent-ink)}
+   .navitem .cnt.hot{background:var(--red-bg);color:var(--red)}
+ 
+   .rail-foot{border-top:1px solid var(--border);padding:8px}
+ 
+   /* ══ MAIN ══ */
+   .main{min-width:0;min-height:0;display:flex;flex-direction:column;position:relative;overflow:hidden}
+   .topbar{grid-column:1/-1;height:56px;display:flex;align-items:center;gap:12px;padding:0 16px;
+     background:var(--bg);border-bottom:1px solid var(--border);z-index:40}
+   .logo{display:flex;align-items:center;gap:8px;min-width:0}
++  .logo-home{display:flex;align-items:center;gap:8px;min-width:0;text-decoration:none;color:inherit;border-radius:8px}
++  .logo-home:hover .brand-name{color:var(--accent-ink)}
++  .logo-home:hover .brand-mark{filter:brightness(1.06)}
+   .logo .brand-mark{width:32px;height:32px;border-radius:8px;background:var(--accent);color:#fff;
+     display:grid;place-items:center;font-size:13px;font-weight:700;flex:none;letter-spacing:-.02em}
+-  .logo .brand-text{display:flex;align-items:baseline;gap:6px;min-width:0;line-height:1.2}
+   .logo .brand-name{font-size:14px;font-weight:600;color:var(--ink);white-space:nowrap}
+   .logo .brand-sub{font-size:12px;font-weight:400;color:var(--ink-3);white-space:nowrap}
+   .logo small{color:var(--ink-3);font-weight:400;font-size:12px;padding-left:8px;border-left:1px solid var(--border);line-height:1.2;white-space:nowrap}
+   .sesswrap{position:relative;display:flex;align-items:center;gap:6px;min-width:0;max-width:min(320px,34vw);margin-right:4px;flex:none}
+   .sesschip{display:flex;align-items:center;gap:7px;min-width:0;max-width:100%;
+     padding:5px 11px;border:1px solid var(--border);border-radius:8px;background:var(--bg);
+     font-size:12.5px;color:var(--ink-2);transition:.12s;text-align:left}
+   .sesschip:hover{border-color:var(--border-2);color:var(--ink)}
+   .sesschip.empty{color:var(--ink-3)}
+   .sesschip.empty .sess-title{color:var(--ink-3);font-weight:400}
+@@ -1342,25 +1344,25 @@
+ </style>
+ </head>
+ <body>
+ 
+ 
+ <div class="app">
+ 
+   <!-- TOPBAR -->
+   <div class="topbar">
+       <div class="logo">
+-        <span class="brand-mark" aria-hidden="true">iP</span>
+-        <span class="brand-text">
++        <a class="logo-home" href="/" title="返回 iProduct">
++          <span class="brand-mark" aria-hidden="true">iP</span>
+           <span class="brand-name">iProduct</span>
+-          <span class="brand-sub">Ops Workbench</span>
+-        </span>
++        </a>
++        <span class="brand-sub">Ops Workbench</span>
+         <small id="crumb">Overview</small>
+       </div>
+       <div class="sp"></div>
+       <div class="sesswrap" id="sesswrap">
+         <button type="button" class="sesschip empty" id="sesschip" title="新会话">
+           <svg class="i sess-ico" viewBox="0 0 16 16"><path d="M3 4.5h10a1.5 1.5 0 0 1 1.5 1.5v5A1.5 1.5 0 0 1 13 12.5H7l-3 2v-2H3A1.5 1.5 0 0 1 1.5 11V6A1.5 1.5 0 0 1 3 4.5z"/></svg>
+           <span class="sess-title" id="sessTitle">新会话</span>
+           <span class="sess-status" id="sessStatus" hidden></span>
+           <span class="sess-caret" id="sessCaret" hidden>▾</span>
+         </button>
