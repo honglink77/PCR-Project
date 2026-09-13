@@ -1050,7 +1050,6 @@
   .view-task .center{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--soft);position:relative}
   .view-task .task-bar{flex:none;display:flex;align-items:center;gap:10px;padding:10px 14px;border:none;
     border-bottom:1px solid var(--border);background:var(--panel);position:relative;z-index:17}
-  .view-task:not(.ctx-collapsed) .task-bar{padding-right:calc(min(372px,92%) + 12px)}
   .view-task .task-bar .tb-t{flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;color:var(--ink)}
   .view-task .task-bar .tb-pin{flex:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;
     letter-spacing:.02em;background:var(--accent);color:#fff;white-space:nowrap}
@@ -1150,9 +1149,7 @@
   .view-task .task-askwrap .plusmenu{bottom:46px}
   .view-task #actionbar{display:none !important}
   .view-task .ctx-scrim{display:none;position:absolute;inset:0;background:rgba(15,23,42,.38);z-index:16;border:none;padding:0;cursor:pointer}
-  .view-task .ctx{position:absolute;top:0;right:0;bottom:0;width:min(372px,92%);flex:none;background:var(--panel);
-    border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0;z-index:18;
-    box-shadow:-12px 0 32px rgba(15,23,42,.18)}
+  .view-task .ctx{width:372px;flex:none;background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
   .view-task .ctx-head{flex:none;display:flex;align-items:stretch;border-bottom:1px solid var(--border);gap:0}
   .view-task .ctx-tabs{flex:1;min-width:0;display:flex;padding:0 2px 0 4px;flex-wrap:wrap;gap:0;border-bottom:none}
   .view-task .ctx-tab{font-size:11.5px;font-weight:600;color:var(--ink-3);padding:11px 8px;border-bottom:2px solid transparent;transition:.12s}
@@ -1162,16 +1159,29 @@
   .view-task .ctx-collapse:hover{color:var(--ink);background:var(--soft)}
   .view-task .ctx-collapse svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .view-task .ctx-body{flex:1;overflow-y:auto;padding:14px}
-  .view-task .ctx-rail{display:none;position:absolute;top:0;right:0;bottom:0;width:36px;flex-direction:column;align-items:center;
+  .view-task .ctx-rail{display:none;width:36px;flex:none;flex-direction:column;align-items:center;
     justify-content:flex-start;gap:10px;padding:12px 0;background:var(--panel);border-left:1px solid var(--border);color:var(--ink-2);
-    cursor:pointer;transition:.12s;z-index:12}
+    cursor:pointer;transition:.12s}
   .view-task .ctx-rail:hover{background:var(--soft);color:var(--accent-ink)}
   .view-task .ctx-rail-ico{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
   .view-task .ctx-rail-lab{writing-mode:vertical-rl;transform:rotate(180deg);font-size:11.5px;font-weight:600;letter-spacing:.06em;line-height:1}
-  .view-task:not(.ctx-collapsed) .ctx-scrim{display:block}
   .view-task.ctx-collapsed .ctx{display:none}
   .view-task.ctx-collapsed .ctx-rail{display:flex}
   .view-task.ctx-collapsed .ctx-scrim{display:none}
+
+  /* 窄窗：抽屉叠层 + 中间置灰；宽屏/最大化：与左侧一致的分栏，不置灰 */
+  @media (max-width:1279px){
+    .view-task:not(.ctx-collapsed) .task-bar{padding-right:calc(min(372px,92%) + 12px)}
+    .view-task .ctx{position:absolute;top:0;right:0;bottom:0;width:min(372px,92%);z-index:18;
+      box-shadow:-12px 0 32px rgba(15,23,42,.18)}
+    .view-task .ctx-rail{position:absolute;top:0;right:0;bottom:0;z-index:12}
+    .view-task:not(.ctx-collapsed) .ctx-scrim{display:block}
+  }
+  @media (min-width:1280px){
+    .view-task .ctx-scrim{display:none !important}
+    .view-task .ctx{position:relative;z-index:1;box-shadow:none;width:372px}
+    .view-task .ctx-rail{position:relative;z-index:1}
+  }
 
   .view-task .sec{margin-bottom:18px}
   .view-task .sec-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:9px;cursor:pointer;user-select:none}
@@ -1442,7 +1452,6 @@
     <nav class="nav">
       <button class="navitem on" data-view="home" onclick="switchView('home')"><svg class="i"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="8.5" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="2" y="8.5" width="5.5" height="5.5" rx="1.5"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.5"/></svg>Overview</button>
       <button class="navitem" data-view="task" onclick="switchView('task')"><svg class="i"><path d="M5.5 2h5a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 10.5 14h-5A1.5 1.5 0 0 1 4 12.5v-9A1.5 1.5 0 0 1 5.5 2z"/><path d="M6.5 6h3M6.5 9h3"/></svg>My Tasks<span class="cnt hot">3</span></button>
-      <button type="button" class="navitem"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.5"/><circle cx="3.2" cy="12.2" r="1.5"/><circle cx="12.8" cy="12.2" r="1.5"/><path d="M7.2 4.6L4.2 10.8M8.8 4.6l3 6.2M4.8 12.2h6.4"/></svg>Agent · Skill · MCP</button>
     </nav>
 
         <div class="taskwrap" id="mytasks-rail">
