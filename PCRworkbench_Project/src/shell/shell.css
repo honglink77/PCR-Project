@@ -375,6 +375,13 @@
   .tipcard .tt{font-size:13px;font-weight:650;line-height:1.35}
   .tipcard .tx{margin-left:auto;color:var(--ink-3);font-size:15px;line-height:1;padding:2px 4px;border-radius:5px}
   .tipcard .tx:hover{background:var(--soft);color:var(--ink)}
+  .iinfo{cursor:help}
+  .iinfo-tip{position:fixed;z-index:180;max-width:min(320px,calc(100vw - 24px));background:var(--bg);
+    border:1px solid var(--border-2);border-radius:10px;box-shadow:0 10px 28px rgba(26,26,24,.14);
+    padding:10px 12px;display:none;pointer-events:auto}
+  .iinfo-tip.show{display:block}
+  .iinfo-tip .it-t{font-size:13px;font-weight:650;color:var(--ink);margin-bottom:6px;line-height:1.35}
+  .iinfo-tip .it-b{font-size:12.5px;color:var(--ink-2);line-height:1.65}
   .tipsec{margin-bottom:9px}
   .tipsec:last-child{margin-bottom:0}
   .tipsec .sl{font-size:10px;font-weight:700;letter-spacing:.05em;margin-bottom:4px;display:flex;align-items:center;gap:5px}

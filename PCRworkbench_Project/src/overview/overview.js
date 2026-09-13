@@ -895,7 +895,7 @@ function renderPlist(){
       <span class="iinfo" data-info="${s.info}">ⓘ</span>
     </button><div class="pstep-b">${s.body||''}</div>`;
     row.querySelector('.pstep-h').onclick=()=>clickStep(s.id);
-    row.querySelector('.iinfo').onclick=ev=>{ev.stopPropagation();openStepInfo(s.info);};
+    row.querySelector('.iinfo').onclick=ev=>ev.stopPropagation();
     host.appendChild(row);
   });
   if(!PARSE.animating) host.querySelectorAll('.pcheck').forEach(el=>el.classList.add('in'));
@@ -926,16 +926,16 @@ function clickStep(id){
   renderPlist();
 }
 
+const PCR_IINFO={
+  s1:{t:'步骤 1 · 理解变更内容',b:'AI 推荐 PCR Type（至少两个候选，各带依据与置信度），须用户确认后才生效；同时识别变更对象、变更动作与 CP/SP。'},
+  s2:{t:'步骤 2 · 识别影响产品',b:'识别产品线/机型、MTM、Geo、CP Team。产品名须匹配主数据；原文未提区域不默认 WW；跨产品线时提示拆分。'},
+  s3:{t:'步骤 3 · 补全必填信息',b:'必须项：Impacted Products、Business Case Reason、Target Implementation Date、Geo Impact、Change Request 完整性。建议项不阻断提交。'},
+  ssim:{t:'步骤 4 · 相似 PCR 检查',b:'上半：重复性检查（硬阻断）；下半：相似案例参考（Comment/Cost/Assessment 与 Return 教训）。须用户确认已参考。'},
+  s4:{t:'步骤 5 · 可行性与价值评估',b:'技术/时间/价值三维度。引用相似 PCR 检查结论。AI 给建议，人做决定。'},
+  s5:{t:'步骤 6 · 提交验证',b:'核对 Type、必填、逻辑一致性与拆分建议。重复检索已并入相似 PCR 步骤。提交后在 PACE 创建记录并进入 Review。'}
+};
 function openStepInfo(key){
-  const map={
-    s1:{t:'步骤 1 · 理解变更内容',b:'AI 推荐 PCR Type（至少两个候选，各带依据与置信度），须用户确认后才生效；同时识别变更对象、变更动作与 CP/SP。'},
-    s2:{t:'步骤 2 · 识别影响产品',b:'识别产品线/机型、MTM、Geo、CP Team。产品名须匹配主数据；原文未提区域不默认 WW；跨产品线时提示拆分。'},
-    s3:{t:'步骤 3 · 补全必填信息',b:'必须项：Impacted Products、Business Case Reason、Target Implementation Date、Geo Impact、Change Request 完整性。建议项不阻断提交。'},
-    ssim:{t:'步骤 4 · 相似 PCR 检查',b:'上半：重复性检查（硬阻断）；下半：相似案例参考（Comment/Cost/Assessment 与 Return 教训）。须用户确认已参考。'},
-    s4:{t:'步骤 5 · 可行性与价值评估',b:'技术/时间/价值三维度。引用相似 PCR 检查结论。AI 给建议，人做决定。'},
-    s5:{t:'步骤 6 · 提交验证',b:'核对 Type、必填、逻辑一致性与拆分建议。重复检索已并入相似 PCR 步骤。提交后在 PACE 创建记录并进入 Review。'}
-  };
-  const d=map[key]||map.s1;
+  const d=PCR_IINFO[key]||PCR_IINFO.s1;
   modalHost.innerHTML=`<div class="modal"><div class="modal-h"><h3>${d.t}</h3></div><div class="modal-b"><p style="font-size:13px;line-height:1.65;color:var(--ink-2)">${d.b}</p><div class="rule-note">${RULE_FOOT}</div></div><div class="modal-f"><button class="btn btn-primary" data-x>知道了</button></div></div>`;
   scrim.classList.add('show');modalHost.querySelector('[data-x]').onclick=closeModal;
 }

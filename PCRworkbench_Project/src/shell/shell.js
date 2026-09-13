@@ -136,6 +136,34 @@ const TIPS_TASK={
    ix:'点击对话区任意位置立即显示完整结果；动画只影响呈现，不影响功能。',
    fn:'动画会累积拖慢演示节奏，需要能随时跳过。',
    ref:['对话动画规范']},
+ vt2VoteFirst:{t:'先选投票结果再填 Comment',
+   ix:'投票结果是第一步，决定后续走六步 Agree 还是三步 Disagree / No Impact。进入任务时不自动生成 Comment。',
+   fn:'维度化 Comment、Control Run 校验、Work Item 生成仅适用于 Agree。选 Disagree 却要求走完整流程，是对用户时间的浪费。',
+   ref:['Vote Task 流程']},
+ vt2Dim:{t:'维度是内容要求，不是界面结构',
+   ix:'Comment 为富文本，维度体现为段落标题与完整度检查项，而不是分维度的多个输入框。',
+   fn:'维度模板由 Product Category × PCR Type × Function Team 决定，由业务维护。模板更新只影响新建 PCR，不影响存量。',
+   ref:['Vote 维度模板']},
+ vt2Valid:{t:'三类校验后果不同',
+   ix:'必填维度仅 Agree 提交时硬阻断；Missing Points 可 Ignore 后继续；Control Run Validation 列出不匹配项，不自动阻断。',
+   fn:'三者严格程度不同。混为一谈会导致要么过度阻断、要么形同虚设。',
+   ref:['FR-07']},
+ vt2WiName:{t:'Work Item 名称取上级 Dimension',
+   ix:'Work Item 名称对应产生 Required Action 的那个 Dimension；同一 Dimension 下多条 Required Action 生成多条。',
+   fn:'OTM 汇总时能一眼看出该待办来自哪个评估维度，而不是一堆无归属的任务名。',
+   ref:['FR-12']},
+ vt2WiAfter:{t:'Work Item 在 Comment 确认后才生成',
+   ix:'校验通过、用户确认 Comment 之后，才一次生成多条草稿。Comment 变更后提示是否重新生成。',
+   fn:'Comment 未定稿就生成，改一次 Comment 就要重生成一次，白做。',
+   ref:['FR-12']},
+ vt2Rules:{t:'规则必须在使用时可见',
+   ix:'生成 Comment、检索相似 PCR、执行校验、生成 Work Item 四处都有规则说明框，并标注原型规则待业务确认。',
+   fn:'用户需要知道 AI 依据什么在做事，否则无法判断结果是否合理，也无法给出有效反馈。',
+   ref:['可解释可追溯']},
+ vt2Force:{t:'强制提交必须让人预知后果',
+   ix:'弹窗明示「该记录将在 OTM 汇总的异常区中显示」，并列出未通过项与完整度，理由必填。',
+   fn:'事先告知后果本身就是一道软性门禁，比单纯要求填理由更有约束力。',
+   ref:['7.5 Force Submit']},
 };
 
 
@@ -533,7 +561,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73,ganttInsight:74,ganttColor:75,ganttEntry:76};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73,ganttInsight:74,ganttColor:75,ganttEntry:76,vt2VoteFirst:77,vt2Dim:78,vt2Valid:79,vt2WiName:80,vt2WiAfter:81,vt2Rules:82,vt2Force:83};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -640,9 +668,66 @@ document.addEventListener('click',ev=>{
   if(tipEl&&!tipEl.contains(ev.target)&&!ev.target.closest('.tipdot')
      &&!ev.target.closest('.listp'))hideTip();
 });
-addEventListener('scroll',()=>{if(!lockScroll)hideTip();},true);
-addEventListener('resize',hideTip);
-addEventListener('keydown',e=>{if(e.key==='Escape'){hideTip();closeList();closeMenu();if(typeof closePlus==='function')closePlus();if(typeof hideGuide==='function')hideGuide();}});
+addEventListener('scroll',()=>{if(!lockScroll)hideTip();hideIinfoTip(true);},true);
+addEventListener('resize',()=>{hideTip();hideIinfoTip(true);});
+addEventListener('keydown',e=>{if(e.key==='Escape'){hideTip();hideIinfoTip(true);closeList();closeMenu();if(typeof closePlus==='function')closePlus();if(typeof hideGuide==='function')hideGuide();}});
+
+let iinfoTipEl=null,iinfoHideT=0,iinfoShowT=0;
+function ensureIinfoTip(){
+  if(iinfoTipEl) return iinfoTipEl;
+  iinfoTipEl=document.createElement('div');
+  iinfoTipEl.className='iinfo-tip';
+  iinfoTipEl.setAttribute('role','tooltip');
+  document.body.appendChild(iinfoTipEl);
+  iinfoTipEl.addEventListener('mouseenter',()=>clearTimeout(iinfoHideT));
+  iinfoTipEl.addEventListener('mouseleave',()=>hideIinfoTip());
+  return iinfoTipEl;
+}
+function resolveIinfo(el){
+  const key=el.getAttribute('data-info')||el.getAttribute('data-vt2-info');
+  if(!key) return null;
+  if(typeof PCR_IINFO!=='undefined' && PCR_IINFO[key]) return PCR_IINFO[key];
+  if(window.VoteV2 && typeof VoteV2.stepInfo==='function') return VoteV2.stepInfo(key);
+  return null;
+}
+function showIinfoTip(el){
+  const d=resolveIinfo(el); if(!d) return;
+  clearTimeout(iinfoHideT); clearTimeout(iinfoShowT);
+  const card=ensureIinfoTip();
+  card.innerHTML=`<div class="it-t">${d.t}</div><div class="it-b">${d.b}</div>`;
+  card.classList.add('show');
+  const r=el.getBoundingClientRect();
+  const w=Math.min(320, innerWidth-24), h=card.offsetHeight;
+  let left=r.right+8, top=r.top-4;
+  if(left+w>innerWidth-12) left=Math.max(12, r.left-w-8);
+  if(top+h>innerHeight-12) top=Math.max(12, innerHeight-h-12);
+  card.style.width=w+'px';
+  card.style.left=left+'px';
+  card.style.top=top+'px';
+}
+function hideIinfoTip(now){
+  clearTimeout(iinfoShowT);
+  const go=()=>{if(iinfoTipEl) iinfoTipEl.classList.remove('show');};
+  if(now){clearTimeout(iinfoHideT); go(); return;}
+  iinfoHideT=setTimeout(go,120);
+}
+document.addEventListener('mouseover',e=>{
+  const el=e.target.closest&&e.target.closest('.iinfo');
+  if(!el) return;
+  clearTimeout(iinfoHideT);
+  clearTimeout(iinfoShowT);
+  iinfoShowT=setTimeout(()=>showIinfoTip(el),80);
+});
+document.addEventListener('mouseout',e=>{
+  const el=e.target.closest&&e.target.closest('.iinfo');
+  if(!el) return;
+  const to=e.relatedTarget;
+  if(to && (el.contains(to) || (iinfoTipEl && iinfoTipEl.contains(to)))) return;
+  hideIinfoTip();
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest&&e.target.closest('.iinfo')) e.stopPropagation();
+}, true);
 
 /* ══════════ 原有交互 ══════════ */
 let tm;

@@ -145,6 +145,15 @@ function renderCenter(){
       <button type="button" data-flow="pending">⏸  标记 Pending</button>
       <button type="button" data-flow="full">▤  查看完整 PCR</button>
     </div>`}`;
+  if(t.voteV2 && window.VoteV2){
+    VoteV2.mountCenter(t,s,isReview);
+    wireCenter();
+    document.getElementById('ahReviewBack')?.addEventListener('click',()=>{
+      if(typeof exitApprovalReview==='function') exitApprovalReview();
+    });
+    bindTaskAskOnce();
+    return;
+  }
   const cards={vote:voteCards,eval:evalCards,otm:otmCards,rev:revCards,wi:wiCards}[t.type](t,s);
   const lead={
     vote:`我已读取该 PCR 的变更详情与产品范围，并按 <b>${t.func} 的 Vote 输入标准</b>做了完整性检查。下方是我生成的 Comment 草稿——<span class="muted">你可以直接编辑，确认后才会写回 PACE。</span><span class="tipdot" onclick="showTip(event,'agent',23)">23</span>`,
@@ -400,6 +409,12 @@ function sendTaskAsk(){
   if(!v){inp?.focus();return;}
   const s=state[cur];
   if(s.done){toast('已完成任务为只读');return;}
+  if(TASKS[cur]?.voteV2 && window.VoteV2){
+    VoteV2.handleAsk(v);
+    if(inp){inp.value='';if(window.AskComposer) AskComposer.autoGrow(inp);}
+    hideTaskGuide();closeTaskPlus();
+    return;
+  }
   s.chat=s.chat||[];
   s.chat.push({role:'user',text:v});
   let reply='已记录你的补充。你可以继续完善 Comment，或选择 Vote 立场后写回。';
@@ -563,6 +578,7 @@ function renderProcessProgress(t){
   </div>`;
 }
 function renderCtx(){
+  if(TASKS[cur]?.voteV2 && window.VoteV2 && VoteV2.renderCtx()) return;
   const t=TASKS[cur];
   const body=document.getElementById('ctxBody');
   const dlSvg=`<svg class="i" style="width:14px;height:14px"><path d="M8 2v8M5 7.5L8 10.5l3-3M3 13h10"/></svg>`;
