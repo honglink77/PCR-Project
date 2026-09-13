@@ -1049,11 +1049,15 @@
   .taskwrap .due.late{color:var(--disagree);font-weight:500}
   .view-task .center{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--soft);position:relative}
   .view-task .task-bar{flex:none;display:flex;align-items:center;gap:10px;padding:10px 14px;border:none;
-    border-bottom:1px solid var(--border);background:var(--panel);position:relative;z-index:6}
+    border-bottom:1px solid var(--border);background:var(--panel);position:relative;z-index:17}
+  .view-task:not(.ctx-collapsed) .task-bar{padding-right:calc(min(372px,92%) + 12px)}
   .view-task .task-bar .tb-t{flex:1;min-width:0;display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;color:var(--ink)}
   .view-task .task-bar .tb-pin{flex:none;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;
     letter-spacing:.02em;background:var(--accent);color:#fff;white-space:nowrap}
   .view-task .task-bar .tb-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .view-task .task-bar .tb-pace{flex:none;height:28px;padding:0 10px;border:1px solid var(--border);border-radius:8px;
+    background:var(--panel);color:var(--ink-2);font-size:12px;font-weight:500;white-space:nowrap}
+  .view-task .task-bar .tb-pace:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
   .view-task .task-bar .ttype{font-size:10px;font-weight:500;padding:1px 6px;border-radius:4px;letter-spacing:.03em;flex:none}
   .view-task .task-bar .ttype.vote{background:var(--info-bg);color:var(--info)}
   .view-task .task-bar .ttype.eval{background:#F3EEFB;color:#6941C6}
@@ -1438,6 +1442,7 @@
     <nav class="nav">
       <button class="navitem on" data-view="home" onclick="switchView('home')"><svg class="i"><rect x="2" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="8.5" y="2" width="5.5" height="5.5" rx="1.5"/><rect x="2" y="8.5" width="5.5" height="5.5" rx="1.5"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.5"/></svg>Overview</button>
       <button class="navitem" data-view="task" onclick="switchView('task')"><svg class="i"><path d="M5.5 2h5a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 10.5 14h-5A1.5 1.5 0 0 1 4 12.5v-9A1.5 1.5 0 0 1 5.5 2z"/><path d="M6.5 6h3M6.5 9h3"/></svg>My Tasks<span class="cnt hot">3</span></button>
+      <button type="button" class="navitem"><svg class="i" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="3.2" r="1.5"/><circle cx="3.2" cy="12.2" r="1.5"/><circle cx="12.8" cy="12.2" r="1.5"/><path d="M7.2 4.6L4.2 10.8M8.8 4.6l3 6.2M4.8 12.2h6.4"/></svg>Agent · Skill · MCP</button>
     </nav>
 
         <div class="taskwrap" id="mytasks-rail">
@@ -3549,10 +3554,10 @@ function renderCenter(){
       <span class="tb-name">${escTask(shortTaskName(t))}</span>
     </div>
     ${isReview?`<button type="button" class="btn btn-ghost tb-back" id="ahReviewBack">← 返回</button>`:`
+    <button type="button" class="tb-pace" id="taskPaceBtn">↗ 在 PACE 中打开</button>
     <button type="button" class="tb-more" id="taskFlowBtn" title="流程操作">▾</button>
     <span class="tipdot" onclick="showTip(event,'flowVsSess',57)">57</span>
     <div class="task-flowmenu" id="taskFlowMenu">
-      <button type="button" data-flow="pace">↗  在 PACE 中打开</button>
       <button type="button" data-flow="reassign">⇄  转派他人</button>
       <button type="button" data-flow="pending">⏸  标记 Pending</button>
       <button type="button" data-flow="full">▤  查看完整 PCR</button>
@@ -3734,6 +3739,34 @@ function wiCards(t,s){return `
   </div>`;
 }
 
+function paceDetailUrl(t){
+  const qs=new URLSearchParams({
+    task:t.ttl||t.tt||'',
+    number:t.pcr||'',
+    subject:t.name||'',
+    product:t.product||'',
+    status:t.status||'',
+    type:t.type||''
+  });
+  const path=(location.pathname||'').replace(/\\/g,'/');
+  let href;
+  if(/\/PACE\//i.test(path)||/detail\.html$/i.test(path)){
+    href=new URL('detail.html',location.href).href;
+  }else if(/\/workbench\//i.test(path)){
+    href=new URL('../PACE/detail.html',location.href).href;
+  }else{
+    href=new URL('../PACE/detail.html',location.href).href;
+  }
+  const u=new URL(href);
+  u.search=qs.toString();
+  return u.toString();
+}
+function openInPace(){
+  const t=TASKS[cur];
+  if(!t){toast('当前任务不可用');return;}
+  window.open(paceDetailUrl(t),'_blank','noopener');
+}
+
 function wireCenter(){
   const s=state[cur];
   const flowBtn=document.getElementById('taskFlowBtn');
@@ -3743,7 +3776,15 @@ function wireCenter(){
     flowMenu?.classList.toggle('show');
   });
   flowMenu?.querySelectorAll('[data-flow]').forEach(b=>{
-    b.onclick=()=>{flowMenu.classList.remove('show');toast(b.textContent.trim());};
+    b.onclick=()=>{
+      flowMenu.classList.remove('show');
+      if(b.dataset.flow==='pace'){openInPace();return;}
+      toast(b.textContent.trim());
+    };
+  });
+  document.getElementById('taskPaceBtn')?.addEventListener('click',e=>{
+    e.stopPropagation();
+    openInPace();
   });
   document.getElementById('centerBody')?.querySelectorAll('[data-act=primary]').forEach(b=>b.onclick=()=>openWriteback());
   document.getElementById('centerBody')?.querySelectorAll('[data-act=force]').forEach(b=>b.onclick=()=>openForce());

@@ -215,13 +215,21 @@
     .iproduct-drawer-head .head-title {
       font-size: 13px;
       font-weight: 600;
-      color: #334155;
+      color: #fff;
       margin-left: 4px;
       text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 6px;
+      background: #0d9488;
     }
     .iproduct-drawer-head .head-title:hover {
-      color: var(--blue);
-      text-decoration: underline;
+      color: #fff;
+      text-decoration: none;
+      background: #0b7c72;
     }
     .task-bar .back-btn {
       margin-right: 2px;
@@ -549,7 +557,7 @@
     <aside class="side-drawer" id="iProductDrawer">
       <div class="iproduct-drawer-head">
         <img class="ip-logo-full" src="assets/iproduct-logo.png" alt="iProduct" />
-        <a class="head-title" href="pcr-workbench-proto-origin.html" target="_blank" rel="noopener noreferrer">Workbench</a>
+        <a class="head-title" href="/workbench/pcr-workbench-proto.html" target="_blank" rel="noopener noreferrer">Workbench</a>
       </div>
       <iframe id="workbenchFrame" title="PCR Workbench" src="about:blank"></iframe>
     </aside>

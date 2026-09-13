@@ -137,10 +137,10 @@ function renderCenter(){
       <span class="tb-name">${escTask(shortTaskName(t))}</span>
     </div>
     ${isReview?`<button type="button" class="btn btn-ghost tb-back" id="ahReviewBack">← 返回</button>`:`
+    <button type="button" class="tb-pace" id="taskPaceBtn">↗ 在 PACE 中打开</button>
     <button type="button" class="tb-more" id="taskFlowBtn" title="流程操作">▾</button>
     <span class="tipdot" onclick="showTip(event,'flowVsSess',57)">57</span>
     <div class="task-flowmenu" id="taskFlowMenu">
-      <button type="button" data-flow="pace">↗  在 PACE 中打开</button>
       <button type="button" data-flow="reassign">⇄  转派他人</button>
       <button type="button" data-flow="pending">⏸  标记 Pending</button>
       <button type="button" data-flow="full">▤  查看完整 PCR</button>
@@ -322,6 +322,34 @@ function wiCards(t,s){return `
   </div>`;
 }
 
+function paceDetailUrl(t){
+  const qs=new URLSearchParams({
+    task:t.ttl||t.tt||'',
+    number:t.pcr||'',
+    subject:t.name||'',
+    product:t.product||'',
+    status:t.status||'',
+    type:t.type||''
+  });
+  const path=(location.pathname||'').replace(/\\/g,'/');
+  let href;
+  if(/\/PACE\//i.test(path)||/detail\.html$/i.test(path)){
+    href=new URL('detail.html',location.href).href;
+  }else if(/\/workbench\//i.test(path)){
+    href=new URL('../PACE/detail.html',location.href).href;
+  }else{
+    href=new URL('../PACE/detail.html',location.href).href;
+  }
+  const u=new URL(href);
+  u.search=qs.toString();
+  return u.toString();
+}
+function openInPace(){
+  const t=TASKS[cur];
+  if(!t){toast('当前任务不可用');return;}
+  window.open(paceDetailUrl(t),'_blank','noopener');
+}
+
 function wireCenter(){
   const s=state[cur];
   const flowBtn=document.getElementById('taskFlowBtn');
@@ -331,7 +359,15 @@ function wireCenter(){
     flowMenu?.classList.toggle('show');
   });
   flowMenu?.querySelectorAll('[data-flow]').forEach(b=>{
-    b.onclick=()=>{flowMenu.classList.remove('show');toast(b.textContent.trim());};
+    b.onclick=()=>{
+      flowMenu.classList.remove('show');
+      if(b.dataset.flow==='pace'){openInPace();return;}
+      toast(b.textContent.trim());
+    };
+  });
+  document.getElementById('taskPaceBtn')?.addEventListener('click',e=>{
+    e.stopPropagation();
+    openInPace();
   });
   document.getElementById('centerBody')?.querySelectorAll('[data-act=primary]').forEach(b=>b.onclick=()=>openWriteback());
   document.getElementById('centerBody')?.querySelectorAll('[data-act=force]').forEach(b=>b.onclick=()=>openForce());
