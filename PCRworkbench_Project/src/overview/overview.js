@@ -537,6 +537,7 @@ function plusInit(){
 }
 
 function newChatSession(){
+  if(typeof VIEW!=='undefined' && VIEW==='specialist' && typeof switchView==='function') switchView('home');
   if(window.Sessions) Sessions.onNewChat();
   if(PARSE.active||PARSE.suspended||PARSE.text){
     exitParseMode();
@@ -604,7 +605,7 @@ function hideParseHist(){
 
 function enterParseMode(){
   PARSE.active=true;PARSE.homeOpen=false;PARSE.suspended=false;
-  document.body.classList.add('parsing');document.body.classList.remove('home-open','taskview');
+  document.body.classList.add('parsing');document.body.classList.remove('home-open','taskview','specview');
   showParseHist();
   document.getElementById('plist').classList.remove('mini');
   const caret=document.getElementById('parseBarCaret');if(caret)caret.textContent='▾';
@@ -652,8 +653,10 @@ function ensureHomeView(){
   document.querySelectorAll('[data-view]').forEach(el=>el.classList.toggle('on',el.dataset.view==='home'));
   document.getElementById('view-home').style.display='';
   document.getElementById('view-task').style.display='none';
+  const spec=document.getElementById('view-specialist');
+  if(spec) spec.style.display='none';
   document.getElementById('crumb').textContent='Overview';
-  document.body.classList.remove('taskview');
+  document.body.classList.remove('taskview','specview');
   const ask=document.getElementById('askwrap');if(ask)ask.style.display='';
 }
 
@@ -667,7 +670,7 @@ function resumeParse(){
   // 恢复解析 UI：不走 enterParseMode，避免清空已有 DOM
   PARSE.active=true;PARSE.homeOpen=false;PARSE.suspended=false;PARSE.animating=false;
   document.body.classList.add('parsing');
-  document.body.classList.remove('home-open','taskview');
+  document.body.classList.remove('home-open','taskview','specview');
   showParseHist();
   const pl=document.getElementById('plist');if(pl)pl.classList.remove('mini');
   const caret=document.getElementById('parseBarCaret');if(caret)caret.textContent='▾';

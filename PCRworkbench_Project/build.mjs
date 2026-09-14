@@ -35,6 +35,7 @@ const parts = [
   shellBefore,
   read('src/overview/overview.html'),
   read('src/mytasks/mytasks.html'),
+  read('src/shell/specialist-view.html'),
   read('src/shell/shell-after.html'),
   '<script>\n',
   read('src/shared/dialogue-motion.js'),

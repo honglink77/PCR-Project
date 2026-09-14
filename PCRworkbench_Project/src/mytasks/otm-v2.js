@@ -7,41 +7,25 @@
   const otm2Dm = () => window.DialogueMotion;
 
   const OTM2_CONCLUSION = `【总体结论】
-本次 CPU SKU 替换（Ultra 7 155U → 165U）在技术层面可行，
-但当前评估尚未达到直接批准条件：1 个 Mandatory Vote Task
-未完成，1 个职能提出 Disagree，另有 1 条强制提交记录。
-建议采用带条件批准或暂缓，待认证评估结论明确后再推进。
+本次 CPU SKU 替换（Ultra 7 155U → 165U）在技术层面可行，但当前评估尚未达到直接批准条件：1 个 Mandatory Vote Task未完成，1 个职能提出 Disagree，另有 1 条强制提交记录。建议采用带条件批准或暂缓，待认证评估结论明确后再推进。
 
 【投票结果与 Comments】
 共 4 个 Mandatory Vote Task，已完成 3 个，未完成 1 个。
-· Development：Agree —— 同封装 pin-to-pin 替代，主板与
-  供电无需改动，PCBA 数量不变（Comment 完整度 67%）
-· BOM：Agree —— 物料清单变更范围清晰，涉及 T1、LNB BOM、
-  MFG BOM 三处更新（Comment 完整度 55%）
+· Development：Agree —— 同封装 pin-to-pin 替代，主板与供电无需改动，PCBA 数量不变（Comment 完整度 67%）
+· BOM：Agree —— 物料清单变更范围清晰，涉及 T1、LNB BOM、MFG BOM 三处更新（Comment 完整度 55%）
 · TPMDM：Disagree —— 已认证机型需重新送测，周期约 3 周
 · Planner：未提交
 
 【反对、未完成及校验异常】
-1. TPMDM 提出 Disagree：T14p Gen 5 与 T16p Gen 5 已完成
-   CCC 认证，本次 CPU 变更触发重新送测，周期约 3 周，
-   将威胁 2026-11-20 目标实施日。该反对意见尚未解决。
-2. Planner 的 Mandatory Vote Task 未提交，已逾期 2 天，
-   阻塞原因为等待 ODM 供应计划确认。
-3. Development 在校验未通过的情况下强制提交：Required
-   Dimension 2 项未填（Control Run、Validation Plan）、
-   Control Run Validation 不匹配、4 项 Missing Points 已
-   Ignore。强制提交原因为「客户催得紧，先给结论后补数据」。
-   该情况不等同于校验通过，相关信息仍需补齐。
-4. BOM 的 Comment 完整度为 55%，低于建议水平，参考价值
-   有限。
+1. TPMDM 提出 Disagree：T14p Gen 5 与 T16p Gen 5 已完成 CCC 认证，本次 CPU 变更触发重新送测，周期约 3 周，将威胁 2026-11-20 目标实施日。该反对意见尚未解决。
+2. Planner 的 Mandatory Vote Task 未提交，已逾期 2 天，阻塞原因为等待 ODM 供应计划确认。
+3. Development 在校验未通过的情况下强制提交：Required Dimension 2 项未填（Control Run、Validation Plan）、Control Run Validation 不匹配、4 项 Missing Points 已 Ignore。强制提交原因为「客户催得紧，先给结论后补数据」。该情况不等同于校验通过，相关信息仍需补齐。
+4. BOM 的 Comment 完整度为 55%，低于建议水平，参考价值有限。
 
 【历史 PCR 差异】
 与 PCR-2025-07612（相似度 94%）相比：
-· Control Run 结论差异：历史 PCR 明确执行 Control Run
-  （50pcs，2wk 完成），本次 Development 的 Comment 中
-  未给出该结论
-· 认证影响差异：历史 PCR 未涉及已认证机型，本次涉及
-  2 个已认证 MTM，风险高于历史同类变更
+· Control Run 结论差异：历史 PCR 明确执行 Control Run（50pcs，2wk 完成），本次 Development 的 Comment 中未给出该结论
+· 认证影响差异：历史 PCR 未涉及已认证机型，本次涉及 2 个已认证 MTM，风险高于历史同类变更
 以上差异仅供参考，不替代本次 PCR 的实际结论。
 
 【Work Item 与待办】
@@ -55,11 +39,8 @@
 
   const OTM2_HIST_BLOCK = `【历史 PCR 差异】
 与 PCR-2025-07612（相似度 94%）相比：
-· Control Run 结论差异：历史 PCR 明确执行 Control Run
-  （50pcs，2wk 完成），本次 Development 的 Comment 中
-  未给出该结论
-· 认证影响差异：历史 PCR 未涉及已认证机型，本次涉及
-  2 个已认证 MTM，风险高于历史同类变更
+· Control Run 结论差异：历史 PCR 明确执行 Control Run（50pcs，2wk 完成），本次 Development 的 Comment 中未给出该结论
+· 认证影响差异：历史 PCR 未涉及已认证机型，本次涉及 2 个已认证 MTM，风险高于历史同类变更
 以上差异仅供参考，不替代本次 PCR 的实际结论。`;
 
   const OTM2_VOTES = [

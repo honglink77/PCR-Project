@@ -1,10 +1,16 @@
 /* OTM Assessment v2：逻辑独立（otm2_）；视觉复用 plist / pcheck / prule / type-opt / vt2-wi / sumtab */
 .view-task .task-ai:has(#otm2_plist){display:flex;flex-direction:column;align-items:flex-start}
-.view-task .task-ai:has(#otm2_plist) .parse-ai{width:100%;max-width:693px;align-self:flex-start}
-.view-task #otm2_wrap{width:100%;max-width:693px}
-.view-task #otm2_plist{width:100%;max-width:693px}
+.view-task .task-ai:has(#otm2_plist) .parse-ai{width:100%;max-width:924px;align-self:flex-start}
+.view-task #otm2_wrap{width:100%;max-width:924px}
+.view-task #otm2_plist{width:100%;max-width:924px}
 #otm2_plist .pstep.open{width:100%;max-width:100%}
 #otm2_plist .pcheck{opacity:1;transform:none}
+#otm2_plist .to-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#otm2_plist .to-name{font-weight:600;color:var(--ink)}
+#otm2_plist .to-conf{font-size:11px;padding:1px 7px;border-radius:999px;background:var(--soft);color:var(--ink-2);font-weight:400}
+#otm2_plist .to-conf.hi{background:var(--green-bg);color:var(--green)}
+#otm2_plist .to-conf.mid{background:var(--amber-bg);color:var(--amber)}
+#otm2_plist .to-conf.lo{background:var(--red-bg);color:var(--red);font-weight:600}
 #otm2_alert{position:sticky;top:0;z-index:8;margin:0 0 8px}
 #otm2_alert .type-warn{width:100%;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;white-space:nowrap}
 #otm2_alert .type-warn .sp{margin-left:auto;color:var(--ink-3)}
@@ -17,7 +23,7 @@
 #otm2_plist .sumtab tr[data-otm2-ft]{cursor:pointer}
 #otm2_plist .sumtab tr.warn td{background:var(--amber-bg)}
 #otm2_plist .sumtab tr.err td{background:var(--red-bg)}
-#otm2_plist .otm2-cmt{min-height:160px;border:1px solid var(--border);border-radius:8px;padding:10px;font-family:inherit;font-size:12.5px;line-height:1.6;background:#fff;white-space:pre-wrap;outline:none}
+#otm2_plist .otm2-cmt{min-height:0;border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:12.5px;line-height:1.4;background:#fff;white-space:pre-wrap;word-break:break-word;outline:none}
 #otm2_plist .otm2-cmt:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 #otm2_plist .otm2-lock{font-size:12px;color:var(--ink-3);margin:6px 0}
 #otm2_plist .type-opt.danger{border-color:var(--red)}

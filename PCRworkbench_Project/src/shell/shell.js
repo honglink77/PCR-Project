@@ -415,7 +415,7 @@ document.addEventListener('click',e=>{
 /* ══════════ 讨论结论：本地存储 ══════════ */
 let VIEW='home';
 const LSKS={home:'pcr_home_notes_v1',task:'pcr_task_notes_v1'};
-let ALL={home:{},task:{}};
+let ALL={home:{},task:{},specialist:{}};
 Object.keys(LSKS).forEach(v=>{try{ALL[v]=JSON.parse(localStorage.getItem(LSKS[v])||'{}');}catch(e){ALL[v]={};}});
 let NOTES=ALL.home, TIPS=TIPS_HOME;
 
@@ -447,16 +447,26 @@ function switchView(v){
     }
   }
   if(VIEW===v){closeMenu();return;}
-  VIEW=v; NOTES=ALL[v]; TIPS=(v==='home'?TIPS_HOME:TIPS_TASK);
+  VIEW=v; NOTES=ALL[v]||(ALL[v]={}); TIPS=(v==='home'?TIPS_HOME:TIPS_TASK);
   document.querySelectorAll('[data-view]').forEach(el=>el.classList.toggle('on',el.dataset.view===v));
   document.getElementById('view-home').style.display = v==='home'?'':'none';
   document.getElementById('view-task').style.display = v==='task'?'':'none';
-  document.getElementById('crumb').textContent = v==='home'?'Overview':'My Tasks';
+  const spec=document.getElementById('view-specialist');
+  if(spec) spec.style.display = v==='specialist'?'':'none';
+  document.getElementById('crumb').textContent = v==='home'?'Overview':v==='task'?'My Tasks':'Specialist';
   if(v==='home'){
     if(window.HomePins&&HomePins.renderHomeSection) HomePins.renderHomeSection();
   }
   if(v==='task'){ if(window.MyTasks&&MyTasks.ensureInit) MyTasks.ensureInit(); else if(!window.__taskInit){window.__taskInit=1;renderTaskAll();} }
+  if(v==='specialist'){
+    const frame=document.getElementById('specialistFrame');
+    if(frame && !frame.dataset.loaded){
+      frame.src='specialist/index.html#agent';
+      frame.dataset.loaded='1';
+    }
+  }
   document.body.classList.toggle('taskview', v==='task');
+  document.body.classList.toggle('specview', v==='specialist');
   syncRailTip();
   const ask=document.getElementById('askwrap');
   if(ask)ask.style.display=(v==='home'?'':'none');
