@@ -67,9 +67,9 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   ];
 
   const VT2_WI_SEED = [
-    { id: 'vt2_w1', name: 'Control Run', desc: '执行 Control Run 验证，50pcs 于 MFG 产线', date: 'PCR approved 后 3 周', dateMode: 'rel', ft: 'Development', owner: 'test@lenovo.com', src: '【Control Run】' },
-    { id: 'vt2_w2', name: 'SW / BIOS Impact', desc: 'BIOS microcode 0x12A 兼容性验证', date: '2026-10-25', dateMode: 'abs', ft: 'Development', owner: 'test29@lenovo.com', src: '【SW / BIOS Impact】' },
-    { id: 'vt2_w3', name: 'SW / BIOS Impact', desc: '已认证 MTM 重新送测影响评估', date: '2026-10-30', dateMode: 'abs', ft: 'Development', owner: 'huangxl16@lenovo.com', src: '【SW / BIOS Impact】' },
+    { id: 'vt2_w1', name: 'Control Run', desc: '执行 Control Run 验证，50pcs 于 MFG 产线', date: 'PCR approved 后 3 周', dateMode: 'rel', ft: 'Development', owner: 'test@lenovo.com', src: '【Control Run】', status: 'Draft', ai: true },
+    { id: 'vt2_w2', name: 'SW / BIOS Impact', desc: 'BIOS microcode 0x12A 兼容性验证', date: '2026-10-25', dateMode: 'abs', ft: 'Development', owner: 'test29@lenovo.com', src: '【SW / BIOS Impact】', status: 'Draft', ai: true },
+    { id: 'vt2_w3', name: 'SW / BIOS Impact', desc: '已认证 MTM 重新送测影响评估', date: '2026-10-30', dateMode: 'abs', ft: 'Development', owner: 'yac@lenovo.com', src: '【SW / BIOS Impact】', status: 'Draft', ai: true },
   ];
 
   const VT2_INFO = {
@@ -100,7 +100,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       showDiff: false, diffA: 1, diffB: 2,
       ignoreMissing: false, missingDone: false, crDone: false, reviewed: false,
       commentReady: false, checkReady: false, compReady: false, commentDirty: false,
-      wiOpen: false, wis: [], wiDirty: false, confirmedText: '', editWi: null,
+      wiOpen: false, wis: [], wiDirty: false, confirmedText: '', editWi: null, wiFold: {},
       forceNote: '', openId: 'vote', playedIntro: false,
       simOpen: true, rootOpen: true,
     };
@@ -110,6 +110,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     const s = state[VT2_ID];
     if (!s.vt2) s.vt2 = vt2Default();
     if (s.vt2.compReady == null) s.vt2.compReady = !!s.vt2.checkReady;
+    if (!s.vt2.wiFold) s.vt2.wiFold = {};
     return s.vt2;
   }
   function vt2Order() {
@@ -389,7 +390,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
           </div>
         </div>
         <div class="vt2-row"><span class="k">Function Team</span><select data-vt2-f="ft"><option>Development</option><option>TPM</option><option>Certification</option></select></div>
-        <div class="vt2-row"><span class="k">Task Owner</span><select data-vt2-f="owner"><option value="">请选择</option><option>test@lenovo.com</option><option>test29@lenovo.com</option><option>huangxl16@lenovo.com</option></select></div>
+        <div class="vt2-row"><span class="k">Task Owner</span><select data-vt2-f="owner"><option value="">请选择</option><option>test@lenovo.com</option><option>test29@lenovo.com</option><option>yac@lenovo.com</option></select></div>
         <div class="vt2-src">来源：${w.draftNew || w.src === '手动添加' ? '手动添加' : 'Comment ' + vt2Esc(w.src) + ' 维度'}</div>
         <div class="type-acts"><button class="btn btn-ghost" type="button" data-vt2-wix="${w.id}">取消</button><button class="btn btn-primary" type="button" data-vt2-wis="${w.id}" ${canSave ? '' : 'disabled'}>保存</button></div>
       </div>`;
@@ -403,6 +404,44 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       <div class="vt2-row"><span class="k">Task Owner</span><span>${vt2Esc(w.owner)}</span></div>
       <div class="vt2-src">来源：Comment ${vt2Esc(w.src)} 维度</div>
     </div>`;
+  }
+
+  function vt2SrcLine(w) {
+    return (w.draftNew || w.src === '手动添加') ? '手动添加' : 'Comment ' + vt2Esc(w.src) + ' 维度';
+  }
+  function vt2WiDateCell(w) {
+    if (w.dateMode === 'rel') {
+      return `${vt2Esc(w.date || '—')}<span class="vt2-di" title="相对时间">ⓘ</span>`;
+    }
+    return vt2Esc(w.date || '—');
+  }
+  function vt2WiOps(w) {
+    return `<div class="vt2-ops-wrap">
+      <button type="button" class="vt2-ico" data-vt2-wie="${w.id}" title="编辑">✎</button>
+      <button type="button" class="vt2-ico" data-vt2-widl="${w.id}" title="删除">✕</button>
+    </div>`;
+  }
+  function vt2WiTable() {
+    const st = vt2St();
+    return `<table class="sumtab vt2-witab"><thead><tr>
+      <th></th><th>Work Item</th><th>Description</th><th>Target Date</th><th>Function Team</th><th>Task Owner</th><th>Status</th><th>操作</th>
+    </tr></thead><tbody>${st.wis.map((w) => {
+      if (st.editWi === w.id || w.draftNew) {
+        return `<tr class="bc-detail" data-vt2-wid="${w.id}"><td colspan="8">${vt2WiCard(w)}</td></tr>`;
+      }
+      const open = !!st.wiFold[w.id];
+      const desc = w.desc && String(w.desc).trim() ? vt2Esc(w.desc) : '—（未填写）';
+      return `<tr data-vt2-bwi="${w.id}">
+        <td class="vt2-exp" data-vt2-bexp="${w.id}">${open ? '▾' : '▸'}</td>
+        <td><span class="vt2-gen">${w.ai === false ? '✍️' : '🤖'}</span> ${vt2Esc(w.name)}</td>
+        <td>${desc}</td>
+        <td>${vt2WiDateCell(w)}</td>
+        <td>${vt2Esc(w.ft)}</td>
+        <td>${vt2Esc(w.owner)}</td>
+        <td>${vt2Esc(w.status || 'Draft')}</td>
+        <td class="vt2-ops-cell">${vt2WiOps(w)}</td>
+      </tr>${open ? `<tr class="bc-detail"><td colspan="8"><div class="vt2-src" style="border:none;margin:0;padding:0">来源：${vt2SrcLine(w)}</div></td></tr>` : ''}`;
+    }).join('')}</tbody></table>`;
   }
 
   function vt2Body(id) {
@@ -514,7 +553,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
         '一个 Dimension 下有多个 Required Action → 生成多条 Work Item',
       ]) + (st.wiDirty ? `<div class="sim-note">Comment 已修改，是否重新生成 Work Item？ <button class="btn btn-ghost" type="button" style="padding:2px 8px;font-size:12px" data-vt2="genwi">重新生成</button></div>` : '')
         + `<div id="vt2_wilead" class="sd-note" style="margin:8px 0">AI 已从确认的 Comment 中识别出 ${st.wis.length} 项待办 ${VT2_TIP('vt2WiName', 80)}</div>
-        <div id="vt2_wilist">${st.wis.map(vt2WiCard).join('')}</div>
+        <div id="vt2_wilist">${vt2WiTable()}</div>
         <div class="pact"><button class="btn btn-ghost" type="button" data-vt2="addwi">+ 手动添加</button></div>
         <div class="rule-note">⚠ 此为草稿，随 Vote 结果提交至 OTM，由 OTM 确认后才创建并分发，不直接创建</div>`;
     }
@@ -953,12 +992,20 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     root.querySelector('[data-vt2=genwi]')?.addEventListener('click', vt2GenWi);
     root.querySelector('[data-vt2=addwi]')?.addEventListener('click', () => {
       const id = 'vt2_w' + Date.now();
-      st.wis.push({ id, name: '', desc: '', date: '', dateMode: '', ft: 'Development', owner: '', src: '手动添加', draftNew: true });
+      st.wis.push({ id, name: '', desc: '', date: '', dateMode: '', ft: 'Development', owner: '', src: '手动添加', draftNew: true, ai: false, status: 'Draft' });
       st.editWi = id;
       vt2RenderPlist();
     });
-    root.querySelectorAll('[data-vt2-wie]').forEach((b) => { b.onclick = () => { st.editWi = b.dataset.vt2Wie; vt2RenderPlist(); }; });
-    root.querySelectorAll('[data-vt2-widl]').forEach((b) => { b.onclick = () => { st.wis = st.wis.filter((w) => w.id !== b.dataset.vt2Widl); vt2RenderPlist(); }; });
+    root.querySelectorAll('[data-vt2-bexp]').forEach((td) => {
+      td.onclick = (e) => {
+        e.stopPropagation();
+        const id = td.dataset.vt2Bexp;
+        st.wiFold[id] = !st.wiFold[id];
+        vt2RenderPlist();
+      };
+    });
+    root.querySelectorAll('[data-vt2-wie]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); st.editWi = b.dataset.vt2Wie; vt2RenderPlist(); }; });
+    root.querySelectorAll('[data-vt2-widl]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); st.wis = st.wis.filter((w) => w.id !== b.dataset.vt2Widl); vt2RenderPlist(); }; });
     root.querySelectorAll('[data-vt2-wix]').forEach((b) => {
       b.onclick = () => {
         const w = st.wis.find((x) => x.id === b.dataset.vt2Wix);
@@ -1022,15 +1069,12 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     const lead = document.getElementById('vt2_wilead');
     if (lead && dm) await dm.streamText(lead, `AI 已从确认的 Comment 中识别出 ${st.wis.length} 项待办…`, document.getElementById('centerBody'));
     if (list) {
-      const cards = [...list.querySelectorAll('.vt2-wi')];
-      cards.forEach((c) => { c.style.opacity = '0'; c.style.transform = 'translateY(8px)'; });
-      for (const c of cards) {
+      const rows = [...list.querySelectorAll('tbody tr[data-vt2-bwi]')];
+      rows.forEach((c) => { c.style.opacity = '0'; });
+      for (const c of rows) {
         if (dm) await dm.sleep(dm.isSkipping() ? 0 : 250);
-        c.style.transition = 'opacity .3s, transform .3s';
+        c.style.transition = 'opacity .3s';
         c.style.opacity = '1';
-        c.style.transform = 'none';
-        const src = c.querySelector('.vt2-src');
-        if (src) { src.classList.add('vt2-hl'); setTimeout(() => src.classList.remove('vt2-hl'), 800); }
       }
     }
     st.openId = 'submit';

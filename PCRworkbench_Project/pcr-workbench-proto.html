@@ -1389,8 +1389,8 @@
 
 /* Vote Task v2：仅 vt2；视觉复用 Create PCR 的 plist / type-opt / sim-card / pcheck / submit-dock */
 .view-task .task-ai:has(#vt2_plist){display:flex;flex-direction:column;align-items:flex-start}
-.view-task .task-ai:has(#vt2_plist) .parse-ai{width:100%;max-width:693px;align-self:flex-start}
-.view-task #vt2_plist{width:100%;max-width:693px}
+.view-task .task-ai:has(#vt2_plist) .parse-ai{width:100%;max-width:924px;align-self:flex-start}
+.view-task #vt2_plist{width:100%;max-width:924px}
 #vt2_plist .pstep.open{width:100%;max-width:100%}
 #vt2_plist .pcheck{opacity:1;transform:none}
 #vt2_plist .vt2-pfill-r{display:flex;align-items:center;gap:8px;flex:none}
@@ -1449,6 +1449,16 @@
 .vt2-date-line label{flex:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:12px;color:var(--ink-2);cursor:pointer}
 .vt2-date-line label input{width:auto;flex:none;padding:0;border:none}
 .vt2-src{font-size:12px;color:var(--accent-ink);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
+#vt2_plist .vt2-witab{width:100%;font-size:12px}
+#vt2_plist .vt2-exp{width:22px;color:var(--ink-3);cursor:pointer;user-select:none}
+#vt2_plist .vt2-gen{display:inline-block;width:1.4em;text-align:center}
+#vt2_plist .vt2-di{display:inline-grid;place-items:center;width:16px;height:16px;margin-left:4px;border:1px solid var(--border-2);border-radius:50%;color:var(--ink-3);font-size:10px;vertical-align:middle;cursor:help}
+#vt2_plist .vt2-ops-cell{white-space:nowrap;width:1%}
+#vt2_plist .vt2-ops-wrap{position:relative;display:inline-flex;align-items:center;gap:2px}
+#vt2_plist .vt2-ico{border:none;background:transparent;cursor:pointer;color:var(--ink-3);padding:2px 4px;font-size:14px;line-height:1}
+#vt2_plist .vt2-ico:hover{color:var(--ink)}
+#vt2_plist .vt2-witab .vt2-wi{margin:0;padding:0;background:transparent}
+#vt2_wilist{overflow-x:auto}
 
 .vt2-diff{font-size:12.5px;line-height:1.55}
 .vt2-diff .del{color:#B42318;text-decoration:line-through;background:#FEF3F2}
@@ -1482,6 +1492,34 @@
 #otm2_plist .otm2-sec-t{font-size:12.5px;font-weight:600;margin-bottom:6px}
 #otm2_plist .otm2-fil{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 #otm2_plist .otm2-fil .btn.on{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+#otm2_plist .otm2-tabs{display:flex;flex-wrap:wrap;gap:0 14px;margin:4px 0 10px;padding:0;border-bottom:1px solid var(--border)}
+#otm2_plist .otm2-tabs button{border:none;background:transparent;padding:6px 2px 8px;margin-bottom:-1px;border-bottom:2px solid transparent;border-radius:0;font-size:12.5px;color:var(--ink-3);cursor:pointer}
+#otm2_plist .otm2-tabs button.on{font-weight:600;color:var(--accent-ink);border-bottom-color:var(--accent);background:transparent}
+#otm2_plist .otm2-tabs button.bad{color:var(--red)}
+#otm2_plist .otm2-tabs button.bad.on{color:var(--red);border-bottom-color:var(--red)}
+#otm2_plist .otm2-tabs button.amber{color:var(--amber)}
+#otm2_plist .otm2-tabs button.amber.on{color:var(--amber);border-bottom-color:var(--amber)}
+#otm2_plist .otm2-sec-h{display:flex;align-items:center;gap:8px;width:100%;border:none;background:transparent;padding:6px 0;cursor:pointer;font:inherit;text-align:left}
+#otm2_plist .otm2-sec-ch{color:var(--ink-3);width:14px}
+#otm2_plist .otm2-sec-tt{font-size:12.5px;font-weight:600;color:var(--ink)}
+#otm2_plist .otm2-sec-sum{margin-left:auto;font-size:12px;color:var(--ink-3)}
+#otm2_plist .otm2-sec-sum.warn{color:var(--amber)}
+#otm2_plist .otm2-sec-b{padding:4px 0 8px}
+#otm2_plist .otm2-gen{display:inline-block;width:1.4em;text-align:center}
+#otm2_plist .otm2-radcell{white-space:nowrap}
+#otm2_plist .otm2-rad{display:inline-flex;align-items:center;gap:3px;margin-right:8px;font-size:12px;color:var(--ink-2);cursor:pointer}
+#otm2_plist .otm2-rad.acc{color:var(--accent-ink)}
+#otm2_plist .otm2-rad.ign{color:var(--ink-3)}
+#otm2_plist .otm2-rad.wait{color:var(--amber)}
+#otm2_plist .otm2-cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+#otm2_plist .otm2-cmp b{display:block;color:var(--ink);margin-bottom:4px}
+#otm2_plist .otm2-step-line{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;max-width:100%}
+#otm2_plist .pstep[data-otm2-step="wicheck"] .psum{max-width:none;color:var(--ink-2);font-weight:400}
+#otm2_plist .otm2-mini{font-size:12px;padding:3px 8px}
+#otm2_plist .otm2-savebar{flex-wrap:wrap;align-items:center}
+#otm2_plist .otm2-sync{margin:10px 0 14px;padding-top:10px;border-top:1px dashed var(--border)}
+.view-task:has(#otm2_plist) .center-body{scroll-padding-top:52px}
+#otm2_plist .pstep,#otm2_plist .otm2-sec,#otm2_plist tr[data-otm2-wid]{scroll-margin-top:56px}
 #otm2_plist .sumtab{width:100%;font-size:12px}
 #otm2_plist .sumtab tr[data-otm2-ft]{cursor:pointer}
 #otm2_plist .sumtab tr.warn td{background:var(--amber-bg)}
@@ -1495,7 +1533,27 @@
 #otm2_plist .type-opt[disabled]{opacity:.45;pointer-events:none}
 .otm2-pop .type-opt[disabled]{opacity:.45;pointer-events:none}
 .otm2-pop .type-opt.danger.on,.otm2-pop .type-opt.danger:hover{background:var(--red-bg);border-color:var(--red)}
-#otm2_plist .otm2-rel{font-size:12px;color:var(--ink-2);line-height:1.55}
+#otm2_pop .box{width:min(560px,94vw);max-height:min(86vh,760px);overflow:auto}
+.otm2-pop .otm2-sec-t{font-size:12.5px;font-weight:600}
+#otm2_plist .otm2-witab{width:100%;font-size:12px;margin-bottom:8px}
+#otm2_plist .otm2-witab .otm2-exp{width:22px;color:var(--ink-3);cursor:pointer;user-select:none}
+#otm2_plist .otm2-ck{font-weight:700}
+#otm2_plist .otm2-ck.ok{color:var(--green)}
+#otm2_plist .otm2-ck.warn{color:var(--amber)}
+#otm2_plist .otm2-ck.err{color:var(--red)}
+#otm2_plist .otm2-ck.need{color:#EA580C}
+#otm2_plist .otm2-di{display:inline-grid;place-items:center;width:16px;height:16px;margin-left:4px;border:1px solid var(--border-2);border-radius:50%;color:var(--ink-3);font-size:10px;vertical-align:middle;cursor:help}
+#otm2_plist .otm2-ops-cell{white-space:nowrap;width:1%}
+#otm2_plist .otm2-ops-wrap{position:relative;display:inline-flex;align-items:center;gap:2px}
+#otm2_plist .otm2-ico{border:none;background:transparent;cursor:pointer;color:var(--ink-3);padding:2px 4px;font-size:14px;line-height:1}
+#otm2_plist .otm2-ico:hover{color:var(--ink)}
+#otm2_plist .otm2-more{position:absolute;right:0;top:100%;z-index:12;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,23,32,.12);min-width:168px;padding:4px}
+#otm2_plist .otm2-more button{display:block;width:100%;text-align:left;border:none;background:transparent;padding:6px 10px;font:inherit;font-size:12.5px;color:var(--ink-2);cursor:pointer;border-radius:6px}
+#otm2_plist .otm2-more button:hover{background:var(--soft);color:var(--ink)}
+#otm2_plist .otm2-issue td{background:var(--soft);padding:6px 12px 8px 48px}
+#otm2_plist .otm2-issue .pcheck{margin:2px 0}
+#otm2_plist tr.otm2-hit td{box-shadow:inset 3px 0 0 var(--accent)}
+#otm2_plist .otm2-loc{display:block;width:100%;text-align:left;white-space:normal;margin-top:4px;padding:2px 8px;font-size:12px}
 #otm2_plist .otm2-dup{margin:8px 0}
 #otm2_plist .otm2-ops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 #otm2_plist .vt2-pfill-r{display:flex;align-items:center;gap:8px;flex:none}
@@ -4531,7 +4589,7 @@ Intel 已确认新 SKU 可用，pin-to-pin 替代，目标实施日尚有充足�
         title: 'TPM Review',
         status: 'concern',
         action: 'Approve with concern',
-        actor: 'huangxl16@lenovo.com',
+        actor: 'yac@lenovo.com',
         time: '01-07 11:05',
         duration: '2 天',
         comment: `【审阅结论】
@@ -4594,7 +4652,7 @@ TPM 提出的认证影响问题将通过专项 Evaluation Task 解决，不阻�
             comment: '物料清单变更范围清晰，3 个机型均可覆盖。',
           },
           {
-            id: 'v-pl', func: 'Planner', stance: 'Agree', actor: 'huangxl16@lenovo.com', time: '01-13',
+            id: 'v-pl', func: 'Planner', stance: 'Agree', actor: 'yac@lenovo.com', time: '01-13',
             comment: '供应计划无冲突，切换时点可配合目标实施日。',
           },
           {
@@ -4980,9 +5038,9 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   ];
 
   const VT2_WI_SEED = [
-    { id: 'vt2_w1', name: 'Control Run', desc: '执行 Control Run 验证，50pcs 于 MFG 产线', date: 'PCR approved 后 3 周', dateMode: 'rel', ft: 'Development', owner: 'test@lenovo.com', src: '【Control Run】' },
-    { id: 'vt2_w2', name: 'SW / BIOS Impact', desc: 'BIOS microcode 0x12A 兼容性验证', date: '2026-10-25', dateMode: 'abs', ft: 'Development', owner: 'test29@lenovo.com', src: '【SW / BIOS Impact】' },
-    { id: 'vt2_w3', name: 'SW / BIOS Impact', desc: '已认证 MTM 重新送测影响评估', date: '2026-10-30', dateMode: 'abs', ft: 'Development', owner: 'huangxl16@lenovo.com', src: '【SW / BIOS Impact】' },
+    { id: 'vt2_w1', name: 'Control Run', desc: '执行 Control Run 验证，50pcs 于 MFG 产线', date: 'PCR approved 后 3 周', dateMode: 'rel', ft: 'Development', owner: 'test@lenovo.com', src: '【Control Run】', status: 'Draft', ai: true },
+    { id: 'vt2_w2', name: 'SW / BIOS Impact', desc: 'BIOS microcode 0x12A 兼容性验证', date: '2026-10-25', dateMode: 'abs', ft: 'Development', owner: 'test29@lenovo.com', src: '【SW / BIOS Impact】', status: 'Draft', ai: true },
+    { id: 'vt2_w3', name: 'SW / BIOS Impact', desc: '已认证 MTM 重新送测影响评估', date: '2026-10-30', dateMode: 'abs', ft: 'Development', owner: 'yac@lenovo.com', src: '【SW / BIOS Impact】', status: 'Draft', ai: true },
   ];
 
   const VT2_INFO = {
@@ -5013,7 +5071,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       showDiff: false, diffA: 1, diffB: 2,
       ignoreMissing: false, missingDone: false, crDone: false, reviewed: false,
       commentReady: false, checkReady: false, compReady: false, commentDirty: false,
-      wiOpen: false, wis: [], wiDirty: false, confirmedText: '', editWi: null,
+      wiOpen: false, wis: [], wiDirty: false, confirmedText: '', editWi: null, wiFold: {},
       forceNote: '', openId: 'vote', playedIntro: false,
       simOpen: true, rootOpen: true,
     };
@@ -5023,6 +5081,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     const s = state[VT2_ID];
     if (!s.vt2) s.vt2 = vt2Default();
     if (s.vt2.compReady == null) s.vt2.compReady = !!s.vt2.checkReady;
+    if (!s.vt2.wiFold) s.vt2.wiFold = {};
     return s.vt2;
   }
   function vt2Order() {
@@ -5302,7 +5361,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
           </div>
         </div>
         <div class="vt2-row"><span class="k">Function Team</span><select data-vt2-f="ft"><option>Development</option><option>TPM</option><option>Certification</option></select></div>
-        <div class="vt2-row"><span class="k">Task Owner</span><select data-vt2-f="owner"><option value="">请选择</option><option>test@lenovo.com</option><option>test29@lenovo.com</option><option>huangxl16@lenovo.com</option></select></div>
+        <div class="vt2-row"><span class="k">Task Owner</span><select data-vt2-f="owner"><option value="">请选择</option><option>test@lenovo.com</option><option>test29@lenovo.com</option><option>yac@lenovo.com</option></select></div>
         <div class="vt2-src">来源：${w.draftNew || w.src === '手动添加' ? '手动添加' : 'Comment ' + vt2Esc(w.src) + ' 维度'}</div>
         <div class="type-acts"><button class="btn btn-ghost" type="button" data-vt2-wix="${w.id}">取消</button><button class="btn btn-primary" type="button" data-vt2-wis="${w.id}" ${canSave ? '' : 'disabled'}>保存</button></div>
       </div>`;
@@ -5316,6 +5375,44 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       <div class="vt2-row"><span class="k">Task Owner</span><span>${vt2Esc(w.owner)}</span></div>
       <div class="vt2-src">来源：Comment ${vt2Esc(w.src)} 维度</div>
     </div>`;
+  }
+
+  function vt2SrcLine(w) {
+    return (w.draftNew || w.src === '手动添加') ? '手动添加' : 'Comment ' + vt2Esc(w.src) + ' 维度';
+  }
+  function vt2WiDateCell(w) {
+    if (w.dateMode === 'rel') {
+      return `${vt2Esc(w.date || '—')}<span class="vt2-di" title="相对时间">ⓘ</span>`;
+    }
+    return vt2Esc(w.date || '—');
+  }
+  function vt2WiOps(w) {
+    return `<div class="vt2-ops-wrap">
+      <button type="button" class="vt2-ico" data-vt2-wie="${w.id}" title="编辑">✎</button>
+      <button type="button" class="vt2-ico" data-vt2-widl="${w.id}" title="删除">✕</button>
+    </div>`;
+  }
+  function vt2WiTable() {
+    const st = vt2St();
+    return `<table class="sumtab vt2-witab"><thead><tr>
+      <th></th><th>Work Item</th><th>Description</th><th>Target Date</th><th>Function Team</th><th>Task Owner</th><th>Status</th><th>操作</th>
+    </tr></thead><tbody>${st.wis.map((w) => {
+      if (st.editWi === w.id || w.draftNew) {
+        return `<tr class="bc-detail" data-vt2-wid="${w.id}"><td colspan="8">${vt2WiCard(w)}</td></tr>`;
+      }
+      const open = !!st.wiFold[w.id];
+      const desc = w.desc && String(w.desc).trim() ? vt2Esc(w.desc) : '—（未填写）';
+      return `<tr data-vt2-bwi="${w.id}">
+        <td class="vt2-exp" data-vt2-bexp="${w.id}">${open ? '▾' : '▸'}</td>
+        <td><span class="vt2-gen">${w.ai === false ? '✍️' : '🤖'}</span> ${vt2Esc(w.name)}</td>
+        <td>${desc}</td>
+        <td>${vt2WiDateCell(w)}</td>
+        <td>${vt2Esc(w.ft)}</td>
+        <td>${vt2Esc(w.owner)}</td>
+        <td>${vt2Esc(w.status || 'Draft')}</td>
+        <td class="vt2-ops-cell">${vt2WiOps(w)}</td>
+      </tr>${open ? `<tr class="bc-detail"><td colspan="8"><div class="vt2-src" style="border:none;margin:0;padding:0">来源：${vt2SrcLine(w)}</div></td></tr>` : ''}`;
+    }).join('')}</tbody></table>`;
   }
 
   function vt2Body(id) {
@@ -5427,7 +5524,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
         '一个 Dimension 下有多个 Required Action → 生成多条 Work Item',
       ]) + (st.wiDirty ? `<div class="sim-note">Comment 已修改，是否重新生成 Work Item？ <button class="btn btn-ghost" type="button" style="padding:2px 8px;font-size:12px" data-vt2="genwi">重新生成</button></div>` : '')
         + `<div id="vt2_wilead" class="sd-note" style="margin:8px 0">AI 已从确认的 Comment 中识别出 ${st.wis.length} 项待办 ${VT2_TIP('vt2WiName', 80)}</div>
-        <div id="vt2_wilist">${st.wis.map(vt2WiCard).join('')}</div>
+        <div id="vt2_wilist">${vt2WiTable()}</div>
         <div class="pact"><button class="btn btn-ghost" type="button" data-vt2="addwi">+ 手动添加</button></div>
         <div class="rule-note">⚠ 此为草稿，随 Vote 结果提交至 OTM，由 OTM 确认后才创建并分发，不直接创建</div>`;
     }
@@ -5866,12 +5963,20 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     root.querySelector('[data-vt2=genwi]')?.addEventListener('click', vt2GenWi);
     root.querySelector('[data-vt2=addwi]')?.addEventListener('click', () => {
       const id = 'vt2_w' + Date.now();
-      st.wis.push({ id, name: '', desc: '', date: '', dateMode: '', ft: 'Development', owner: '', src: '手动添加', draftNew: true });
+      st.wis.push({ id, name: '', desc: '', date: '', dateMode: '', ft: 'Development', owner: '', src: '手动添加', draftNew: true, ai: false, status: 'Draft' });
       st.editWi = id;
       vt2RenderPlist();
     });
-    root.querySelectorAll('[data-vt2-wie]').forEach((b) => { b.onclick = () => { st.editWi = b.dataset.vt2Wie; vt2RenderPlist(); }; });
-    root.querySelectorAll('[data-vt2-widl]').forEach((b) => { b.onclick = () => { st.wis = st.wis.filter((w) => w.id !== b.dataset.vt2Widl); vt2RenderPlist(); }; });
+    root.querySelectorAll('[data-vt2-bexp]').forEach((td) => {
+      td.onclick = (e) => {
+        e.stopPropagation();
+        const id = td.dataset.vt2Bexp;
+        st.wiFold[id] = !st.wiFold[id];
+        vt2RenderPlist();
+      };
+    });
+    root.querySelectorAll('[data-vt2-wie]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); st.editWi = b.dataset.vt2Wie; vt2RenderPlist(); }; });
+    root.querySelectorAll('[data-vt2-widl]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); st.wis = st.wis.filter((w) => w.id !== b.dataset.vt2Widl); vt2RenderPlist(); }; });
     root.querySelectorAll('[data-vt2-wix]').forEach((b) => {
       b.onclick = () => {
         const w = st.wis.find((x) => x.id === b.dataset.vt2Wix);
@@ -5935,15 +6040,12 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     const lead = document.getElementById('vt2_wilead');
     if (lead && dm) await dm.streamText(lead, `AI 已从确认的 Comment 中识别出 ${st.wis.length} 项待办…`, document.getElementById('centerBody'));
     if (list) {
-      const cards = [...list.querySelectorAll('.vt2-wi')];
-      cards.forEach((c) => { c.style.opacity = '0'; c.style.transform = 'translateY(8px)'; });
-      for (const c of cards) {
+      const rows = [...list.querySelectorAll('tbody tr[data-vt2-bwi]')];
+      rows.forEach((c) => { c.style.opacity = '0'; });
+      for (const c of rows) {
         if (dm) await dm.sleep(dm.isSkipping() ? 0 : 250);
-        c.style.transition = 'opacity .3s, transform .3s';
+        c.style.transition = 'opacity .3s';
         c.style.opacity = '1';
-        c.style.transform = 'none';
-        const src = c.querySelector('.vt2-src');
-        if (src) { src.classList.add('vt2-hl'); setTimeout(() => src.classList.remove('vt2-hl'), 800); }
       }
     }
     st.openId = 'submit';
@@ -6215,12 +6317,12 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     },
     {
       ft: 'Planner', vote: null, status: 'Inwork', pct: null, submit: null, mandatory: true,
-      due: '2026-11-10', submitted: '逾期 2 天', owner: 'huangxl16@lenovo.com', late: 2,
+      due: '2026-11-10', submitted: '逾期 2 天', owner: 'yac@lenovo.com', late: 2,
       block: '等待 ODM 供应计划确认', comment: '',
     },
     {
       ft: 'TPMDM', vote: 'Disagree', status: 'Completed', pct: 92, submit: 'normal', mandatory: true,
-      due: '2026-11-10', submitted: '11-13 14:20', owner: 'huangxl16@lenovo.com',
+      due: '2026-11-10', submitted: '11-13 14:20', owner: 'yac@lenovo.com',
       reason: '认证需重新送测，周期约 3 周，威胁 11-20 目标实施日',
       comment: '【Certification Impact】\nT14p Gen 5 与 T16p Gen 5 已完成 CCC 认证，本次 CPU 变更触发重新送测，周期约 3 周。\n\n【SW Impact】\n需验证 BIOS 新版本在已认证机型上的兼容性。',
       check: { req: [], mp: [], cr: '', wi: true, wiOk: true, at: '2026-11-13 14:15', ver: 'v1.2' },
@@ -6228,11 +6330,11 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   ];
 
   const OTM2_WI_SEED = [
-    { id: 'otm2_w1', name: 'Control Run', ft: 'Development', voteTask: 'Development Vote Task', src: '【Control Run】', desc: '执行 Control Run 验证，50pcs 于 MFG 产线', date: 'PCR approved 后 3 周', dateMode: 'rel', base: 'PCR approved 2026-10-15', calc: '+ 3 周 = 2026-11-05', absDate: '2026-11-05', owner: 'test@lenovo.com', status: '待确认', ai: true, ra: 'Control Run 验证' },
-    { id: 'otm2_w2', name: 'SW / BIOS Impact', ft: 'Development', voteTask: 'Development Vote Task', src: '【SW / BIOS Impact】', desc: 'BIOS microcode 0x12A 兼容性验证', date: '2026-10-25', dateMode: 'abs', owner: 'test@lenovo.com', status: '待确认', ai: true, ra: 'BIOS microcode 兼容性验证' },
-    { id: 'otm2_w3', name: 'BOM Update', ft: 'BOM', voteTask: 'BOM Vote Task', src: '【BOM Action】', desc: '更新 T1 / LNB BOM / MFG BOM 三处物料清单', date: '2026-11-02', dateMode: 'abs', owner: 'test29@lenovo.com', status: '待确认', ai: true, ra: 'BOM 三处清单更新' },
-    { id: 'otm2_w4', name: 'Certification', ft: 'TPMDM', voteTask: 'TPMDM Vote Task', src: '【Certification Impact】', desc: '已认证 MTM 重新送测评估，预计 3 周', date: '2026-11-08', dateMode: 'abs', owner: 'huangxl16@lenovo.com', status: '待确认', ai: true, ra: '已认证 MTM 重新送测评估' },
-    { id: 'otm2_w5', name: 'BIOS 版本兼容性测试', ft: 'TPMDM', voteTask: 'TPMDM Vote Task', src: '【SW Impact】', desc: '验证 BIOS 新版本在已认证机型上的兼容性', date: '2026-11-06', dateMode: 'abs', owner: 'huangxl16@lenovo.com', status: '待确认', ai: true, ra: 'BIOS 版本兼容性测试' },
+    { id: 'otm2_w1', name: 'Control Run', ft: 'Development', voteTask: 'Development Vote Task', src: '【Control Run】', desc: '执行 Control Run 验证，50pcs 于 MFG 产线', date: 'PCR approved 后 3 周', dateMode: 'rel', base: 'PCR approved 2026-10-15', calc: '+ 3 周 = 2026-11-05', absDate: '2026-11-05', owner: 'test@lenovo.com', status: 'Draft', ai: true, coversRa: true, ra: 'Control Run 验证' },
+    { id: 'otm2_w2', name: 'SW / BIOS Impact', ft: 'Development', voteTask: 'Development Vote Task', src: '【SW / BIOS Impact】', desc: 'BIOS microcode 0x12A 兼容性验证', date: '2026-10-25', dateMode: 'abs', owner: 'test@lenovo.com', status: 'Draft', ai: true, coversRa: true, ra: 'BIOS microcode 兼容性验证' },
+    { id: 'otm2_w3', name: 'BOM Update', ft: 'BOM', voteTask: 'BOM Vote Task', src: '手动添加', desc: '', date: '2026-11-02', dateMode: 'abs', owner: 'test29@lenovo.com', status: 'Draft', ai: false, coversRa: false, ra: 'BOM 三处清单更新' },
+    { id: 'otm2_w4', name: 'Certification', ft: 'TPMDM', voteTask: 'TPMDM Vote Task', src: '【Certification Impact】', desc: '已认证 MTM 重新送测评估，预计 3 周', date: '2026-11-08', dateMode: 'abs', owner: 'yac@lenovo.com', status: 'Draft', ai: true, coversRa: true, ra: '已认证 MTM 重新送测评估' },
+    { id: 'otm2_w5', name: 'BIOS 版本兼容性测试', ft: 'TPMDM', voteTask: 'TPMDM Vote Task', src: '【SW Impact】', desc: '验证 BIOS 新版本在已认证机型上的兼容性', date: '2026-11-06', dateMode: 'abs', owner: 'yac@lenovo.com', status: 'Draft', ai: true, coversRa: true, ra: 'BIOS 版本兼容性测试' },
   ];
 
   const OTM2_DIFFS = [
@@ -6242,12 +6344,10 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   ];
 
   const OTM2_INFO = {
-    summary: { t: '查看汇总', b: '一步内分四区：Vote 结果、Work Item、历史差异、校验继承。Disagree / 未完成 / 强制提交不得被汇总成整体同意。' },
+    summary: { t: '查看汇总', b: '一步内分三区：Vote 结果（行展开含 Comments 与校验详情）、Work Item、历史差异。Disagree / 未完成 / 强制提交不得被汇总成整体同意。' },
     conclusion: { t: '确认 Assessment Conclusion', b: '只读参考区与可编辑结论区必须分离。存在异常时第三段不得为空；删除异常内容时提示但不阻断。' },
-    wicheck: { t: '校验 Work Item', b: '硬阻断、警告、需填原因分级。语义判重可合并且保留全部来源；删除条目须说明不执行原因。' },
-    save: { t: '保存 Work Item', b: '校验通过后定稿保存，并保留来源 Vote Task 与 Required Action 的关联。' },
-    sync: { t: '同步 PACE Sub-task', b: '决策前为待执行；决策后只回显失败项，已成功的不再出现在重试列表。' },
-    decide: { t: '完成 Assessment 决策', b: '单一入口，四组决策卡片。Mandatory 未完成或存在 Disagree 时禁用直接 Approve，Conditional Approve 可用。' },
+    wicheck: { t: '校验并保存 Work Item', b: '硬阻断、警告、需填原因分级。语义判重可合并且保留全部来源；删除对应 Required Action 的条目须说明不执行原因。保存后仍可回改。' },
+    decide: { t: '完成 Assessment 决策', b: '单一入口，四组决策卡片。决策后同步 Sub-task；失败项可定位并单条重试。Mandatory 未完成或 Disagree 时禁用直接 Approve。' },
   };
 
   const OTM2_DECISIONS = [
@@ -6268,7 +6368,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     const d = new Date();
     return `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
-  function otm2CloneWis() { return OTM2_WI_SEED.map((w) => ({ ...w, sources: [{ ft: w.ft, src: w.src, ra: w.ra, voteTask: w.voteTask }] })); }
+  function otm2CloneWis() { return OTM2_WI_SEED.map((w) => ({ ...w, sources: [{ ft: w.ft, src: w.src, ra: w.coversRa === false ? '手动添加' : w.ra, voteTask: w.voteTask }] })); }
 
   function otm2Default() {
     return {
@@ -6278,9 +6378,12 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       showDiff: false, diffA: 1, diffB: 1, concDirty: false,
       diffs: OTM2_DIFFS.map((d) => ({ ...d, mark: '待确认' })),
       wis: otm2CloneWis(), skip: {}, editWi: null, mergeSel: {},
+      bOpen: {}, wiOpen: {}, cOpen: {}, menuWi: null, mergeMode: false, mergeFrom: null, focusWi: null,
+      secOpen: { a: true, b: false, c: false, d: false },
       dupResolved: false, merged: false, notDup: false,
       savedN: 0, syncFail: { id: 'otm2_w1', reason: 'Task Owner test@lenovo.com 在目标 Function Team 中未找到有效账号' },
-      syncOk: [], retried: false, decision: null, decFields: {}, pcrStatus: 'Under_Assessment',
+      syncOk: [], retried: false, syncFailed: false, decision: null, decFields: {}, pcrStatus: 'Under_Assessment',
+      forceNote: '', forceEntry: false,
       ops: [], playedIntro: false, lockOpen: false,
     };
   }
@@ -6288,7 +6391,14 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   function otm2St() {
     const s = state[OTM2_ID];
     if (!s.otm2) s.otm2 = otm2Default();
-    return s.otm2;
+    const st = s.otm2;
+    if (!st.bOpen) st.bOpen = {};
+    if (!st.wiOpen) st.wiOpen = {};
+    if (!st.cOpen) st.cOpen = {};
+    if (!st.secOpen) st.secOpen = { a: true, b: false, c: false, d: false };
+    if (st.openId === 'save') st.openId = 'wicheck';
+    if (st.openId === 'sync') st.openId = 'decide';
+    return st;
   }
   function otm2Log(kind, text) {
     const st = otm2St();
@@ -6365,60 +6475,47 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     }
   }
 
-  function otm2Order() { return ['summary', 'conclusion', 'wicheck', 'save', 'sync', 'decide']; }
+  function otm2Order() { return ['summary', 'conclusion', 'wicheck', 'decide']; }
   function otm2CurrentId() {
     const st = otm2St();
     if (!st.viewed) return 'summary';
     if (!st.concReady) return 'conclusion';
-    if (!st.wiChecked) return 'wicheck';
-    if (!st.wiSaved) return 'save';
-    if (!st.decided) return 'decide';
-    return 'sync';
+    if (!st.wiSaved) return 'wicheck';
+    return 'decide';
   }
   function otm2StepState(id, cur) {
     const st = otm2St();
     const order = otm2Order();
     const idx = order.indexOf(id);
     const curIdx = order.indexOf(cur);
-    const done = {
-      summary: !!st.viewed,
-      conclusion: !!st.concReady,
-      wicheck: !!st.wiChecked,
-      save: !!st.wiSaved,
-      sync: !!st.synced,
-      decide: !!st.decided,
-    };
-    if (id === 'sync' && st.decided && st.synced) {
-      return { st: st.syncFail && !st.retried ? 'warn' : 'done', sum: st.retried ? '5 成功' : '4 成功 · 1 失败' };
-    }
-    if (id === 'sync' && !st.decided) return { st: idx <= curIdx ? 'pending' : 'wait', sum: '待执行' };
-    if (done[id] || (id === 'decide' && state[OTM2_ID].done)) {
-      let sum = '已完成';
-      if (id === 'summary') sum = '已查看汇总';
-      if (id === 'conclusion') sum = otm2Pct(st.conclusion) + '%';
-      if (id === 'wicheck') sum = otm2ActiveWis().length + ' 条待保存';
-      if (id === 'save') sum = '已保存 ' + st.savedN + ' 条';
-      if (id === 'decide') sum = (OTM2_DECISIONS.find((d) => d.id === st.decision) || {}).name || '已决策';
-      return { st: 'done', sum };
+    if (id === 'summary' && st.viewed) return { st: 'done', sum: '已查看汇总' };
+    if (id === 'conclusion' && st.concReady) return { st: 'done', sum: otm2Pct(st.conclusion) + '%' };
+    if (id === 'wicheck' && st.wiSaved) return { st: 'done', sum: '已保存 ' + st.savedN + ' 条' };
+    if (id === 'decide' && st.decided) {
+      if (st.syncFailed && !st.retried) return { st: 'warn', sum: otm2DecLabel() };
+      return { st: 'done', sum: otm2DecLabel() };
     }
     if (idx > curIdx) return { st: 'wait', sum: '待前置完成' };
-    if (id === 'summary' || id === 'conclusion' || id === 'wicheck' || id === 'save' || id === 'decide') return { st: 'pending', sum: '待确认' };
+    if (id === 'wicheck') {
+      const r = otm2CheckReport();
+      const sum = otm2CheckSumText(r);
+      if (r.hardItems.length) return { st: 'err', sum };
+      if (r.needItems.length || r.warnItems.length) return { st: 'warn', sum };
+      return { st: 'run', sum };
+    }
     return { st: 'run', sum: '进行中' };
   }
   function otm2Model() {
-    const st = otm2St();
     const cur = otm2CurrentId();
     const defs = [
       { id: 'summary', title: '查看汇总', info: 'summary' },
       { id: 'conclusion', title: '确认 Assessment Conclusion', info: 'conclusion' },
-      { id: 'wicheck', title: '校验 Work Item', info: 'wicheck' },
-      { id: 'save', title: '保存 Work Item', info: 'save' },
-      { id: 'sync', title: '同步 PACE Sub-task', info: 'sync' },
+      { id: 'wicheck', title: '校验并保存 Work Item', info: 'wicheck' },
       { id: 'decide', title: '完成 Assessment 决策', info: 'decide' },
     ];
     return defs.map((d) => {
       const stt = otm2StepState(d.id, cur);
-      return { ...d, st: stt.st, sum: stt.sum, open: st.openId === d.id };
+      return { ...d, st: stt.st, sum: stt.sum, open: otm2St().openId === d.id };
     });
   }
 
@@ -6430,7 +6527,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
         <div class="prule-t">⚠ 需要你注意的异常　4 项</div>
         <div class="pcheck err in"><span class="ck">🔴</span><div><b>反对意见</b>　1 项<div>TPMDM · Disagree<br>认证需重新送测，周期约 3 周，威胁 11-20 目标实施日　<button type="button" class="btn btn-ghost" style="padding:2px 8px;font-size:12px" data-otm2="goto-tpmdm">查看原始 Comment</button></div></div></div>
         <div class="pcheck err in"><span class="ck">🔴</span><div><b>强制提交</b>　1 项 ${OTM2_TIP('otm2ForceNeq', 87)}<div>Development · 校验未通过仍提交<br>未通过项：Required Dimension 2 项未填、Control Run Validation 不匹配<br>Missing Points：4 项（已 Ignore）<br>原因：客户催得紧，先给结论后补数据<br>提交人：test@lenovo.com · 2026-11-12 16:40<br>后续是否已解决：<b>否</b></div></div></div>
-        <div class="pcheck warn in"><span class="ck">🟡</span><div><b>未完成</b>　1 项<div>Planner · Vote Task 未提交<br>Mandatory：是 · Owner：huangxl16@lenovo.com<br>Target Date：2026-11-10 · <b>已逾期 2 天</b><br>阻塞原因：等待 ODM 供应计划确认</div></div></div>
+        <div class="pcheck warn in"><span class="ck">🟡</span><div><b>未完成</b>　1 项<div>Planner · Vote Task 未提交<br>Mandatory：是 · Owner：yac@lenovo.com<br>Target Date：2026-11-10 · <b>已逾期 2 天</b><br>阻塞原因：等待 ODM 供应计划确认</div></div></div>
         <div class="pcheck warn in"><span class="ck">🟡</span><div><b>低完整度</b>　1 项<div>BOM · Comment 完整度 55%</div></div></div>
         <div class="rule-note">⚠ 以上异常不可隐藏，需在 Assessment Conclusion 中明确说明处理方式</div>
       </div>` : ''}
@@ -6439,6 +6536,24 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
 
   function otm2VoteRow(v) {
     const cls = v.vote === 'Disagree' ? 'err' : (!v.vote || v.late ? 'warn' : '');
+    const open = otm2St().voteOpen === v.ft;
+    let detail = '';
+    if (open) {
+      const submitted = !!v.check;
+      const cmt = submitted
+        ? `<div class="vt2-cmt">${v.comment ? otm2Esc(v.comment) : '（无 Comments）'}</div>`
+        : `<div class="otm2-lock">未提交，无 Comment</div>`;
+      const chk = submitted
+        ? otm2CheckFtHtml(v.ft)
+        : `<div class="pcheck warn in"><span class="ck">⚠</span><div>未提交，无校验结果</div></div>`;
+      detail = `<tr class="bc-detail"><td colspan="8">
+        <div class="otm2-lock">🔒 原始记录，不可修改 · Owner ${otm2Esc(v.owner)}</div>
+        <div class="otm2-sec-t">【完整 Comment】</div>
+        ${cmt}
+        <div class="otm2-sec-t">【校验结果】</div>
+        ${chk}
+      </td></tr>`;
+    }
     return `<tr class="${cls}" data-otm2-ft="${v.ft}">
       <td>${otm2Esc(v.ft)}</td>
       <td>${v.vote ? otm2Esc(v.vote) : '— 未提交'}</td>
@@ -6448,7 +6563,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       <td>${v.mandatory ? 'Yes' : 'No'}</td>
       <td>${otm2Esc(v.due)}</td>
       <td>${otm2Esc(v.submitted)}</td>
-    </tr>${otm2St().voteOpen === v.ft ? `<tr class="bc-detail"><td colspan="8"><div class="otm2-lock">🔒 原始 Comments，不可修改 · Owner ${otm2Esc(v.owner)}</div><div class="vt2-cmt">${v.comment ? otm2Esc(v.comment) : '（未提交，无 Comments）'}</div></td></tr>` : ''}`;
+    </tr>${detail}`;
   }
 
   function otm2WiRead(w) {
@@ -6482,7 +6597,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       </div>
       ${w.dateMode === 'rel' ? `<div class="otm2-rel" style="margin-left:106px">基准：${otm2Esc(w.base || '基准日待定')}<br>计算：${otm2Esc(w.calc || '预计 ' + (w.absDate || ''))} ${OTM2_TIP('otm2RelDate', 91)}</div>` : ''}
       <div class="vt2-row"><span class="k">Function Team</span><select data-otm2-f="ft"><option>Development</option><option>BOM</option><option>TPMDM</option><option>Planner</option></select></div>
-      <div class="vt2-row"><span class="k">Task Owner</span><select data-otm2-f="owner"><option value="">请选择</option><option>test@lenovo.com</option><option>test29@lenovo.com</option><option>huangxl16@lenovo.com</option></select></div>
+      <div class="vt2-row"><span class="k">Task Owner</span><select data-otm2-f="owner"><option value="">请选择</option><option>test@lenovo.com</option><option>test29@lenovo.com</option><option>yac@lenovo.com</option></select></div>
       <div class="vt2-src">来源：${otm2Esc(srcs)}</div>
       <div class="type-acts">
         <button class="btn btn-ghost" type="button" data-otm2-wix="${w.id}">取消</button>
@@ -6517,6 +6632,267 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     if (!String(w.date || '').trim()) miss.push('Target Date 无法识别');
     return miss;
   }
+  function otm2UncoveredIds() {
+    const st = otm2St();
+    return Object.keys(st.skip).filter((k) => st.skip[k] && !st.skip[k].reason);
+  }
+  function otm2ExplainedIds() {
+    const st = otm2St();
+    return Object.keys(st.skip).filter((k) => st.skip[k] && st.skip[k].reason);
+  }
+  function otm2DupLive() {
+    const st = otm2St();
+    const live = otm2ActiveWis();
+    const a = live.find((w) => w.id === 'otm2_w2');
+    const b = live.find((w) => w.id === 'otm2_w5');
+    return !st.dupResolved && a && b ? { a, b } : null;
+  }
+  function otm2IsTight(w) {
+    return w.id === 'otm2_w1';
+  }
+  function otm2RowCheck(w) {
+    const hard = otm2HardBlock(w);
+    const warn = [];
+    const dup = otm2DupLive();
+    if (dup && (w.id === dup.a.id || w.id === dup.b.id)) {
+      const other = w.id === dup.a.id ? dup.b : dup.a;
+      warn.push({ k: 'dup', other, text: `与「${other.name}」语义相似 87%` });
+    }
+    if (otm2IsTight(w)) warn.push({ k: 'tight', text: '历史同类平均 18 天，本次设定 10 天，偏紧' });
+    const level = hard.length ? 'err' : warn.length ? 'warn' : 'ok';
+    return { hard, warn, level };
+  }
+  function otm2CheckReport() {
+    const st = otm2St();
+    const live = otm2ActiveWis();
+    const uncovered = otm2UncoveredIds();
+    const hardItems = [];
+    live.forEach((w) => {
+      otm2HardBlock(w).forEach((m) => hardItems.push({ id: w.id, text: `${w.name || '未命名'}：${m}` }));
+    });
+    uncovered.forEach((id) => {
+      const w = st.wis.find((x) => x.id === id);
+      hardItems.push({ id, text: `${w ? (w.name || w.ra) : id}：未记录不执行原因` });
+    });
+    const warnItems = [];
+    const dup = otm2DupLive();
+    if (dup) warnItems.push({ id: dup.a.id, text: `判重 1 组（${dup.a.name} 与 ${dup.b.name}）` });
+    live.filter(otm2IsTight).forEach((w) => warnItems.push({ id: w.id, text: `Target Date 偏紧 1 条（${w.name}）` }));
+    const needItems = uncovered.map((id) => {
+      const w = st.wis.find((x) => x.id === id);
+      return { id, text: `Required Action 未覆盖：${w ? w.ra : id}` };
+    });
+    const hardFailLive = live.filter((w) => otm2HardBlock(w).length).length;
+    return {
+      liveN: live.length,
+      hardPass: live.length - hardFailLive,
+      hardItems,
+      warnItems,
+      needItems,
+      allOk: !hardItems.length && !warnItems.length && !needItems.length,
+    };
+  }
+  function otm2CheckSumText(r) {
+    if (r.hardItems.length) return '✗ ' + r.hardItems.length + ' 项硬阻断未通过';
+    if (r.needItems.length) return '! ' + r.needItems.length + ' 项需说明原因';
+    if (r.warnItems.length) return '✓ 硬阻断全过 · ⚠ ' + r.warnItems.length + ' 警告';
+    return '✓ 全部通过';
+  }
+  function otm2CheckStatusHtml(r) {
+    if (r.hardItems.length) return `<span class="otm2-ck err">✗</span> ${r.hardItems.length} 项硬阻断未通过`;
+    if (r.needItems.length) return `<span class="otm2-ck need">!</span> ${r.needItems.length} 项需说明原因`;
+    if (r.warnItems.length) return `<span class="otm2-ck ok">✓</span> 硬阻断全过 · <span class="otm2-ck warn">⚠</span> ${r.warnItems.length} 警告`;
+    return `<span class="otm2-ck ok">✓</span> 全部通过`;
+  }
+  function otm2CkMark(level) {
+    if (level === 'err') return '<span class="otm2-ck err">✗</span>';
+    if (level === 'warn') return '<span class="otm2-ck warn">⚠</span>';
+    if (level === 'need') return '<span class="otm2-ck need">!</span>';
+    return '<span class="otm2-ck ok">✓</span>';
+  }
+  function otm2WiDateCell(w) {
+    if (w.dateMode === 'rel') {
+      return `${otm2Esc(w.absDate || '')}<span class="otm2-di" title="相对时间，展开查看计算过程">ⓘ</span>`;
+    }
+    return otm2Esc(w.date || '—');
+  }
+  function otm2WiDetailHtml(w) {
+    const srcs = (w.sources || [{ ft: w.ft, src: w.src, ra: w.ra, voteTask: w.voteTask }]).map((s) => `${s.ft} · ${s.voteTask || ''} · ${s.src}`).join('；');
+    const rel = w.dateMode === 'rel'
+      ? `<div class="otm2-rel">原文：${otm2Esc(w.date)}<br>基准：${otm2Esc(w.base)}<br>计算：${otm2Esc(w.calc)} ${OTM2_TIP('otm2RelDate', 91)}</div>`
+      : '';
+    return `<div class="vt2-row"><span class="k">Description</span><span>${w.desc ? otm2Esc(w.desc) : '—（未填写）'}</span></div>
+      ${rel}
+      <div class="vt2-src">来源：${otm2Esc(srcs)} ${OTM2_TIP('otm2Trace', 90)}</div>`;
+  }
+  function otm2Gen(w) {
+    return `<span class="otm2-gen">${w.ai ? '🤖' : '✍️'}</span>`;
+  }
+  function otm2DescCell(w) {
+    return w.desc && String(w.desc).trim() ? otm2Esc(w.desc) : '—（未填写）';
+  }
+  function otm2OpsHtml(w) {
+    const st = otm2St();
+    const menu = st.menuWi === w.id;
+    return `<div class="otm2-ops-wrap">
+      <button type="button" class="otm2-ico" data-otm2-wie="${w.id}" title="编辑">✎</button>
+      <button type="button" class="otm2-ico" data-otm2-widl="${w.id}" title="删除">✕</button>
+      <button type="button" class="otm2-ico" data-otm2-more="${w.id}" title="更多">⋯</button>
+      ${menu ? `<div class="otm2-more">
+        <button type="button" data-otm2-split="${w.id}">⊟　拆分为两条</button>
+        <button type="button" data-otm2-mergefrom="${w.id}">⊕　合并到…</button>
+        <button type="button" data-otm2-skipmark="${w.id}">⊘　标记无需执行</button>
+        <button type="button" data-otm2-backft="${w.id}">↩　退回 Function Team</button>
+      </div>` : ''}
+    </div>`;
+  }
+  function otm2Sec(id, title, sum, inner, warn) {
+    const open = !!otm2St().secOpen[id];
+    return `<div class="otm2-sec" data-otm2-sec="${id}">
+      <button type="button" class="otm2-sec-h" data-otm2-secx="${id}">
+        <span class="otm2-sec-ch">${open ? '▾' : '▸'}</span>
+        <span class="otm2-sec-tt">${title}</span>
+        <span class="otm2-sec-sum${warn ? ' warn' : ''}">${sum}</span>
+      </button>
+      ${open ? `<div class="otm2-sec-b">${inner}</div>` : ''}
+    </div>`;
+  }
+  function otm2HistSection() {
+    const st = otm2St();
+    const keep = st.diffs.filter((d) => d.mark !== '忽略');
+    if (!keep.length) {
+      return '【历史 PCR 差异】\n历史差异均已标记为忽略，不写入本结论。差异仅供参考，不替代本次 PCR 的实际结论。';
+    }
+    const lines = keep.map((d) => `· ${d.kind}${d.mark === '待确认' ? '（待确认）' : ''}：${d.sum}`);
+    return `【历史 PCR 差异】\n与 PCR-2025-07612（相似度 94%）相比：\n${lines.join('\n')}\n以上差异仅供参考，不替代本次 PCR 的实际结论。`;
+  }
+  function otm2PatchHist() {
+    const st = otm2St();
+    const s = state[OTM2_ID];
+    const re = /【历史 PCR 差异】[\s\S]*?(?=【Work Item 与待办】|$)/;
+    const sec = otm2HistSection() + '\n\n';
+    st.conclusion = re.test(st.conclusion) ? st.conclusion.replace(re, sec) : (st.conclusion.trim() + '\n\n' + sec);
+    if (s) s.comment = st.conclusion;
+    st.concDirty = true;
+  }
+  function otm2DirtyWi() {
+    const st = otm2St();
+    st.wiChecked = false;
+    st.wiSaved = false;
+  }
+  function otm2CanSave() {
+    const r = otm2CheckReport();
+    return { ok: !r.hardItems.length && !r.needItems.length, r };
+  }
+  function otm2Who() { return 'test@lenovo.com'; }
+  function otm2DecLabel() {
+    const st = otm2St();
+    const d = OTM2_DECISIONS.find((x) => x.id === st.decision);
+    if (!d) return '已决策';
+    return d.name + (st.forceNote ? '（强制提交）' : '');
+  }
+  function otm2SyncHtml() {
+    const st = otm2St();
+    const liveN = otm2ActiveWis().length;
+    const fail = !!(st.syncFailed && !st.retried);
+    const okN = fail ? Math.max(0, liveN - 1) : liveN;
+    const failW = otm2ActiveWis().find((w) => w.id === st.syncFail.id);
+    return `<div class="vt2-row"><span class="k">同步结果</span><span>
+      <span class="otm2-ck ok">✓</span> ${okN} 条已同步为 Sub-task
+      <span class="iinfo otm2-di" title="Sub-task 含 PCR Number、Work Item Name、Description、Function Team、Task Owner、Target Date、来源 Vote Task、来源 Comments、创建人和创建时间">ⓘ</span>
+      ${fail ? `<div class="pcheck err in" style="margin-top:6px"><span class="ck">✗</span><div><b>${otm2Esc(failW ? failW.name : 'Control Run')}</b>　同步失败
+        <div>${otm2Esc(st.syncFail.reason)}</div>
+        <div class="type-acts">
+          <button type="button" class="btn btn-ghost otm2-mini" data-otm2="locfail">定位到该条</button>
+          <button type="button" class="btn btn-ghost otm2-mini" data-otm2="retry">重新提交</button>
+        </div></div></div>` : ''}
+    </span></div>`;
+  }
+  function otm2ResultHtml() {
+    const st = otm2St();
+    return `<div class="submit-dock">
+      <div class="otm2-sync">
+        <div class="pcheck ok in"><span class="ck">✓</span><div><b>本任务已处理完成</b></div></div>
+        <div class="vt2-row"><span class="k">决策</span><span>${otm2Esc(otm2DecLabel())}</span></div>
+        ${st.forceNote ? `<div class="vt2-row"><span class="k">强制提交原因</span><span>${otm2Esc(st.forceNote)}</span></div>` : ''}
+        <div class="vt2-row"><span class="k">PCR 状态</span><span>Under_Assessment → <b>${otm2Esc(st.pcrStatus)}</b></span></div>
+        ${otm2SyncHtml()}
+        <div class="pact" style="justify-content:flex-end">
+          <button type="button" class="btn btn-ghost" data-otm2="undecide">撤销决策</button>
+        </div>
+      </div>
+    </div>`;
+  }
+  function otm2LocBtn(id, text) {
+    return `<button type="button" class="btn btn-ghost otm2-loc" data-otm2-loc="${id}">· ${otm2Esc(text)}</button>`;
+  }
+  function otm2WiBTable(wis) {
+    const st = otm2St();
+    return `<table class="sumtab otm2-witab"><thead><tr>
+      <th></th><th>Work Item</th><th>Description</th><th>Target Date</th><th>Function Team</th><th>Task Owner</th><th>Status</th><th>操作</th>
+    </tr></thead><tbody>${wis.map((w) => {
+      if (st.editWi === w.id || w.draftNew) {
+        return `<tr class="bc-detail" data-otm2-wid="${w.id}"><td colspan="8">${otm2WiEdit(w)}</td></tr>`;
+      }
+      const open = !!st.bOpen[w.id];
+      return `<tr data-otm2-bwi="${w.id}" class="${st.focusWi === w.id ? 'otm2-hit' : ''}">
+        <td class="otm2-exp" data-otm2-bexp="${w.id}">${open ? '▾' : '▸'}</td>
+        <td>${otm2Gen(w)} ${otm2Esc(w.name)}</td>
+        <td>${otm2DescCell(w)}</td>
+        <td>${otm2WiDateCell(w)}</td>
+        <td>${otm2Esc(w.ft)}</td>
+        <td>${otm2Esc(w.owner)}</td>
+        <td>${otm2Esc(w.status)}</td>
+        <td class="otm2-ops-cell">${otm2OpsHtml(w)}</td>
+      </tr>${open ? `<tr class="bc-detail"><td colspan="8">${otm2WiDetailHtml(w)}</td></tr>` : ''}`;
+    }).join('')}</tbody></table>`;
+  }
+  function otm2IssueRow(w, chk, colspan) {
+    const bits = [];
+    chk.hard.forEach((m) => {
+      bits.push(`<div class="pcheck err in"><span class="ck">✗</span><div>${otm2Esc(m)}，必须填写后才能保存</div></div>`);
+    });
+    chk.warn.forEach((x) => {
+      if (x.k === 'dup') {
+        bits.push(`<div class="pcheck warn in"><span class="ck">⚠</span><div>${otm2Esc(x.text)}
+          <div class="type-acts">
+            <button type="button" class="btn btn-ghost" data-otm2="merge">合并为一条</button>
+            <button type="button" class="btn btn-ghost" data-otm2="notdup">确认不重复</button>
+          </div></div></div>`);
+      } else {
+        bits.push(`<div class="pcheck warn in"><span class="ck">⚠</span><div>${otm2Esc(x.text)}</div></div>`);
+      }
+    });
+    if (!bits.length) return '';
+    return `<tr class="otm2-issue" data-otm2-iss="${w.id}"><td colspan="${colspan}">${bits.join('')}</td></tr>`;
+  }
+  function otm2WiCheckTable(wis) {
+    const st = otm2St();
+    const colspan = st.mergeMode ? 9 : 8;
+    return `${st.mergeMode ? `<div class="otm2-lock">选择要合并到的目标行　<button type="button" class="btn btn-ghost" data-otm2="mergex">取消</button></div>` : ''}
+    <table class="sumtab otm2-witab"><thead><tr>
+      ${st.mergeMode ? '<th></th>' : ''}
+      <th></th><th>校验</th><th>Work Item</th><th>Target Date</th><th>Function Team</th><th>Task Owner</th><th>Status</th><th>操作</th>
+    </tr></thead><tbody>${wis.map((w) => {
+      if (st.editWi === w.id || w.draftNew) {
+        return `<tr class="bc-detail" data-otm2-wid="${w.id}"><td colspan="${colspan}">${otm2WiEdit(w)}</td></tr>`;
+      }
+      const chk = otm2RowCheck(w);
+      const open = !!st.wiOpen[w.id] || st.focusWi === w.id;
+      const mergePick = st.mergeMode && w.id !== st.mergeFrom;
+      return `<tr data-otm2-wid="${w.id}" class="${st.focusWi === w.id ? 'otm2-hit' : ''}">
+        ${st.mergeMode ? `<td>${mergePick ? `<input type="checkbox" data-otm2-mtgt="${w.id}">` : ''}</td>` : ''}
+        <td class="otm2-exp" data-otm2-wexp="${w.id}">${open ? '▾' : '▸'}</td>
+        <td>${otm2CkMark(chk.level)}</td>
+        <td>${otm2Gen(w)} ${otm2Esc(w.name || '（未命名）')}</td>
+        <td>${otm2WiDateCell(w)}</td>
+        <td>${otm2Esc(w.ft)}</td>
+        <td>${otm2Esc(w.owner)}</td>
+        <td>${otm2Esc(w.status || 'Draft')}</td>
+        <td class="otm2-ops-cell">${otm2OpsHtml(w)}</td>
+      </tr>${otm2IssueRow(w, chk, colspan)}${open ? `<tr class="bc-detail"><td colspan="${colspan}">${otm2WiDetailHtml(w)}</td></tr>` : ''}`;
+    }).join('')}</tbody></table>`;
+  }
 
   function otm2Body(id) {
     const st = otm2St();
@@ -6530,42 +6906,47 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
         return true;
       });
       const wis = otm2ActiveWis();
-      return `<div class="otm2-sec" data-otm2-sec="a"><div class="otm2-sec-t">区域 A · Vote Task 结果汇总 ${OTM2_TIP('otm2NoImpact', 86)}</div>
-        <div class="otm2-fil">
-          <button type="button" class="btn btn-ghost ${fil === 'all' ? 'on' : ''}" data-otm2-fil="all">全部 4</button>
-          <button type="button" class="btn btn-ghost ${fil === 'dis' ? 'on' : ''}" data-otm2-fil="dis">反对 1</button>
-          <button type="button" class="btn btn-ghost ${fil === 'open' ? 'on' : ''}" data-otm2-fil="open">未完成 1</button>
-          <button type="button" class="btn btn-ghost ${fil === 'chk' ? 'on' : ''}" data-otm2-fil="chk">校验异常 1</button>
-          <button type="button" class="btn btn-ghost ${fil === 'force' ? 'on' : ''}" data-otm2-fil="force">强制提交 1</button>
+      const pendingDiff = st.diffs.filter((d) => d.mark === '待确认').length;
+      const innerA = `<div class="otm2-tabs">
+          <button type="button" class="${fil === 'all' ? 'on' : ''}" data-otm2-fil="all">全部 4</button>
+          <button type="button" class="bad ${fil === 'dis' ? 'on' : ''}" data-otm2-fil="dis">⚠ 反对 1</button>
+          <button type="button" class="amber ${fil === 'open' ? 'on' : ''}" data-otm2-fil="open">⏱ 未完成 1</button>
+          <button type="button" class="bad ${fil === 'chk' ? 'on' : ''}" data-otm2-fil="chk">✗ 校验异常 1</button>
+          <button type="button" class="amber ${fil === 'force' ? 'on' : ''}" data-otm2-fil="force">⚠ 强制提交 1</button>
         </div>
         <table class="sumtab"><thead><tr><th>Function Team</th><th>Vote Result</th><th>Task Status</th><th>完整度</th><th>提交方式</th><th>Mandatory</th><th>Target Date</th><th>Submitted Time</th></tr></thead>
         <tbody>${votes.map(otm2VoteRow).join('')}</tbody></table>
-        <div class="otm2-lock">点击行展开该职能完整 Comments（只读）。Comments / Task Owner 在展开区查看。</div>
-      </div>
-      <div class="otm2-sec" data-otm2-sec="b"><div class="otm2-sec-t">区域 B · Work Item 汇总　来自 3 个职能　${wis.length} 条 ${OTM2_TIP('otm2Trace', 90)}</div>
-        ${wis.map(otm2WiRead).join('')}
-      </div>
-      <div class="otm2-sec" data-otm2-sec="c">${otm2RuleBox('Difference 生成规则', [
+        <div class="otm2-lock">点击行展开该职能完整 Comments 与校验结果（只读）。</div>`;
+      const innerB = `${otm2WiBTable(wis)}<div class="pact"><button type="button" class="btn btn-ghost" data-otm2="addwi">＋ 新增</button></div>`;
+      const innerC = `${otm2RuleBox('Difference 生成规则', [
         '获取 Top 3 相似 PCR，对比当前 PCR 与相似 PCR 中相同 Function Team 的历史 Vote Comments',
         '识别 7 类差异：① 当前新增的信息 ② 当前缺失的信息 ③ 与历史处理方式不一致 ④ 新增或减少的风险 ⑤ Work Item 差异 ⑥ Control Run 结论差异 ⑦ Target Date 或行动计划差异',
         'AI 不得因历史 PCR 相似就覆盖当前 Comments 或 Work Item，差异仅供参考',
       ])}
-        ${st.diffs.map((d) => `<div class="sim-card">
-          <div><b>${otm2Esc(d.ft)}</b> · 与 ${otm2Esc(d.pcr)} 的差异</div>
-          <div style="font-size:12.5px;line-height:1.55;margin-top:4px">差异类型：${otm2Esc(d.kind)}<br>当前：${otm2Esc(d.cur)}<br>历史：${otm2Esc(d.hist)}<br>摘要：${otm2Esc(d.sum)}</div>
-          <div class="type-warn" style="white-space:normal">⚠ 仅供参考，请自行判断可比性</div>
-          <div class="type-acts">OTM 处理：
-            <button type="button" class="btn btn-ghost ${d.mark === '接受' ? 'on' : ''}" data-otm2-dmark="${d.id}" data-v="接受">接受</button>
-            <button type="button" class="btn btn-ghost ${d.mark === '忽略' ? 'on' : ''}" data-otm2-dmark="${d.id}" data-v="忽略">忽略</button>
-            <button type="button" class="btn btn-ghost ${d.mark === '待确认' ? 'on' : ''}" data-otm2-dmark="${d.id}" data-v="待确认">待确认</button>
-          </div>
-        </div>`).join('')}
-      </div>
-      <div class="otm2-sec" data-otm2-sec="d"><div class="otm2-sec-t">区域 D · Comments 校验结果继承</div>
-        <div class="otm2-fil">${OTM2_VOTES.map((v) => `<button type="button" class="btn btn-ghost ${st.checkFt === v.ft ? 'on' : ''}" data-otm2-cft="${v.ft}">${v.ft}</button>`).join('')}</div>
-        ${otm2CheckFtHtml(st.checkFt)}
-      </div>
-      <div class="pact"><button type="button" class="btn btn-primary" data-otm2="viewed">已查看，继续</button></div>`;
+        <div class="otm2-lock">仅供参考，请自行判断可比性</div>
+        <table class="sumtab otm2-witab"><thead><tr>
+          <th></th><th>Function</th><th>差异类型</th><th>摘要</th><th>OTM 处理</th>
+        </tr></thead><tbody>${st.diffs.map((d) => {
+          const open = !!st.cOpen[d.id];
+          return `<tr data-otm2-crow="${d.id}">
+            <td class="otm2-exp">${open ? '▾' : '▸'}</td>
+            <td>${otm2Esc(d.ft)}</td>
+            <td>${otm2Esc(d.kind)}</td>
+            <td>${otm2Esc(d.sum)}</td>
+            <td class="otm2-radcell">
+              <label class="otm2-rad acc"><input type="radio" name="otm2_dm_${d.id}" data-otm2-dmark="${d.id}" data-v="接受" ${d.mark === '接受' ? 'checked' : ''}> 接受</label>
+              <label class="otm2-rad ign"><input type="radio" name="otm2_dm_${d.id}" data-otm2-dmark="${d.id}" data-v="忽略" ${d.mark === '忽略' ? 'checked' : ''}> 忽略</label>
+              <label class="otm2-rad wait"><input type="radio" name="otm2_dm_${d.id}" data-otm2-dmark="${d.id}" data-v="待确认" ${d.mark === '待确认' ? 'checked' : ''}> 待确认</label>
+            </td>
+          </tr>${open ? `<tr class="bc-detail"><td colspan="5"><div class="otm2-cmp">
+            <div><b>当前</b><div>${otm2Esc(d.cur)}</div></div>
+            <div><b>历史 · ${otm2Esc(d.pcr)}</b><div>${otm2Esc(d.hist)}</div></div>
+          </div></td></tr>` : ''}`;
+        }).join('')}</tbody></table>`;
+      return otm2Sec('a', '区域 A · Vote Task 结果汇总', '4 个职能', innerA)
+        + otm2Sec('b', '区域 B · Work Item 汇总', `来自 3 个职能 · ${wis.length} 条 ${OTM2_TIP('otm2Trace', 90)}`, innerB)
+        + otm2Sec('c', '区域 C · 历史相似 PCR 差异', `对比 PCR-2025-07612（94%）· 3 条 · 待处理 ${pendingDiff}`, innerC, pendingDiff > 0)
+        + `<div class="pact"><button type="button" class="btn btn-primary" data-otm2="viewed">已查看，继续</button></div>`;
     }
     if (id === 'conclusion') {
       const c = otm2Covered(st.conclusion);
@@ -6608,19 +6989,16 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     if (id === 'wicheck') {
       const wis = otm2St().wis;
       const live = otm2ActiveWis();
-      const dup = !st.dupResolved && live.some((w) => w.id === 'otm2_w2') && live.some((w) => w.id === 'otm2_w5');
-      const uncovered = Object.keys(st.skip).filter((k) => st.skip[k] && !st.skip[k].reason);
-      const explained = Object.keys(st.skip).filter((k) => st.skip[k] && st.skip[k].reason);
+      const uncovered = otm2UncoveredIds();
+      const explained = otm2ExplainedIds();
       return otm2RuleBox('Work Item 校验规则', [
         '硬阻断项（必须修正才能保存）：① Description 不为空 ② Function Team 有效 ③ Task Owner 有效 ④ Target Date 可识别 ⑨ 被删除或不采纳的 Work Item 已记录原因',
         '警告项（提示但不阻断）：⑤ Target Date 不早于合理基准日期（基准依据历史 PCR 同类 Work Item 周期）⑥ 不存在重复 Work Item（语义相似判定）⑧ 与 Control Run 结论无明显冲突',
         '需说明原因项：⑦ 所有有效 Required Action 均已被覆盖；未覆盖时必须填写原因',
-      ]) + (dup ? `<div class="type-warn otm2-dup" style="white-space:normal">⚠ 检测到可能重复的 Work Item<br>① BIOS microcode 兼容性验证　来源：Development<br>② BIOS 版本兼容性测试　来源：TPMDM<br>语义相似度 87%<br>
-        <button type="button" class="btn btn-ghost" data-otm2="merge">合并为一条</button>
-        <button type="button" class="btn btn-ghost" data-otm2="notdup">确认不重复</button></div>` : '')
+      ])
         + (uncovered.length ? uncovered.map((id) => {
           const w = wis.find((x) => x.id === id);
-          return `<div class="pcheck err in"><span class="ck">✗</span><div><b>未覆盖</b>　${otm2Esc(w ? w.ra : id)}　需填写不执行原因
+          return `<div class="pcheck err in" data-otm2-wid="${id}"><span class="ck">✗</span><div><b>未覆盖</b>　${otm2Esc(w ? w.ra : id)}　需填写不执行原因
             <div class="vt2-row" style="margin-top:6px"><span class="k">原因</span><input data-otm2-skip="${id}" placeholder="说明为何不执行"></div>
             <button type="button" class="btn btn-ghost" data-otm2-skipok="${id}">记录原因</button></div></div>`;
         }).join('') : '')
@@ -6628,51 +7006,26 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
           const w = wis.find((x) => x.id === id);
           return `<div class="pcheck wait in"><span class="ck">○</span><div><b>已说明不执行</b>　${otm2Esc(w ? w.ra : id)}　·　${otm2Esc(st.skip[id].reason)}</div></div>`;
         }).join('')
-        + live.map((w) => {
-          const tight = w.dateMode === 'abs' && w.date === '2026-10-25';
-          return `<div>
-            <label style="display:flex;align-items:center;gap:6px;margin:6px 0 0;font-size:12px;color:var(--ink-3)"><input type="checkbox" data-otm2-msel="${w.id}" ${st.mergeSel[w.id] ? 'checked' : ''}> 选择以合并</label>
-            ${st.editWi === w.id || w.draftNew ? otm2WiEdit(w) : otm2WiRead(w) + `<div class="ops otm2-ops">
-              <button type="button" class="btn btn-ghost" data-otm2-wie="${w.id}">✎ 编辑</button>
-              <button type="button" class="btn btn-ghost" data-otm2-widl="${w.id}">✕ 删除</button>
-              <button type="button" class="btn btn-ghost" data-otm2-split="${w.id}">拆分</button>
-              <button type="button" class="btn btn-ghost" data-otm2-skipmark="${w.id}">标记无需执行</button>
-              <button type="button" class="btn btn-ghost" data-otm2-backft="${w.id}">退回 Function Team</button>
-            </div>`}
-            ${tight ? '<div class="type-warn" style="white-space:normal">⚠ 历史同类平均 18 天，本次设定 10 天，偏紧</div>' : ''}
-            ${w.dateMode === 'rel' ? `<div class="type-warn" style="white-space:normal">相对时间 ${OTM2_TIP('otm2RelDate', 91)}：${otm2Esc(w.date)} · 基准 ${otm2Esc(w.base)} · ${otm2Esc(w.calc)}</div>` : ''}
+        + otm2WiCheckTable(live)
+        + (() => {
+          const gate = otm2CanSave();
+          const loc = gate.r.hardItems.concat(gate.r.needItems).map((x) => otm2LocBtn(x.id, x.text)).join('');
+          return `<div class="pact otm2-savebar">
+            <button type="button" class="btn btn-ghost" data-otm2="addwi">＋ 新增 Work Item</button>
+            ${gate.ok ? '' : `<span class="otm2-lock">⚠ 存在 ${gate.r.hardItems.length || gate.r.needItems.length} 项硬阻断未通过，修正后方可保存${loc}</span>`}
+            <button type="button" class="btn btn-primary" data-otm2="savewi" ${gate.ok ? '' : 'disabled'}>保存 Work Item</button>
           </div>`;
-        }).join('')
-        + `<div class="pact">
-          <button type="button" class="btn btn-ghost" data-otm2="addwi">＋ 新增 Work Item</button>
-          <button type="button" class="btn btn-ghost" data-otm2="domerge">合并勾选</button>
-          <button type="button" class="btn btn-ghost" data-otm2="checkall">校验全部</button>
-        </div>`;
-    }
-    if (id === 'save') {
-      const n = otm2ActiveWis().length;
-      const skipN = Object.keys(st.skip).filter((k) => st.skip[k] && st.skip[k].reason).length;
-      const blocks = otm2ActiveWis().flatMap(otm2HardBlock);
-      const uncovered = Object.keys(st.skip).filter((k) => st.skip[k] && !st.skip[k].reason);
-      return `<div class="sd-note">待保存：${n} 条${st.merged ? '（其中 1 条为合并后的条目）' : ''}<br>已标记不执行：${skipN} 条（已记录原因）</div>
-        ${blocks.length || uncovered.length ? `<div class="type-warn" style="white-space:normal">存在硬阻断：${[...blocks, ...uncovered.map(() => '未覆盖项未填原因')].join('、')}</div>` : ''}
-        <div class="pact"><button type="button" class="btn btn-primary" data-otm2="savewi" ${blocks.length || uncovered.length ? 'disabled' : ''}>保存 Work Item</button></div>`;
-    }
-    if (id === 'sync') {
-      if (!st.decided) return `<div class="sd-note">将在完成 Assessment 决策后自动执行</div>`;
-      if (st.retried) return `<div class="pcheck ok in"><span class="ck">✓</span><div>5 条已同步为 PACE Sub-task</div></div>`;
-      const fail = otm2ActiveWis().find((w) => w.id === st.syncFail.id);
-      return `<div class="pcheck err in"><span class="ck">✗</span><div><b>${otm2Esc(fail ? fail.name : 'Control Run')}</b>　同步失败<div>同步失败：${otm2Esc(st.syncFail.reason)}</div>
-        <div class="type-acts"><button type="button" class="btn btn-ghost" data-otm2="locfail">定位到该条</button>
-        <button type="button" class="btn btn-primary" data-otm2="retry">重新同步</button></div></div></div>
-        <div class="otm2-lock">已成功的 4 条不再显示，避免重复同步。Sub-task 含 PCR Number、Work Item Name、Description、Function Team、Task Owner、Target Date、来源 Vote Task、来源 Comments、创建人和创建时间。</div>`;
+        })();
     }
     if (id === 'decide') {
+      if (st.decided) return otm2ResultHtml();
+      const hard = otm2HardGate();
       return `<div class="submit-dock">
-        <div class="sd-note">底部不平铺八个决策。先做确认前检查，再按四组选择。${OTM2_TIP('otm2Single', 88)}${OTM2_TIP('otm2Gate', 89)}</div>
+        ${otm2PrecheckHtml()}
         <div class="pact">
           <button type="button" class="btn btn-ghost" data-otm2="draft">保存草稿</button>
           <button type="button" class="btn btn-primary" data-otm2="decide">完成 Assessment</button>
+          ${hard ? `<button type="button" class="btn-force" data-otm2="force">Force Submit</button>${OTM2_TIP('otm2Gate', 89)}` : ''}
         </div>
       </div>`;
     }
@@ -6707,102 +7060,161 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   }
   function otm2HidePop() { document.getElementById('otm2_pop')?.remove(); }
 
-  function otm2ApproveDisabled() {
-    return { disabled: true, why: '⚠ 无法 Approve：还有 1 个 Mandatory Vote Task 未完成（Planner），且 TPMDM 投票结果为 Disagree。可选择 Conditional Approve、Pending 或 Return。' };
+  function otm2HardGate() {
+    return true;
+  }
+  function otm2PrecheckHtml() {
+    const n = otm2ActiveWis().length;
+    const hard = otm2HardGate();
+    return `<div class="otm2-sync">
+      <div class="otm2-sec-t">确认前检查</div>
+      <div class="pcheck err in"><span class="ck">✗</span><div>Mandatory Vote Task 全部完成　1 项未完成（Planner）</div></div>
+      <div class="pcheck err in"><span class="ck">✗</span><div>不存在 Disagree　1 项 Disagree（TPMDM）</div></div>
+      <div class="pcheck warn in"><span class="ck">⚠</span><div>Control Run 不匹配　1 项（提示）</div></div>
+      <div class="pcheck warn in"><span class="ck">⚠</span><div>存在强制提交　1 条（提示）</div></div>
+      <div class="pcheck warn in"><span class="ck">⚠</span><div>Missing Points 已 Ignore　4 项（提示）</div></div>
+      <div class="pcheck ok in"><span class="ck">✓</span><div>Work Item 完整　${n} 条已确认</div></div>
+      <div class="pcheck ok in"><span class="ck">✓</span><div>Owner 与 Target Date 明确　全部有效</div></div>
+      ${hard ? `<div class="type-warn" style="white-space:normal">⚠ 存在硬性未通过项，无法直接 Approve，可选择 Conditional Approve / Pending / 退回，或 Force Submit ${OTM2_TIP('otm2Gate', 89)}</div>` : ''}
+    </div>`;
   }
 
-  function otm2OpenDecide(phase, pick) {
+  function otm2CaptureDecFields() {
     const st = otm2St();
-    if (phase === 'check') {
-      otm2Pop(`<h3>确认前检查</h3>
-        <div class="pcheck err in"><span class="ck">✗</span><div>Mandatory Vote Task 全部完成　1 项未完成</div></div>
-        <div class="pcheck err in"><span class="ck">✗</span><div>不存在 Disagree　1 项 Disagree</div></div>
-        <div class="pcheck warn in"><span class="ck">⚠</span><div>不存在未解决的 Missing Points　4 项已 Ignore</div></div>
-        <div class="pcheck err in"><span class="ck">✗</span><div>不存在 Control Run 不匹配　1 项不匹配</div></div>
-        <div class="pcheck warn in"><span class="ck">⚠</span><div>不存在强制提交　1 条</div></div>
-        <div class="pcheck ok in"><span class="ck">✓</span><div>Work Item 完整　${otm2ActiveWis().length} 条已确认</div></div>
-        <div class="pcheck ok in"><span class="ck">✓</span><div>Owner 与 Target Date 明确　全部有效</div></div>
-        <div class="type-warn" style="white-space:normal">存在异常，可选择的决策已相应限制 ${OTM2_TIP('otm2Gate', 89)}</div>
-        <div class="pact" style="justify-content:flex-end"><button type="button" class="btn btn-ghost" id="otm2_pop_x">取消</button><button type="button" class="btn btn-primary" id="otm2_pop_ok">继续选择决策</button></div>`);
-      document.getElementById('otm2_pop_x').onclick = otm2HidePop;
-      document.getElementById('otm2_pop_ok').onclick = () => otm2OpenDecide('choose');
-      return;
-    }
-    if (phase === 'choose') {
-      const dis = otm2ApproveDisabled();
-      let html = `<h3>请选择 Assessment 决策</h3><div class="type-warn" style="white-space:normal">${dis.why}</div>`;
-      let last = '';
-      OTM2_DECISIONS.forEach((d) => {
-        if (d.g !== last) { html += `<div class="otm2-sec-t" style="margin:10px 0 6px">${d.g}</div>`; last = d.g; }
-        const block = (d.id === 'awi' || d.id === 'ac');
-        html += `<button type="button" class="type-opt ${d.danger ? 'danger' : ''} ${pick === d.id ? 'on' : ''}" data-otm2-dec="${d.id}" ${block ? 'disabled' : ''}>
-          <span class="to-radio">${pick === d.id ? '●' : '○'}</span>
-          <span class="to-main"><span class="to-row"><span class="to-name">${d.name}</span></span><div class="to-basis">${d.desc}</div></span>
-        </button>`;
-      });
-      html += `<div class="pact" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn btn-ghost" id="otm2_pop_x">取消</button><button type="button" class="btn btn-primary" id="otm2_pop_ok" ${pick ? '' : 'disabled'}>确认并继续</button></div>`;
-      otm2Pop(html);
-      document.getElementById('otm2_pop_x').onclick = otm2HidePop;
-      document.querySelectorAll('[data-otm2-dec]').forEach((b) => {
-        b.onclick = () => otm2OpenDecide('choose', b.dataset.otm2Dec);
-      });
-      document.getElementById('otm2_pop_ok').onclick = () => { if (pick) otm2OpenDecide(pick === 'rj' ? 'reject2' : 'fields', pick); };
-      return;
-    }
-    if (phase === 'reject2') {
-      otm2Pop(`<h3>确认拒绝并终止？</h3><p style="color:var(--red)">Reject PCR 将终止该 PCR，需二次确认。</p>
-        <div class="pact" style="justify-content:flex-end"><button type="button" class="btn btn-ghost" id="otm2_pop_x">取消</button><button type="button" class="btn btn-warnghost" id="otm2_pop_ok">仍要拒绝</button></div>`);
-      document.getElementById('otm2_pop_x').onclick = () => otm2OpenDecide('choose', 'rj');
-      document.getElementById('otm2_pop_ok').onclick = () => otm2OpenDecide('fields', 'rj');
-      return;
-    }
-    const d = OTM2_DECISIONS.find((x) => x.id === pick);
+    const next = { ...st.decFields };
+    const f1 = document.getElementById('otm2_f1');
+    const f2 = document.getElementById('otm2_f2');
+    const f3 = document.getElementById('otm2_f3');
+    const fr = document.getElementById('otm2_force_r');
+    if (f1) next.f1 = f1.value;
+    if (f2) next.f2 = f2.value;
+    if (f3) next.f3 = f3.value;
+    if (fr) next.force = fr.value;
+    st.decFields = next;
+  }
+  function otm2DecCanConfirm(pick, forceMode) {
+    if (!pick) return false;
+    const fr = (document.getElementById('otm2_force_r')?.value || '').trim();
+    if (forceMode && !fr) return false;
+    return true;
+  }
+  function otm2OpenDecide(pick, force) {
+    const st = otm2St();
+    if (typeof force === 'boolean') st.forceEntry = force;
+    const forceMode = !!st.forceEntry;
+    const hard = otm2HardGate();
+    const dsel = pick ? OTM2_DECISIONS.find((x) => x.id === pick) : null;
     const f = st.decFields;
-    const fields = {
-      awi: '',
-      ac: `<div class="vt2-row"><span class="k">无需 WI 原因</span><input id="otm2_f1" value="${otm2Esc(f.f1 || '')}" placeholder="必填"></div>`,
-      ca: `<div class="vt2-row"><span class="k">批准条件</span><input id="otm2_f1" value="${otm2Esc(f.f1 || 'TPMDM 认证评估完成后确认')}" placeholder="必填"></div>
-           <div class="vt2-row"><span class="k">负责人</span><input id="otm2_f2" value="${otm2Esc(f.f2 || 'test@lenovo.com')}" placeholder="必填"></div>
-           <div class="vt2-row"><span class="k">目标日期</span><input id="otm2_f3" value="${otm2Esc(f.f3 || '2026-11-30')}" placeholder="必填"></div>`,
-      pending: `<div class="vt2-row"><span class="k">Pending 原因</span><input id="otm2_f1" value="${otm2Esc(f.f1 || '')}" placeholder="必填"></div>
-                <div class="vt2-row"><span class="k">等待事项</span><input id="otm2_f2" value="${otm2Esc(f.f2 || '')}" placeholder="必填"></div>
-                <div class="vt2-row"><span class="k">预计恢复</span><input id="otm2_f3" value="${otm2Esc(f.f3 || '')}" placeholder="必填"></div>`,
-      sp: `<div class="vt2-row"><span class="k">Proposed Solution</span><input id="otm2_f1" value="${otm2Esc(f.f1 || '')}" placeholder="必填"></div>
-           <div class="vt2-row"><span class="k">待确认事项</span><input id="otm2_f2" value="${otm2Esc(f.f2 || '')}" placeholder="必填"></div>`,
-      qr: `<div class="vt2-row"><span class="k">退回原因</span><input id="otm2_f1" value="${otm2Esc(f.f1 || '')}" placeholder="必填"></div>
-           <div class="vt2-row"><span class="k">需修改内容</span><input id="otm2_f2" value="${otm2Esc(f.f2 || '')}" placeholder="必填"></div>`,
-      rr: `<div class="vt2-row"><span class="k">退回原因</span><input id="otm2_f1" value="${otm2Esc(f.f1 || '')}" placeholder="必填"></div>
-           <div class="vt2-row"><span class="k">重新 Review 原因</span><input id="otm2_f2" value="${otm2Esc(f.f2 || '')}" placeholder="必填"></div>`,
-      rj: `<div class="vt2-row"><span class="k">拒绝原因</span><input id="otm2_f1" value="${otm2Esc(f.f1 || '')}" placeholder="必填"></div>`,
+    let html = `<h3>${forceMode ? 'Force Submit · ' : ''}请选择 Assessment 决策</h3>
+      <div class="type-warn" style="white-space:normal">${forceMode
+        ? '⚠ Force Submit：Approve 类决策已解锁，须填写强制提交原因。'
+        : '⚠ 无法 Approve：还有 1 个 Mandatory Vote Task 未完成（Planner），且 TPMDM 投票结果为 Disagree。可选择 Conditional Approve、Pending 或 Return。'}</div>`;
+    let last = '';
+    OTM2_DECISIONS.forEach((d) => {
+      if (d.g !== last) { html += `<div class="otm2-sec-t" style="margin:10px 0 6px">${d.g}</div>`; last = d.g; }
+      const block = !forceMode && hard && (d.id === 'awi' || d.id === 'ac');
+      html += `<button type="button" class="type-opt ${d.danger ? 'danger' : ''} ${pick === d.id ? 'on' : ''}" data-otm2-dec="${d.id}" ${block ? 'disabled' : ''}>
+        <span class="to-radio">${pick === d.id ? '●' : '○'}</span>
+        <span class="to-main"><span class="to-row"><span class="to-name">${d.name}</span></span><div class="to-basis">${d.desc}</div></span>
+      </button>`;
+    });
+    if (pick && dsel) {
+      if (forceMode) {
+        html += `<div class="vt2-row" style="margin-top:12px"><span class="k">强制提交原因</span><input id="otm2_force_r" value="${otm2Esc(f.force || '')}" placeholder="必填"></div>`;
+      }
+      html += `<div class="type-warn" style="white-space:normal;margin-top:10px">⚠ 存在 1 个 Mandatory Vote 未完成、1 个 Disagree 及 1 条强制提交记录，已在 Assessment Conclusion 中说明</div>`;
+    }
+    html += `<div class="pact" style="justify-content:flex-end;margin-top:12px"><button type="button" class="btn btn-ghost" id="otm2_pop_x">取消</button><button type="button" class="btn btn-primary" id="otm2_pop_ok" disabled>确认</button></div>`;
+    otm2Pop(html);
+    const syncOk = () => {
+      const btn = document.getElementById('otm2_pop_ok');
+      if (btn) btn.disabled = !otm2DecCanConfirm(pick, forceMode);
     };
-    otm2Pop(`<h3>确认 ${otm2Esc(d.name)}</h3>${fields[pick] || ''}
-      <div class="sd-note" style="margin-top:10px">PCR 状态将变更：Under_Assessment → <b>${d.to}</b><br>
-      Work Item：${otm2ActiveWis().length} 条将保存并同步为 Sub-task</div>
-      <div class="type-warn" style="white-space:normal">⚠ 存在 1 个 Mandatory Vote 未完成、1 个 Disagree 及 1 条强制提交记录，已在 Assessment Conclusion 中说明</div>
-      <div class="pact" style="justify-content:flex-end"><button type="button" class="btn btn-ghost" id="otm2_pop_x">取消</button><button type="button" class="btn btn-primary" id="otm2_pop_ok">确认</button></div>`);
-    document.getElementById('otm2_pop_x').onclick = () => otm2OpenDecide('choose', pick);
+    document.getElementById('otm2_pop_x').onclick = otm2HidePop;
+    document.querySelectorAll('[data-otm2-dec]').forEach((b) => {
+      b.onclick = () => {
+        otm2CaptureDecFields();
+        otm2OpenDecide(b.dataset.otm2Dec);
+      };
+    });
+    document.getElementById('otm2_pop')?.querySelectorAll('input').forEach((el) => {
+      el.addEventListener('input', syncOk);
+      el.addEventListener('change', syncOk);
+    });
     document.getElementById('otm2_pop_ok').onclick = () => {
-      const f1 = document.getElementById('otm2_f1');
-      const f2 = document.getElementById('otm2_f2');
-      const f3 = document.getElementById('otm2_f3');
-      if (pick !== 'awi' && f1 && !f1.value.trim()) { f1.style.borderColor = 'var(--disagree)'; f1.focus(); return; }
-      if ((pick === 'ca' || pick === 'pending') && f2 && !f2.value.trim()) { f2.focus(); return; }
-      if ((pick === 'ca' || pick === 'pending') && f3 && !f3.value.trim()) { f3.focus(); return; }
-      st.decFields = { f1: f1 ? f1.value : '', f2: f2 ? f2.value : '', f3: f3 ? f3.value : '' };
+      if (!pick || !dsel) return;
+      otm2CaptureDecFields();
+      if (!otm2DecCanConfirm(pick, forceMode)) return;
+      const fr = document.getElementById('otm2_force_r');
+      const n = otm2ActiveWis().length;
+      const names = otm2ActiveWis().map((w) => w.name).join('、');
+      st.decFields = { ...st.decFields, force: fr ? fr.value : '' };
       st.decision = pick;
       st.decided = true;
-      st.pcrStatus = d.to;
-      TASKS[OTM2_ID].status = d.to;
-      if (!st.wiSaved) { st.wiSaved = true; st.savedN = otm2ActiveWis().length; }
+      st.forceNote = forceMode ? (fr ? fr.value.trim() : '') : '';
+      st.forceEntry = false;
+      st.pcrStatus = dsel.to;
+      st.syncFailed = false;
+      st.retried = true;
+      TASKS[OTM2_ID].status = dsel.to;
+      if (!st.wiSaved) { st.wiSaved = true; st.savedN = n; }
       st.synced = true;
       state[OTM2_ID].done = true;
-      state[OTM2_ID].path = d.name;
-      otm2Log('审批动作', d.name);
-      otm2Log('Sub-task 同步结果', '4 成功 · 1 失败（Control Run）');
+      state[OTM2_ID].path = dsel.name;
+      otm2Log('完成 Assessment 决策', dsel.name + (st.forceNote ? '（强制提交）' : ''));
+      if (st.forceNote) {
+        otm2Log('强制提交原因', st.forceNote);
+        otm2Log('被绕过的硬性未通过项', 'Mandatory 未完成（Planner）；Disagree（TPMDM）');
+      }
+      otm2Log('确认人', otm2Who());
+      otm2Log('Sub-task 同步结果', n + ' 条已同步为 Sub-task（全部成功）：' + names);
       otm2HidePop();
-      st.openId = 'sync';
-      toast('已确认 ' + d.name + ' · PCR → ' + d.to);
-      otm2Render();
+      st.openId = 'decide';
+      toast('已确认 ' + dsel.name + ' · PCR → ' + dsel.to);
+      if (typeof renderTaskAll === 'function') renderTaskAll();
+      else otm2Render();
+    };
+    syncOk();
+  }
+
+  function otm2OpenUndo() {
+    const st = otm2St();
+    const n = otm2ActiveWis().length;
+    otm2Pop(`<h3>撤销决策？</h3>
+      <p style="font-size:13px;color:var(--ink-2);line-height:1.55">撤销后将撤回已同步的 ${n} 条 Sub-task，PCR 状态退回 Under_Assessment。</p>
+      <div class="vt2-row"><span class="k">撤销原因</span><input id="otm2_undo_r" placeholder="必填"></div>
+      <div class="pact" style="justify-content:flex-end;margin-top:12px">
+        <button type="button" class="btn btn-ghost" id="otm2_pop_x">取消</button>
+        <button type="button" class="btn btn-primary" id="otm2_pop_ok" disabled>确认撤销</button>
+      </div>`);
+    const inp = document.getElementById('otm2_undo_r');
+    const ok = document.getElementById('otm2_pop_ok');
+    const sync = () => { ok.disabled = !inp.value.trim(); };
+    inp.addEventListener('input', sync);
+    document.getElementById('otm2_pop_x').onclick = otm2HidePop;
+    ok.onclick = () => {
+      const reason = inp.value.trim();
+      if (!reason) { inp.focus(); return; }
+      const names = otm2ActiveWis().map((w) => w.name).join('、');
+      st.decided = false;
+      st.decision = null;
+      st.forceNote = '';
+      st.forceEntry = false;
+      st.synced = false;
+      st.syncFailed = false;
+      st.retried = false;
+      st.pcrStatus = 'Under_Assessment';
+      TASKS[OTM2_ID].status = 'Under_Assessment';
+      state[OTM2_ID].done = false;
+      state[OTM2_ID].path = null;
+      st.openId = 'decide';
+      otm2Log('撤销决策', reason);
+      otm2Log('撤销人', otm2Who());
+      otm2Log('被撤回的 Sub-task', n + ' 条：' + names);
+      otm2HidePop();
+      toast('已撤销决策 · PCR → Under_Assessment');
+      if (typeof renderTaskAll === 'function') renderTaskAll();
+      else otm2Render();
     };
   }
 
@@ -6810,11 +7222,11 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     const host = document.getElementById('otm2_plist');
     if (!host) return;
     const steps = otm2Model();
-    const done = steps.filter((s) => s.st === 'done').length;
+      const done = steps.filter((s) => s.st === 'done').length;
     const anyOpen = steps.some((s) => s.open);
     host.innerHTML = `<div class="plist-h" id="otm2_plist_h">
       <h3>OTM Assessment · ${OTM2_PCR}</h3>
-      <span class="pcnt">${done}/6 已完成</span>
+      <span class="pcnt">${done}/4 已完成</span>
       <button type="button" class="plist-toggle" id="otm2_toggle">${anyOpen ? '▴' : '▾'}</button>
       ${OTM2_TIP('otm2NoDissolve', 84)}
     </div>`;
@@ -6822,13 +7234,21 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       const row = document.createElement('div');
       row.className = 'pstep ' + s.st + (s.open ? ' open' : '') + (i === steps.length - 1 ? ' last' : '');
       row.dataset.otm2Step = s.id;
-      const icon = s.st === 'done' ? '✓' : s.st === 'pending' ? '◇' : s.st === 'err' ? '!' : s.st === 'warn' ? '!' : s.st === 'run' ? '' : '○';
-      row.innerHTML = `<button class="pstep-h" type="button">
-        <span class="pico">${icon}</span><span class="ptt">${s.title}</span>
-        <span class="psum">${otm2Esc(s.sum || '')}</span>
-        <span class="chev">›</span>
-        <span class="iinfo" data-otm2-info="${s.info}">ⓘ</span>
-      </button><div class="pstep-b">${s.open ? otm2Body(s.id) : ''}</div>`;
+      const icon = s.st === 'done' ? '✓' : s.st === 'run' ? '' : (s.st === 'warn' || s.st === 'err') ? '!' : '○';
+      const sumHtml = (s.id === 'wicheck' && s.st !== 'wait' && s.st !== 'done')
+        ? otm2CheckStatusHtml(otm2CheckReport())
+        : otm2Esc(s.sum || '');
+      const recheck = (s.id === 'wicheck' && s.open && s.st !== 'wait')
+        ? `<button type="button" class="btn btn-ghost otm2-mini" data-otm2="checkall">⟲ 重新校验</button>`
+        : '';
+      row.innerHTML = `<div class="otm2-step-line">
+        <button class="pstep-h" type="button">
+          <span class="pico">${icon}</span><span class="ptt">${s.title}</span>
+          <span class="psum">${sumHtml}</span>
+          <span class="chev">›</span>
+          <span class="iinfo" data-otm2-info="${s.info}">ⓘ</span>
+        </button>${recheck}
+      </div><div class="pstep-b">${s.open ? otm2Body(s.id) : ''}</div>`;
       host.appendChild(row);
     });
     otm2Wire();
@@ -6842,12 +7262,13 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   }
 
   function otm2Open(id) {
+    if (!id) return;
     const st = otm2St();
     const curId = otm2CurrentId();
     const order = otm2Order();
     const idx = order.indexOf(id);
     const curIdx = order.indexOf(curId);
-    const doneMap = { summary: st.viewed, conclusion: st.concReady, wicheck: st.wiChecked, save: st.wiSaved, sync: st.synced, decide: st.decided };
+    const doneMap = { summary: st.viewed, conclusion: st.concReady, wicheck: st.wiSaved, decide: st.decided };
     if (idx > curIdx && !doneMap[id]) { toast('需先完成前置步骤'); return; }
     st.openId = id;
     otm2Render();
@@ -6877,7 +7298,8 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     root.querySelectorAll('.pstep-h').forEach((btn) => {
       btn.onclick = (e) => {
         if (e.target.closest('.iinfo')) return;
-        const id = btn.parentElement.dataset.otm2Step;
+        const id = btn.closest('.pstep')?.dataset.otm2Step;
+        if (!id) return;
         if (st.openId === id) { st.openId = null; otm2Render(); }
         else otm2Open(id);
       };
@@ -6888,15 +7310,74 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       e.stopPropagation();
       st.voteOpen = 'TPMDM'; st.voteFilter = 'dis'; st.openId = 'summary'; otm2Render();
     });
+    root.querySelectorAll('[data-otm2-secx]').forEach((b) => {
+      b.onclick = () => {
+        const id = b.dataset.otm2Secx;
+        st.secOpen[id] = !st.secOpen[id];
+        otm2Render();
+      };
+    });
     root.querySelectorAll('[data-otm2-fil]').forEach((b) => { b.onclick = () => { st.voteFilter = b.dataset.otm2Fil; otm2Render(); }; });
     root.querySelectorAll('[data-otm2-ft]').forEach((tr) => {
       tr.onclick = () => { st.voteOpen = st.voteOpen === tr.dataset.otm2Ft ? null : tr.dataset.otm2Ft; otm2Render(); };
     });
-    root.querySelectorAll('[data-otm2-cft]').forEach((b) => { b.onclick = () => { st.checkFt = b.dataset.otm2Cft; otm2Render(); }; });
-    root.querySelectorAll('[data-otm2-dmark]').forEach((b) => {
+    root.querySelectorAll('[data-otm2-bexp]').forEach((td) => {
+      td.onclick = (e) => {
+        e.stopPropagation();
+        const id = td.dataset.otm2Bexp;
+        st.bOpen[id] = !st.bOpen[id];
+        otm2Render();
+      };
+    });
+    root.querySelectorAll('[data-otm2-crow]').forEach((tr) => {
+      tr.onclick = (e) => {
+        if (e.target.closest('.otm2-radcell')) return;
+        const id = tr.dataset.otm2Crow;
+        st.cOpen[id] = !st.cOpen[id];
+        otm2Render();
+      };
+    });
+    root.querySelectorAll('[data-otm2-wexp]').forEach((td) => {
+      td.onclick = (e) => {
+        e.stopPropagation();
+        const id = td.dataset.otm2Wexp;
+        st.wiOpen[id] = !st.wiOpen[id];
+        st.focusWi = null;
+        otm2Render();
+      };
+    });
+    root.querySelectorAll('[data-otm2-loc]').forEach((b) => {
       b.onclick = () => {
-        const d = st.diffs.find((x) => x.id === b.dataset.otm2Dmark);
-        if (d) { d.mark = b.dataset.v; otm2Log('Difference 标记', d.ft + ' → ' + d.mark); otm2Render(); }
+        st.focusWi = b.dataset.otm2Loc;
+        st.wiOpen[st.focusWi] = true;
+        st.menuWi = null;
+        otm2Render();
+      };
+    });
+    root.querySelectorAll('[data-otm2-more]').forEach((b) => {
+      b.onclick = (e) => {
+        e.stopPropagation();
+        const id = b.dataset.otm2More;
+        st.menuWi = st.menuWi === id ? null : id;
+        otm2Render();
+      };
+    });
+    root.querySelectorAll('.otm2-more').forEach((el) => { el.onclick = (e) => e.stopPropagation(); });
+    root.onclick = (e) => {
+      if (!st.menuWi) return;
+      if (e.target.closest('[data-otm2-more], .otm2-more')) return;
+      st.menuWi = null;
+      otm2Render();
+    };
+    root.querySelectorAll('[data-otm2-dmark]').forEach((el) => {
+      el.onchange = () => {
+        const d = st.diffs.find((x) => x.id === el.dataset.otm2Dmark);
+        if (!d) return;
+        d.mark = el.dataset.v;
+        otm2PatchHist();
+        otm2Log('Difference 标记', d.ft + ' → ' + d.mark);
+        toast('已更新结论第四段');
+        otm2Render();
       };
     });
     root.querySelector('[data-otm2=viewed]')?.addEventListener('click', () => { st.viewed = true; st.openId = 'conclusion'; otm2Log('查看汇总', '已查看四区汇总'); otm2Render(); });
@@ -6950,37 +7431,50 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       }
       go();
     });
-    root.querySelector('[data-otm2=merge]')?.addEventListener('click', () => {
-      const a = st.wis.find((w) => w.id === 'otm2_w2');
-      const b = st.wis.find((w) => w.id === 'otm2_w5');
-      if (!a || !b || a.removed || b.removed) return;
-      a.desc = a.desc + '\n' + b.desc;
-      a.sources = [...(a.sources || []), ...(b.sources || [])];
-      b.removed = true;
-      st.dupResolved = true; st.merged = true;
-      otm2Log('Work Item 合并', 'BIOS 两条合并，保留 Development 与 TPMDM 来源');
-      toast('已合并为一条，并保留两个来源标注');
-      otm2Render();
+    root.querySelectorAll('[data-otm2=merge]').forEach((btn) => {
+      btn.onclick = () => {
+        const a = st.wis.find((w) => w.id === 'otm2_w2');
+        const b = st.wis.find((w) => w.id === 'otm2_w5');
+        if (!a || !b || a.removed || b.removed) return;
+        a.desc = a.desc + '\n' + b.desc;
+        a.sources = [...(a.sources || []), ...(b.sources || [])];
+        b.removed = true;
+        st.dupResolved = true; st.merged = true; st.menuWi = null;
+        otm2DirtyWi();
+        otm2Log('Work Item 合并', 'BIOS 两条合并，保留 Development 与 TPMDM 来源');
+        toast('已合并为一条，并保留两个来源标注');
+        otm2Render();
+      };
     });
-    root.querySelector('[data-otm2=notdup]')?.addEventListener('click', () => { st.dupResolved = true; st.notDup = true; otm2Log('确认不重复', 'BIOS 两条保持独立'); otm2Render(); });
-    root.querySelector('[data-otm2=domerge]')?.addEventListener('click', () => {
-      const ids = Object.keys(st.mergeSel).filter((k) => st.mergeSel[k]);
-      if (ids.length < 2) { toast('请勾选至少两条再合并'); return; }
-      const keep = st.wis.find((w) => w.id === ids[0]);
-      ids.slice(1).forEach((id) => {
-        const w = st.wis.find((x) => x.id === id);
-        if (!w) return;
-        keep.desc = (keep.desc || '') + '\n' + (w.desc || '');
-        keep.sources = [...(keep.sources || []), ...(w.sources || [])];
-        w.removed = true;
-      });
-      st.merged = true; st.mergeSel = {};
-      otm2Log('Work Item 合并', ids.join('+'));
-      toast('已合并并保留全部来源');
-      otm2Render();
+    root.querySelectorAll('[data-otm2=notdup]').forEach((btn) => {
+      btn.onclick = () => { st.dupResolved = true; st.notDup = true; st.menuWi = null; otm2Log('确认不重复', 'BIOS 两条保持独立'); toast('已确认不重复'); otm2Render(); };
     });
-    root.querySelectorAll('[data-otm2-msel]').forEach((c) => { c.onchange = () => { st.mergeSel[c.dataset.otm2Msel] = c.checked; }; });
-    root.querySelectorAll('[data-otm2-wie]').forEach((b) => { b.onclick = () => { st.editWi = b.dataset.otm2Wie; otm2Render(); }; });
+    root.querySelector('[data-otm2=mergex]')?.addEventListener('click', () => { st.mergeMode = false; st.mergeFrom = null; otm2Render(); });
+    root.querySelectorAll('[data-otm2-mergefrom]').forEach((b) => {
+      b.onclick = (e) => {
+        e.stopPropagation();
+        st.mergeMode = true; st.mergeFrom = b.dataset.otm2Mergefrom; st.menuWi = null;
+        otm2Render();
+      };
+    });
+    root.querySelectorAll('[data-otm2-mtgt]').forEach((c) => {
+      c.onchange = () => {
+        if (!c.checked) return;
+        const from = st.wis.find((w) => w.id === st.mergeFrom);
+        const to = st.wis.find((w) => w.id === c.dataset.otm2Mtgt);
+        if (!from || !to || from.id === to.id) return;
+        to.desc = (to.desc || '') + (from.desc ? ('\n' + from.desc) : '');
+        to.sources = [...(to.sources || []), ...(from.sources || [])];
+        from.removed = true;
+        if ((from.id === 'otm2_w2' && to.id === 'otm2_w5') || (from.id === 'otm2_w5' && to.id === 'otm2_w2')) st.dupResolved = true;
+        st.merged = true; st.mergeMode = false; st.mergeFrom = null;
+        otm2DirtyWi();
+        otm2Log('Work Item 合并', from.name + ' → ' + to.name);
+        toast('已合并并保留全部来源');
+        otm2Render();
+      };
+    });
+    root.querySelectorAll('[data-otm2-wie]').forEach((b) => { b.onclick = (e) => { e.stopPropagation(); st.editWi = b.dataset.otm2Wie; st.menuWi = null; otm2Render(); }; });
     root.querySelectorAll('[data-otm2-wix]').forEach((b) => {
       b.onclick = () => {
         const w = st.wis.find((x) => x.id === b.dataset.otm2Wix);
@@ -6992,14 +7486,40 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       b.onclick = () => {
         const card = b.closest('.vt2-wi');
         const w = st.wis.find((x) => x.id === b.dataset.otm2Wis);
-        if (!w || !card) return;
+        if (!w || !card || b.disabled) return;
         otm2ReadWiFields(card, w);
         const miss = otm2HardBlock(w);
         if (miss.length) { toast('硬阻断：' + miss.join('、')); return; }
         w.draftNew = false; st.editWi = null;
+        otm2DirtyWi();
         otm2Log('Work Item 修改', w.name);
         otm2Render();
       };
+    });
+    root.querySelectorAll('.vt2-wi[data-otm2-wid]').forEach((card) => {
+      const btn = card.querySelector('[data-otm2-wis]');
+      if (!btn) return;
+      const w = st.wis.find((x) => x.id === card.dataset.otm2Wid);
+      const sync = () => {
+        const name = (card.querySelector('[data-otm2-f=name]')?.value || '').trim();
+        const desc = (card.querySelector('[data-otm2-f=desc]')?.value || '').trim();
+        const date = (card.querySelector('[data-otm2-f=date]')?.value || '').trim();
+        const owner = card.querySelector('[data-otm2-f=owner]')?.value || '';
+        const ft = card.querySelector('[data-otm2-f=ft]')?.value || '';
+        btn.disabled = !name || !desc || !date || !owner || !ft;
+      };
+      card.querySelectorAll('[data-otm2-f]').forEach((el) => {
+        el.addEventListener('input', sync);
+        el.addEventListener('change', sync);
+      });
+      card.querySelectorAll('input[type=radio]').forEach((el) => {
+        el.addEventListener('change', () => {
+          if (!w) return;
+          otm2ReadWiFields(card, w);
+          otm2Render();
+        });
+      });
+      sync();
     });
     root.querySelectorAll('[data-otm2-widl], [data-otm2-skipmark]').forEach((b) => {
       b.onclick = () => {
@@ -7007,10 +7527,16 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
         const w = st.wis.find((x) => x.id === id);
         if (!w) return;
         w.removed = true;
-        st.skip[id] = st.skip[id] || { reason: '' };
-        st.wiChecked = false;
-        otm2Log('删除/不执行', w.name);
-        toast('Required Action 未覆盖，请填写原因');
+        st.menuWi = null;
+        otm2DirtyWi();
+        if (w.coversRa !== false) {
+          st.skip[id] = st.skip[id] || { reason: '' };
+          otm2Log('删除/不执行', w.name);
+          toast('Required Action 未覆盖，请填写原因');
+        } else {
+          otm2Log('删除', w.name);
+          toast('已删除（该条不对应 Required Action）');
+        }
         otm2Render();
       };
     });
@@ -7027,8 +7553,9 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       b.onclick = () => {
         const w = st.wis.find((x) => x.id === b.dataset.otm2Split);
         if (!w) return;
-        const nw = { ...w, id: 'otm2_w' + Date.now(), name: w.name + ' (2)', desc: '', draftNew: true, ai: false, sources: [...(w.sources || [])] };
-        st.wis.push(nw); st.editWi = nw.id;
+        const nw = { ...w, id: 'otm2_w' + Date.now(), name: w.name + ' (2)', desc: '', status: 'Draft', draftNew: true, ai: false, coversRa: false, sources: [...(w.sources || [])] };
+        st.wis.push(nw); st.editWi = nw.id; st.menuWi = null;
+        otm2DirtyWi();
         otm2Log('拆分', w.name);
         otm2Render();
       };
@@ -7038,21 +7565,37 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     });
     root.querySelector('[data-otm2=addwi]')?.addEventListener('click', () => {
       const id = 'otm2_w' + Date.now();
-      st.wis.push({ id, name: '', desc: '', date: '', dateMode: 'abs', ft: 'Development', owner: '', status: '待确认', ai: false, draftNew: true, src: '手动添加', sources: [{ ft: 'Development', src: '手动添加', ra: '手动添加', voteTask: '' }] });
+      st.wis.push({ id, name: '', desc: '', date: '', dateMode: 'abs', ft: 'Development', owner: '', status: 'Draft', ai: false, coversRa: false, draftNew: true, src: '手动添加', sources: [{ ft: 'Development', src: '手动添加', ra: '手动添加', voteTask: '' }] });
       st.editWi = id;
+      otm2DirtyWi();
       otm2Render();
     });
     root.querySelector('[data-otm2=checkall]')?.addEventListener('click', () => {
-      const blocks = otm2ActiveWis().flatMap(otm2HardBlock);
-      const uncovered = Object.keys(st.skip).filter((k) => st.skip[k] && !st.skip[k].reason);
-      if (blocks.length || uncovered.length) { toast('校验未通过：请处理硬阻断与未覆盖原因'); return; }
+      const r = otm2CheckReport();
+      if (r.hardItems.length || r.needItems.length) {
+        st.wiChecked = false;
+        otm2Log('重新校验', '未通过');
+        toast('校验未通过：请处理硬阻断与未覆盖原因');
+        otm2Render();
+        return;
+      }
       st.wiChecked = true;
-      st.openId = 'save';
-      otm2Log('重新校验', 'Work Item 全部校验通过');
-      toast('校验通过');
+      otm2Log('重新校验', r.allOk ? '九项校验全部通过' : '硬阻断已通过，仍有警告');
+      toast(r.allOk ? '✓ 九项校验全部通过' : '硬阻断已通过，警告项仍提示但不阻断');
       otm2Render();
     });
+    if (st.focusWi) {
+      const hit = root.querySelector(`tr[data-otm2-wid="${st.focusWi}"], .pcheck[data-otm2-wid="${st.focusWi}"]`);
+      if (hit) hit.scrollIntoView({ block: 'nearest' });
+    }
     root.querySelector('[data-otm2=savewi]')?.addEventListener('click', () => {
+      const gate = otm2CanSave();
+      if (!gate.ok) {
+        toast('保存前校验未通过：请处理硬阻断与未覆盖原因');
+        otm2Render();
+        return;
+      }
+      st.wiChecked = true;
       st.wiSaved = true;
       st.savedN = otm2ActiveWis().length;
       st.openId = 'decide';
@@ -7060,14 +7603,16 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       toast('已保存 ' + st.savedN + ' 条 Work Item');
       otm2Render();
     });
-    root.querySelector('[data-otm2=locfail]')?.addEventListener('click', () => { st.openId = 'wicheck'; st.editWi = st.syncFail.id; otm2Render(); });
+    root.querySelector('[data-otm2=locfail]')?.addEventListener('click', () => { st.openId = 'wicheck'; st.focusWi = st.syncFail.id; st.wiOpen[st.syncFail.id] = true; otm2Render(); });
     root.querySelector('[data-otm2=retry]')?.addEventListener('click', () => {
       st.retried = true;
       otm2Log('单条重试', 'Control Run 同步成功');
       toast('已重新同步 Control Run');
       otm2Render();
     });
-    root.querySelector('[data-otm2=decide]')?.addEventListener('click', () => otm2OpenDecide('check'));
+    root.querySelector('[data-otm2=decide]')?.addEventListener('click', () => otm2OpenDecide(null, false));
+    root.querySelector('[data-otm2=force]')?.addEventListener('click', () => otm2OpenDecide(null, true));
+    root.querySelector('[data-otm2=undecide]')?.addEventListener('click', () => otm2OpenUndo());
     root.querySelectorAll('select[data-otm2-f=ft]').forEach((sel) => {
       const w = st.wis.find((x) => x.id === sel.closest('.vt2-wi')?.dataset.otm2Wid);
       if (w) sel.value = w.ft || 'Development';
@@ -7075,6 +7620,16 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     root.querySelectorAll('select[data-otm2-f=owner]').forEach((sel) => {
       const w = st.wis.find((x) => x.id === sel.closest('.vt2-wi')?.dataset.otm2Wid);
       if (w) sel.value = w.owner || '';
+    });
+    root.querySelectorAll('.vt2-wi[data-otm2-wid] [data-otm2-wis]').forEach((btn) => {
+      const card = btn.closest('.vt2-wi');
+      if (!card) return;
+      const name = (card.querySelector('[data-otm2-f=name]')?.value || '').trim();
+      const desc = (card.querySelector('[data-otm2-f=desc]')?.value || '').trim();
+      const date = (card.querySelector('[data-otm2-f=date]')?.value || '').trim();
+      const owner = card.querySelector('[data-otm2-f=owner]')?.value || '';
+      const ft = card.querySelector('[data-otm2-f=ft]')?.value || '';
+      btn.disabled = !name || !desc || !date || !owner || !ft;
     });
   }
 

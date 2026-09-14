@@ -62,7 +62,7 @@ Intel 已确认新 SKU 可用，pin-to-pin 替代，目标实施日尚有充足�
         title: 'TPM Review',
         status: 'concern',
         action: 'Approve with concern',
-        actor: 'huangxl16@lenovo.com',
+        actor: 'yac@lenovo.com',
         time: '01-07 11:05',
         duration: '2 天',
         comment: `【审阅结论】
@@ -125,7 +125,7 @@ TPM 提出的认证影响问题将通过专项 Evaluation Task 解决，不阻�
             comment: '物料清单变更范围清晰，3 个机型均可覆盖。',
           },
           {
-            id: 'v-pl', func: 'Planner', stance: 'Agree', actor: 'huangxl16@lenovo.com', time: '01-13',
+            id: 'v-pl', func: 'Planner', stance: 'Agree', actor: 'yac@lenovo.com', time: '01-13',
             comment: '供应计划无冲突，切换时点可配合目标实施日。',
           },
           {

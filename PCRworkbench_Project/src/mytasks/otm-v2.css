@@ -19,6 +19,34 @@
 #otm2_plist .otm2-sec-t{font-size:12.5px;font-weight:600;margin-bottom:6px}
 #otm2_plist .otm2-fil{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 #otm2_plist .otm2-fil .btn.on{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+#otm2_plist .otm2-tabs{display:flex;flex-wrap:wrap;gap:0 14px;margin:4px 0 10px;padding:0;border-bottom:1px solid var(--border)}
+#otm2_plist .otm2-tabs button{border:none;background:transparent;padding:6px 2px 8px;margin-bottom:-1px;border-bottom:2px solid transparent;border-radius:0;font-size:12.5px;color:var(--ink-3);cursor:pointer}
+#otm2_plist .otm2-tabs button.on{font-weight:600;color:var(--accent-ink);border-bottom-color:var(--accent);background:transparent}
+#otm2_plist .otm2-tabs button.bad{color:var(--red)}
+#otm2_plist .otm2-tabs button.bad.on{color:var(--red);border-bottom-color:var(--red)}
+#otm2_plist .otm2-tabs button.amber{color:var(--amber)}
+#otm2_plist .otm2-tabs button.amber.on{color:var(--amber);border-bottom-color:var(--amber)}
+#otm2_plist .otm2-sec-h{display:flex;align-items:center;gap:8px;width:100%;border:none;background:transparent;padding:6px 0;cursor:pointer;font:inherit;text-align:left}
+#otm2_plist .otm2-sec-ch{color:var(--ink-3);width:14px}
+#otm2_plist .otm2-sec-tt{font-size:12.5px;font-weight:600;color:var(--ink)}
+#otm2_plist .otm2-sec-sum{margin-left:auto;font-size:12px;color:var(--ink-3)}
+#otm2_plist .otm2-sec-sum.warn{color:var(--amber)}
+#otm2_plist .otm2-sec-b{padding:4px 0 8px}
+#otm2_plist .otm2-gen{display:inline-block;width:1.4em;text-align:center}
+#otm2_plist .otm2-radcell{white-space:nowrap}
+#otm2_plist .otm2-rad{display:inline-flex;align-items:center;gap:3px;margin-right:8px;font-size:12px;color:var(--ink-2);cursor:pointer}
+#otm2_plist .otm2-rad.acc{color:var(--accent-ink)}
+#otm2_plist .otm2-rad.ign{color:var(--ink-3)}
+#otm2_plist .otm2-rad.wait{color:var(--amber)}
+#otm2_plist .otm2-cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+#otm2_plist .otm2-cmp b{display:block;color:var(--ink);margin-bottom:4px}
+#otm2_plist .otm2-step-line{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;max-width:100%}
+#otm2_plist .pstep[data-otm2-step="wicheck"] .psum{max-width:none;color:var(--ink-2);font-weight:400}
+#otm2_plist .otm2-mini{font-size:12px;padding:3px 8px}
+#otm2_plist .otm2-savebar{flex-wrap:wrap;align-items:center}
+#otm2_plist .otm2-sync{margin:10px 0 14px;padding-top:10px;border-top:1px dashed var(--border)}
+.view-task:has(#otm2_plist) .center-body{scroll-padding-top:52px}
+#otm2_plist .pstep,#otm2_plist .otm2-sec,#otm2_plist tr[data-otm2-wid]{scroll-margin-top:56px}
 #otm2_plist .sumtab{width:100%;font-size:12px}
 #otm2_plist .sumtab tr[data-otm2-ft]{cursor:pointer}
 #otm2_plist .sumtab tr.warn td{background:var(--amber-bg)}
@@ -32,7 +60,27 @@
 #otm2_plist .type-opt[disabled]{opacity:.45;pointer-events:none}
 .otm2-pop .type-opt[disabled]{opacity:.45;pointer-events:none}
 .otm2-pop .type-opt.danger.on,.otm2-pop .type-opt.danger:hover{background:var(--red-bg);border-color:var(--red)}
-#otm2_plist .otm2-rel{font-size:12px;color:var(--ink-2);line-height:1.55}
+#otm2_pop .box{width:min(560px,94vw);max-height:min(86vh,760px);overflow:auto}
+.otm2-pop .otm2-sec-t{font-size:12.5px;font-weight:600}
+#otm2_plist .otm2-witab{width:100%;font-size:12px;margin-bottom:8px}
+#otm2_plist .otm2-witab .otm2-exp{width:22px;color:var(--ink-3);cursor:pointer;user-select:none}
+#otm2_plist .otm2-ck{font-weight:700}
+#otm2_plist .otm2-ck.ok{color:var(--green)}
+#otm2_plist .otm2-ck.warn{color:var(--amber)}
+#otm2_plist .otm2-ck.err{color:var(--red)}
+#otm2_plist .otm2-ck.need{color:#EA580C}
+#otm2_plist .otm2-di{display:inline-grid;place-items:center;width:16px;height:16px;margin-left:4px;border:1px solid var(--border-2);border-radius:50%;color:var(--ink-3);font-size:10px;vertical-align:middle;cursor:help}
+#otm2_plist .otm2-ops-cell{white-space:nowrap;width:1%}
+#otm2_plist .otm2-ops-wrap{position:relative;display:inline-flex;align-items:center;gap:2px}
+#otm2_plist .otm2-ico{border:none;background:transparent;cursor:pointer;color:var(--ink-3);padding:2px 4px;font-size:14px;line-height:1}
+#otm2_plist .otm2-ico:hover{color:var(--ink)}
+#otm2_plist .otm2-more{position:absolute;right:0;top:100%;z-index:12;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(15,23,32,.12);min-width:168px;padding:4px}
+#otm2_plist .otm2-more button{display:block;width:100%;text-align:left;border:none;background:transparent;padding:6px 10px;font:inherit;font-size:12.5px;color:var(--ink-2);cursor:pointer;border-radius:6px}
+#otm2_plist .otm2-more button:hover{background:var(--soft);color:var(--ink)}
+#otm2_plist .otm2-issue td{background:var(--soft);padding:6px 12px 8px 48px}
+#otm2_plist .otm2-issue .pcheck{margin:2px 0}
+#otm2_plist tr.otm2-hit td{box-shadow:inset 3px 0 0 var(--accent)}
+#otm2_plist .otm2-loc{display:block;width:100%;text-align:left;white-space:normal;margin-top:4px;padding:2px 8px;font-size:12px}
 #otm2_plist .otm2-dup{margin:8px 0}
 #otm2_plist .otm2-ops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 #otm2_plist .vt2-pfill-r{display:flex;align-items:center;gap:8px;flex:none}

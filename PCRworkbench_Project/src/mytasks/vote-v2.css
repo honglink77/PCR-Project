@@ -1,7 +1,7 @@
 /* Vote Task v2：仅 vt2；视觉复用 Create PCR 的 plist / type-opt / sim-card / pcheck / submit-dock */
 .view-task .task-ai:has(#vt2_plist){display:flex;flex-direction:column;align-items:flex-start}
-.view-task .task-ai:has(#vt2_plist) .parse-ai{width:100%;max-width:693px;align-self:flex-start}
-.view-task #vt2_plist{width:100%;max-width:693px}
+.view-task .task-ai:has(#vt2_plist) .parse-ai{width:100%;max-width:924px;align-self:flex-start}
+.view-task #vt2_plist{width:100%;max-width:924px}
 #vt2_plist .pstep.open{width:100%;max-width:100%}
 #vt2_plist .pcheck{opacity:1;transform:none}
 #vt2_plist .vt2-pfill-r{display:flex;align-items:center;gap:8px;flex:none}
@@ -60,6 +60,16 @@
 .vt2-date-line label{flex:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-size:12px;color:var(--ink-2);cursor:pointer}
 .vt2-date-line label input{width:auto;flex:none;padding:0;border:none}
 .vt2-src{font-size:12px;color:var(--accent-ink);margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
+#vt2_plist .vt2-witab{width:100%;font-size:12px}
+#vt2_plist .vt2-exp{width:22px;color:var(--ink-3);cursor:pointer;user-select:none}
+#vt2_plist .vt2-gen{display:inline-block;width:1.4em;text-align:center}
+#vt2_plist .vt2-di{display:inline-grid;place-items:center;width:16px;height:16px;margin-left:4px;border:1px solid var(--border-2);border-radius:50%;color:var(--ink-3);font-size:10px;vertical-align:middle;cursor:help}
+#vt2_plist .vt2-ops-cell{white-space:nowrap;width:1%}
+#vt2_plist .vt2-ops-wrap{position:relative;display:inline-flex;align-items:center;gap:2px}
+#vt2_plist .vt2-ico{border:none;background:transparent;cursor:pointer;color:var(--ink-3);padding:2px 4px;font-size:14px;line-height:1}
+#vt2_plist .vt2-ico:hover{color:var(--ink)}
+#vt2_plist .vt2-witab .vt2-wi{margin:0;padding:0;background:transparent}
+#vt2_wilist{overflow-x:auto}
 
 .vt2-diff{font-size:12.5px;line-height:1.55}
 .vt2-diff .del{color:#B42318;text-decoration:line-through;background:#FEF3F2}
