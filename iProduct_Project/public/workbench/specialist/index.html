@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Specialist</title>
+  <style>
+    :root{
+      --bg:#FAFAFA; --card:#FFFFFF; --ink:#242424; --ink-2:#666666; --ink-3:#8A8A8A;
+      --line:#ECECEC; --nav:#0D9488; --tag:#F4F4F4; --hover:#DADADA;
+      --ok:#E8F6EE; --ok-ink:#067647; --plan:#FDF3E0; --plan-ink:#B54708;
+      --risk:#FCEDE7; --risk-ink:#C4320A;
+      --shadow:0 10px 28px rgba(24,24,24,.08);
+      --r-btn:9px; --r-agent:18px; --r-skill:12px; --r-mcp:14px;
+      --sans:Inter,Arial,Helvetica,sans-serif;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans)}
+    body{min-width:1100px}
+    button,input,select{font:inherit;color:inherit}
+    button{border:0;background:none;cursor:pointer}
+    img{max-width:100%}
+    :focus-visible{outline:2px solid var(--nav);outline-offset:2px}
+    .sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+    .top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:18px;height:64px;padding:0 32px;
+      background:#fff;border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;gap:4px}
+    .nav-btn{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:999px;
+      color:#3D3D3D;font-size:14px;font-weight:550}
+    .nav-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+    .nav-btn:hover{background:#F4F4F4}
+    .nav-btn.on{background:var(--nav);color:#fff}
+    .top-sp{flex:1}
+    .search{display:flex;align-items:center;gap:8px;width:min(360px,32vw);height:36px;padding:0 12px;border-radius:999px;
+      background:#F4F4F4;border:1px solid transparent}
+    .search:focus-within{background:#fff;border-color:var(--hover)}
+    .search svg{width:15px;height:15px;stroke:var(--ink-3);fill:none;stroke-width:1.6;flex:none}
+    .search input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:13.5px;color:var(--ink)}
+    .search input::placeholder{color:var(--ink-3)}
+    .act{height:36px;padding:0 14px;border-radius:999px;background:var(--nav);color:#fff;font-size:13.5px;font-weight:600}
+    .act:hover{filter:brightness(1.08)}
+    .act:active{transform:scale(.98)}
+
+    .wrap{padding:16px 32px 48px;max-width:1760px;margin:0 auto}
+    h1{margin:0 0 14px;font-size:26px;font-weight:650;letter-spacing:-.03em}
+    h2{margin:0;font-size:20px;font-weight:650;letter-spacing:-.02em}
+    .muted{color:var(--ink-2);font-size:13.5px}
+
+    .feat{margin-bottom:28px}
+    .feat-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+    .feat-track-wrap{position:relative}
+    .feat-track{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 10px;
+      scrollbar-width:none}
+    .feat-track::-webkit-scrollbar{display:none}
+    .scen{flex:none;width:268px;height:176px;border-radius:16px;overflow:hidden;position:relative;scroll-snap-align:start;
+      border:1px solid var(--line);background:#fff;color:var(--ink);text-align:left;transition:transform .18s,box-shadow .18s,border-color .18s}
+    .scen:hover{transform:translateY(-2px);border-color:var(--hover);box-shadow:var(--shadow)}
+    .scen:active{transform:translateY(0)}
+    .scen .art{position:absolute;inset:0;filter:saturate(.62) brightness(1.02) contrast(.96)}
+    .scen .veil{position:absolute;inset:0;background:
+      linear-gradient(180deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.28) 48%,rgba(255,255,255,.72) 80%,#fff 100%),
+      rgba(255,255,255,.16)}
+    .scen .body{position:absolute;left:14px;right:14px;bottom:12px;z-index:1}
+    .scen h3{margin:0 0 8px;font-size:16px;font-weight:650;letter-spacing:-.02em;color:var(--ink)}
+    .scen .ag{display:flex;align-items:center;gap:7px;margin-top:4px;font-size:12px;color:var(--ink-2)}
+    .av{border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none;letter-spacing:-.03em}
+    .av.xs{width:18px;height:18px;font-size:8px}
+    .av.sm{width:28px;height:28px;font-size:11px}
+    .av.md{width:52px;height:52px;font-size:16px}
+    .av.sq{border-radius:10px}
+    .feat-next{position:absolute;right:6px;top:50%;transform:translateY(-60%);width:40px;height:40px;border-radius:50%;
+      background:#fff;border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.12);display:grid;place-items:center;z-index:2}
+    .feat-next svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .feat-next:hover{border-color:var(--hover)}
+
+    .s1 .art{background:linear-gradient(135deg,#3E6E74,#7AADA8 55%,#D4C8B4)}
+    .s2 .art{background:linear-gradient(135deg,#3E4A6A,#7B88C0 50%,#C9C0D6)}
+    .s3 .art{background:linear-gradient(135deg,#6A4E36,#C08A52 48%,#E0CBA8)}
+    .s4 .art{background:linear-gradient(135deg,#2F5E50,#6AA790 52%,#C5D6C8)}
+    .s5 .art{background:linear-gradient(135deg,#4A4068,#8678A8 50%,#D2C4D0)}
+    .s6 .art{background:linear-gradient(135deg,#2F5268,#5E8AAA 48%,#B7CADC)}
+    .art svg{width:100%;height:100%;opacity:.28}
+
+    .row-h{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:8px 0 14px}
+    .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);flex:none}
+    .tab{height:40px;padding:0 14px;font-size:15px;font-weight:600;color:var(--ink-2);position:relative}
+    .tab:hover{color:var(--ink)}
+    .tab.on{color:var(--ink)}
+    .tab.on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;background:var(--ink);border-radius:2px}
+    .badge{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:999px;
+      background:#EEE;color:var(--ink-2);font-size:11px;font-weight:700}
+    .filters{display:flex;flex-wrap:wrap;gap:8px;flex:1;min-width:0}
+    .chip{height:32px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:#fff;font-size:13px;color:#444}
+    .chip:hover{border-color:var(--hover)}
+    .chip.on{background:#F2F2F2;border-color:#E4E4E4;color:var(--ink);font-weight:600}
+    .seg{display:flex;background:#F4F4F4;border-radius:999px;padding:3px;flex:none}
+    .seg button{height:28px;padding:0 12px;border-radius:999px;font-size:13px;color:var(--ink-2);font-weight:550}
+    .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+
+    .grid-agents{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+    .grid-skills{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .grid-mcp{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .grid-rec{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+
+    .acard,.scard,.mcard,.tcard,.rcard{background:var(--card);border:1px solid var(--line);transition:transform .18s,box-shadow .18s,border-color .18s}
+    .acard:hover,.scard:hover,.mcard:hover,.tcard:hover,.rcard:hover{transform:translateY(-2px);border-color:var(--hover);box-shadow:var(--shadow)}
+    .acard:active,.scard:active,.mcard:active,.tcard:active,.rcard:active{transform:translateY(0);box-shadow:none}
+    .acard,.tcard{border-radius:var(--r-agent);padding:16px 16px 14px;text-align:left;display:flex;flex-direction:column;width:100%;position:relative}
+    .acard{cursor:pointer;min-height:168px;padding:14px 14px 12px}
+    .tcard{min-height:220px}
+    .acard .head{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;padding-right:70px}
+    .acard .head .av{width:36px;height:36px;font-size:12px}
+    .acard .meta{flex:1;min-width:0}
+    .acard h3,.tcard h3,.scard h3,.rcard h3,.mcard h3{margin:0;font-size:16.5px;font-weight:650;letter-spacing:-.02em;line-height:1.3}
+    .acard h3{font-size:14.5px;line-height:1.25;min-width:0}
+    .owner{margin:2px 0 0;font-size:12px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .desc{margin:8px 0 0;font-size:13.5px;line-height:1.5;color:var(--ink-2);
+      display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+    .acard .desc{margin-top:0;font-size:13px;line-height:1.45;-webkit-line-clamp:2;flex:none}
+    .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+    .acard .tags{flex-wrap:nowrap;gap:5px;margin-top:auto;padding-top:10px}
+    .tag{font-size:12px;line-height:1;padding:6px 8px;border-radius:6px;background:var(--tag);color:#555}
+    .acard .tag{font-size:11px;padding:4px 6px;white-space:nowrap;flex:none}
+    .tag.plan{background:var(--plan);color:var(--plan-ink)}
+    .tag.risk{background:var(--risk);color:var(--risk-ink)}
+    .tag.ok{background:var(--ok);color:var(--ok-ink)}
+    .invoke{position:absolute;top:12px;right:12px;height:24px;padding:0 10px;border-radius:999px;background:var(--nav);color:#fff;
+      font-size:12px;font-weight:600;letter-spacing:.01em;opacity:0;z-index:2;transition:opacity .16s;line-height:24px}
+    .acard:hover .invoke,.acard:focus-within .invoke{opacity:1}
+    .invoke:active{transform:scale(.97)}
+
+    .tcard .avs{display:flex;margin-bottom:12px}
+    .tcard .avs .av{margin-right:-8px;border:2px solid #fff}
+
+    .rec-h{display:flex;align-items:center;justify-content:space-between;margin:6px 0 12px}
+    .icon-lab{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:8px;color:var(--ink-2);font-size:13.5px;font-weight:600}
+    .icon-lab:hover{background:#F4F4F4;color:var(--ink)}
+    .icon-lab svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.6}
+    .rcard{border-radius:14px;padding:16px;text-align:left;min-height:168px;display:flex;flex-direction:column}
+    .rcard .ih{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+    .rcard p{margin:8px 0 0;font-size:13.5px;line-height:1.5;color:var(--ink-2);flex:1}
+
+    .scard{border-radius:var(--r-skill);padding:14px;display:flex;align-items:flex-start;gap:12px;text-align:left;min-height:108px;width:100%}
+    .scard .copy{flex:1;min-width:0}
+    .scard p{margin:4px 0 0;font-size:13px;line-height:1.45;color:var(--ink-2);
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .mcard{border-radius:var(--r-mcp);padding:18px;display:flex;align-items:flex-start;gap:14px;text-align:left;min-height:118px;width:100%}
+    .mcard .copy{flex:1;min-width:0}
+    .mcard p{margin:6px 0 0;font-size:13.5px;line-height:1.5;color:var(--ink-2);
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+    .ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;flex:none;color:#fff}
+    .ico svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+    .ico.lg{width:44px;height:44px;border-radius:12px}
+
+    .plus{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;flex:none;background:#fff;color:var(--ink)}
+    .plus svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+    .plus:hover{border-color:var(--hover);background:#FAFAFA}
+    .plus.on{background:var(--ok);border-color:#BFE3CC;color:var(--ok-ink)}
+    .plus[aria-disabled="true"]{opacity:.45;cursor:not-allowed;background:#F7F7F7;pointer-events:auto}
+    .plus.sm{width:28px;height:28px}
+
+    .empty{grid-column:1/-1;padding:48px 16px;text-align:center}
+    .empty h3{margin:0 0 6px;font-size:18px}
+    .empty p{margin:0 0 14px;color:var(--ink-2)}
+    .ghost{height:34px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:13.5px;font-weight:600}
+    .ghost:hover{border-color:var(--hover)}
+
+    .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(12px);background:var(--nav);color:#fff;
+      padding:10px 16px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;z-index:80;transition:opacity .2s,transform .2s;
+      max-width:min(520px,90vw);text-align:center}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    .tip{position:fixed;z-index:90;max-width:240px;padding:8px 10px;border-radius:8px;background:var(--nav);color:#fff;
+      font-size:12.5px;line-height:1.4;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity .15s}
+    .tip.show{opacity:1;transform:none}
+
+    .scrim{position:fixed;inset:0;background:rgba(20,20,20,.38);z-index:60;display:none;align-items:center;justify-content:center;padding:24px}
+    .scrim.on{display:flex}
+    .modal{width:min(480px,100%);background:#fff;border-radius:16px;padding:22px 22px 18px;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+    .modal h2{font-size:20px;margin-bottom:16px}
+    .field{margin-bottom:12px}
+    .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px}
+    .field input,.field select{width:100%;height:40px;border:1px solid var(--line);border-radius:8px;padding:0 10px;background:#fff}
+    .field input:focus,.field select:focus{border-color:#C8C8C8;outline:none}
+    .modal-f{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+    .btn{height:36px;padding:0 14px;border-radius:8px;font-size:13.5px;font-weight:600}
+    .btn-ghost{border:1px solid var(--line);background:#fff}
+    .btn-primary{background:var(--nav);color:#fff}
+
+    @media (max-width:1599px){
+      .grid-agents{grid-template-columns:repeat(4,1fr)}
+      .grid-skills,.grid-rec{grid-template-columns:repeat(3,1fr)}
+    }
+    @media (max-width:1099px){
+      .grid-agents{grid-template-columns:repeat(3,1fr)}
+      .grid-skills,.grid-rec{grid-template-columns:repeat(2,1fr)}
+      .grid-mcp{grid-template-columns:1fr}
+      .search{width:240px}
+    }
+    @media (prefers-reduced-motion:reduce){
+      *,*::before,*::after{transition:none !important;animation:none !important}
+      .acard:hover,.scard:hover,.mcard:hover,.tcard:hover,.rcard:hover,.scen:hover{transform:none}
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <nav class="nav" aria-label="Primary">
+      <button type="button" class="nav-btn on" data-page="agent" id="nav-agent">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="5" r="2.2"/><path d="M3.2 13c.6-2.4 2.4-3.6 4.8-3.6s4.2 1.2 4.8 3.6"/></svg>
+        Agent
+      </button>
+      <button type="button" class="nav-btn" data-page="skill" id="nav-skill">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2.4l1.6 3.2 3.6.5-2.6 2.5.6 3.6L8 10.6 4.8 12.2l.6-3.6L2.8 6.1l3.6-.5z"/></svg>
+        Skill
+      </button>
+      <button type="button" class="nav-btn" data-page="mcp" id="nav-mcp">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="2.5" width="4.2" height="4.2" rx="1"/><rect x="9.3" y="2.5" width="4.2" height="4.2" rx="1"/><rect x="2.5" y="9.3" width="4.2" height="4.2" rx="1"/><rect x="9.3" y="9.3" width="4.2" height="4.2" rx="1"/></svg>
+        MCP
+      </button>
+    </nav>
+    <div class="top-sp"></div>
+    <label class="search">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.2"/><path d="M10.4 10.4L13.5 13.5"/></svg>
+      <input id="q" type="search" placeholder="Search agents by role or capability" autocomplete="off">
+    </label>
+    <button type="button" class="act" id="actBtn">My Agents</button>
+  </header>
+
+  <div class="wrap">
+    <div id="app"></div>
+  </div>
+
+  <div class="scrim" id="scrim" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <form class="modal" id="mcpForm">
+      <h2 id="modalTitle">Add Custom MCP</h2>
+      <div class="field">
+        <label for="mcpName">Connector Name</label>
+        <input id="mcpName" name="name" type="text" placeholder="Example: Internal Knowledge MCP" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="mcpUrl">Server URL</label>
+        <input id="mcpUrl" name="url" type="text" placeholder="https://mcp.example.internal/sse" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="mcpAuth">Authentication Method</label>
+        <select id="mcpAuth" name="auth">
+          <option>OAuth</option>
+          <option>Bearer Token</option>
+          <option>API Key</option>
+          <option>Basic Authentication</option>
+        </select>
+      </div>
+      <div class="modal-f">
+        <button type="button" class="btn btn-ghost" id="mcpCancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">Add Connector</button>
+      </div>
+    </form>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="tip" id="tip" role="tooltip"></div>
+
+  <script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const ICO = {
+    plus: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.2v9.6M3.2 8h9.6"/></svg>',
+    check: '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.2l3 3.1 6-6.4"/></svg>',
+    search: '<svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="4.2"/><path d="M10.4 10.4L13.5 13.5"/></svg>'
+  };
+  const AV = (label, color, size) => `<span class="av ${size || 'md'}" style="background:${color}">${label}</span>`;
+  const art = (d) => `<svg viewBox="0 0 268 176" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${d}</svg>`;
+
+  const AGENTS = [
+    { id:'a1', name:'PCR Pre-submission Advisor', owner:'PCR Strategy Team', desc:'Provides early NRE, schedule, supply, and business-case references before a PCR is formally submitted.', tags:['NRE Reference','Schedule Simulation','Supply Risk'], cats:['Pre-PCR','Decision Support'], popular:98, added:1, initials:'PA', color:'#0F766E' },
+    { id:'a2', name:'PCR Submission Specialist', owner:'PCR Creation Team', desc:'Structures change requests, recommends PCR attributes and impacted products, and checks submission quality.', tags:['Content Structuring','Attribute Recommendation','Scope Validation'], cats:['Submission'], popular:92, added:2, initials:'SS', color:'#2563EB' },
+    { id:'a3', name:'PCR Review & Screening Specialist', owner:'PCR Governance Team', desc:'Creates a concise review package with key facts, content gaps, screening concerns, and risk signals.', tags:['One-page Summary','Gap Detection','Risk Signals'], cats:['Review'], popular:88, added:3, initials:'RS', color:'#4F46E5' },
+    { id:'a4', name:'Duplicate PCR & Bundle Analyst', owner:'PCR Optimization Team', desc:'Finds similar PCRs, identifies resource and schedule overlap, and recommends potential bundle opportunities.', tags:['Similarity Search','Overlap Analysis','Bundle Recommendation'], cats:['Review','Data Analysis'], popular:84, added:4, initials:'DA', color:'#7C3AED' },
+    { id:'a5', name:'PCR Assessment Manager', owner:'Cross-functional Assessment Team', desc:'Consolidates vote results, evaluations, cost impact, risks, and unresolved items into an assessment package.', tags:['Vote Summary','Assessment Draft','Work Item Proposal'], cats:['Assessment','Decision Support'], popular:95, added:5, initials:'AM', color:'#B45309' },
+    { id:'a6', name:'PCR Execution Manager', owner:'PCR Delivery Team', desc:'Combines work-item and execution data to provide milestone visibility, blocker detection, and risk alerts.', tags:['Status Query','Milestone Tracking','Risk Alert'], cats:['Execution','Monitoring'], popular:81, added:6, initials:'EM', color:'#047857' },
+    { id:'a7', name:'PCR Commitment Monitor', owner:'PCR Value Management Team', desc:'Tracks committed outcomes against actual results across financial, schedule, supply-risk, and compliance dimensions.', tags:['Plan vs Actual','ROI Tracking','Benefit Closure'], cats:['Monitoring','Knowledge','Data Analysis'], popular:76, added:7, initials:'CM', color:'#BE185D' }
+  ];
+
+  const TEAMS = [
+    { id:'t1', name:'PCR Creation Team', desc:'Coordinates pre-submission analysis, content structuring, scope validation, and duplicate detection.', members:[{n:'Pre-submission Advisor',c:'#0F766E',i:'PA'},{n:'Submission Specialist',c:'#2563EB',i:'SS'},{n:'Review Specialist',c:'#4F46E5',i:'RS'}], tags:['Creation','Validation','Review'], cats:['Pre-PCR','Submission','Review'] },
+    { id:'t2', name:'PCR Assessment Team', desc:'Coordinates vote analysis, evaluation summaries, cost impact, risk identification, and decision preparation.', members:[{n:'Assessment Manager',c:'#B45309',i:'AM'},{n:'Vote Analyst',c:'#0F766E',i:'VA'},{n:'Cost Impact Specialist',c:'#7C3AED',i:'CI'}], tags:['Assessment','Cost','Decision Support'], cats:['Assessment','Decision Support'] },
+    { id:'t3', name:'PCR Delivery Team', desc:'Coordinates work-item generation, execution tracking, milestone monitoring, and escalation.', members:[{n:'Execution Manager',c:'#047857',i:'EM'},{n:'Milestone Monitor',c:'#2563EB',i:'MM'},{n:'Risk Alert Specialist',c:'#BE185D',i:'RA'}], tags:['Execution','Monitoring','Escalation'], cats:['Execution','Monitoring'] },
+    { id:'t4', name:'PCR Value Closure Team', desc:'Tracks commitments, actual results, benefit completion, and reusable lessons from historical PCRs.', members:[{n:'Commitment Monitor',c:'#BE185D',i:'CM'},{n:'Benefit Analyst',c:'#B45309',i:'BA'},{n:'Knowledge Curator',c:'#4F46E5',i:'KC'}], tags:['Commitment','Benefit','Knowledge'], cats:['Monitoring','Knowledge','Data Analysis'] }
+  ];
+
+  const SCENARIOS = [
+    { cls:'s1', title:'PCR Creation & Submission', agents:[{n:'Pre-submission Advisor',c:'#0F766E',i:'PA'},{n:'PCR Submission Specialist',c:'#2563EB',i:'SS'},{n:'Review & Screening Specialist',c:'#4F46E5',i:'RS'}], svg:'<circle cx="210" cy="36" r="46" fill="#fff"/><rect x="24" y="28" width="86" height="108" rx="8" fill="#fff"/>' },
+    { cls:'s2', title:'Duplicate Detection & Bundling', agents:[{n:'Duplicate PCR Analyst',c:'#7C3AED',i:'DA'},{n:'Bundle Recommendation Specialist',c:'#2563EB',i:'BR'},{n:'Product Scope Specialist',c:'#0F766E',i:'PS'}], svg:'<rect x="40" y="30" width="90" height="70" rx="8" fill="#fff"/><rect x="86" y="58" width="90" height="70" rx="8" fill="#fff"/>' },
+    { cls:'s3', title:'Assessment & Decision Support', agents:[{n:'Assessment Management Specialist',c:'#B45309',i:'AM'},{n:'Vote Analysis Specialist',c:'#0F766E',i:'VA'},{n:'Cost Impact Specialist',c:'#7C3AED',i:'CI'}], svg:'<polygon points="134,24 174,92 94,92" fill="#fff"/><circle cx="210" cy="120" r="28" fill="#fff"/>' },
+    { cls:'s4', title:'Execution & Risk Management', agents:[{n:'Execution Management Specialist',c:'#047857',i:'EM'},{n:'Milestone Monitor',c:'#2563EB',i:'MM'},{n:'Risk Alert Specialist',c:'#BE185D',i:'RA'}], svg:'<path d="M28 120 L80 88 L124 100 L188 48 L236 70" stroke="#fff" stroke-width="8" fill="none"/><circle cx="188" cy="48" r="10" fill="#fff"/>' },
+    { cls:'s5', title:'Commitment & Benefit Tracking', agents:[{n:'Commitment Monitor',c:'#BE185D',i:'CM'},{n:'Plan vs Actual Analyst',c:'#B45309',i:'PA'},{n:'Benefit Tracking Specialist',c:'#0F766E',i:'BT'}], svg:'<rect x="40" y="88" width="28" height="52" rx="4" fill="#fff"/><rect x="84" y="60" width="28" height="80" rx="4" fill="#fff"/><rect x="128" y="40" width="28" height="100" rx="4" fill="#fff"/><rect x="172" y="72" width="28" height="68" rx="4" fill="#fff"/>' },
+    { cls:'s6', title:'Agent-to-Agent Collaboration', agents:[{n:'PCR Orchestration Agent',c:'#1D4E89',i:'OA'},{n:'Function Team Agents',c:'#0F766E',i:'FT'},{n:'Domain Expert Agents',c:'#7C3AED',i:'DE'}], svg:'<circle cx="80" cy="70" r="18" fill="#fff"/><circle cx="168" cy="48" r="14" fill="#fff"/><circle cx="190" cy="112" r="16" fill="#fff"/><path d="M96 70h56M168 62v34" stroke="#fff" stroke-width="6"/>' }
+  ];
+
+  const AGENT_CATS = ['All','Pre-PCR','Submission','Review','Assessment','Execution','Monitoring','Decision Support','Knowledge','Data Analysis'];
+  const SKILL_CATS = ['All','Content Understanding','Knowledge Retrieval','Quality Validation','Recommendation','Summarization','Assessment','Task Generation','Execution Monitoring','Value Analysis'];
+
+  const SKILLS = [
+    { id:'s1', name:'Change Request Structuring', desc:'Extracts the background, requested change, benefit, dates, products, parts, and key entities from unstructured input.', cat:'Content Understanding', color:'#2563EB', grid:true },
+    { id:'s2', name:'PCR Type Recommendation', desc:'Recommends PCR type candidates based on change intent, product category, and business rules.', cat:'Recommendation', color:'#7C3AED', grid:true },
+    { id:'s3', name:'PCR Completeness Check', desc:'Checks missing, conflicting, or uncertain information using PCR type and function-specific rules.', cat:'Quality Validation', color:'#D97706', grid:true },
+    { id:'s4', name:'Impacted Product Recommendation', desc:'Recommends impacted products using product data, part numbers, sourcing plans, and lifecycle information.', cat:'Recommendation', color:'#7C3AED', grid:true },
+    { id:'s5', name:'Sponsor Validation', desc:'Validates the selected sponsor against PCR type and business-case rules.', cat:'Quality Validation', color:'#D97706', grid:true },
+    { id:'s6', name:'Similar PCR Finder', desc:'Combines structured filters and semantic matching to return comparable PCRs and key differences.', cat:'Knowledge Retrieval', color:'#0F766E', grid:true },
+    { id:'s7', name:'Duplicate PCR Check', desc:'Detects potentially duplicated PCRs and explains similarity, status, scope, and recommended next actions.', cat:'Quality Validation', color:'#D97706', grid:true },
+    { id:'s8', name:'Vote Comment Generator', desc:'Generates an editable vote-comment draft using PCR context, function rules, evidence, and historical references.', cat:'Assessment', color:'#047857', grid:true },
+    { id:'s9', name:'Comment Quality Check', desc:'Checks comment completeness across risk, impact, cost, schedule, conclusion, and supporting evidence.', cat:'Quality Validation', color:'#D97706', grid:true },
+    { id:'s10', name:'Vote & Evaluation Summary', desc:'Summarizes mandatory results, disagreements, incomplete items, conflicts, and cross-functional conclusions.', cat:'Summarization', color:'#0284C7', grid:true },
+    { id:'s11', name:'Work Item Draft Generator', desc:'Extracts actions, function teams, owners, target dates, dependencies, and acceptance evidence from confirmed conclusions.', cat:'Task Generation', color:'#4F46E5', grid:true },
+    { id:'s12', name:'PCR Version Comparison', desc:'Compares the current version, previous version, and AI baseline to highlight additions, removals, and unresolved items.', cat:'Quality Validation', color:'#D97706', grid:true },
+    { id:'s13', name:'Execution Status Check', desc:'Identifies approaching deadlines, overdue work, blocked items, missing target dates, and late completion.', cat:'Execution Monitoring', color:'#EA580C', grid:true },
+    { id:'s14', name:'Plan vs Actual Analysis', desc:'Compares PCR commitments with actual outcomes and identifies significant gaps and possible root-cause signals.', cat:'Value Analysis', color:'#BE185D', grid:true },
+    { id:'s15', name:'Message Board Summary', desc:'Summarizes discussions, conclusions, unanswered questions, concerns, and follow-up actions.', cat:'Summarization', color:'#0284C7', grid:true },
+    { id:'s16', name:'PCR Submission Quality Check', desc:'Reviews submission completeness, attribute quality, and missing evidence before a PCR is filed.', cat:'Quality Validation', color:'#2563EB', grid:false }
+  ];
+
+  const REC_POOL = ['s16','s8','s6','s11','s1','s7','s13','s14'];
+
+  const MCPS = [
+    { id:'m1', name:'PACE PCR MCP', desc:'Access PCR details, lifecycle states, review tasks, vote tasks, evaluations, work items, and benefit tracking records.', tags:['Core System','PCR Data'], status:'connected', color:'#0F766E' },
+    { id:'m2', name:'PPD Product MCP', desc:'Retrieves product profiles, planning cycles, platforms, project attributes, and product planning information.', tags:['Product Master Data','Planning'], status:'connected', color:'#2563EB' },
+    { id:'m3', name:'SCI Supply MCP', desc:'Provides demand, forecast, sourcing-plan, shortage, and supply-commit information for PCR assessment.', tags:['Supply Data','In Planning'], status:'planning', color:'#D97706' },
+    { id:'m4', name:'PPM Product MCP', desc:'Retrieves product position, shipment information, milestones, and related product attributes.', tags:['Product Planning','Shipment'], status:'available', color:'#7C3AED' },
+    { id:'m5', name:'BOM & OD MCP', desc:'Provides product BOM, specification, part-number, country-sheet, and supported-scope information.', tags:['BOM','Scope Validation'], status:'available', color:'#0F766E' },
+    { id:'m6', name:'Power BI Analytics MCP', desc:'Connects PCR trends, commodity status, cost analysis, and execution dashboards for evidence-based decisions.', tags:['Analytics','Dashboards'], status:'available', color:'#F59E0B' },
+    { id:'m7', name:'SharePoint Knowledge MCP', desc:'Retrieves PCR templates, validation rules, special-feature checklists, and historical knowledge documents.', tags:['Knowledge Base','Documents'], status:'connected', color:'#0369A1' },
+    { id:'m8', name:'ODM Execution MCP', desc:'Provides NRE submission, test start, test finish, execution status, and delivery evidence from ODM partners.', tags:['Execution Data','In Planning'], status:'planning', color:'#475569' },
+    { id:'m9', name:'Cost & NRE MCP', desc:'Provides historical NRE, commodity cost, and PCR cost references under controlled access permissions.', tags:['Cost Data','Restricted'], status:'restricted', color:'#B45309' },
+    { id:'m10', name:'Downstream Task MCP', desc:'Maps PCR work items to OD, T1, CSR, PLM, and other downstream execution systems.', tags:['Task Delivery','In Planning'], status:'planning', color:'#64748B' },
+    { id:'m11', name:'Organization MCP', desc:'Retrieves function teams, owners, managers, delegates, responsibility assignments, and escalation relationships.', tags:['Organization','Ownership'], status:'connected', color:'#4F46E5' },
+    { id:'m12', name:'Notification MCP', desc:'Supports due-date reminders, overdue alerts, blocked-item notifications, and escalation messages.', tags:['Notifications','Escalation'], status:'available', color:'#DC2626' }
+  ];
+
+  const SKILL_ICON = {
+    'Content Understanding':'<path d="M4 3.5h8v9H4z"/><path d="M6 6h4M6 8.5h3"/>',
+    'Knowledge Retrieval':'<circle cx="7" cy="7" r="3.2"/><path d="M10.2 10.2L13 13"/>',
+    'Quality Validation':'<path d="M3.5 8.2l3 3.1 6-6.4"/>',
+    'Recommendation':'<path d="M8 2.8l1.5 3.1 3.4.5-2.5 2.4.6 3.4L8 10.6 5 12.2l.6-3.4L3.1 6.4l3.4-.5z"/>',
+    'Summarization':'<path d="M4 4h8M4 8h8M4 12h5"/>',
+    'Assessment':'<path d="M4 12V7h3v5M9 12V4h3v8"/>',
+    'Task Generation':'<path d="M3.5 5h9M3.5 8h9M3.5 11h6"/>',
+    'Execution Monitoring':'<path d="M3 11l3.5-3.5 2.5 2.2L13 5"/>',
+    'Value Analysis':'<path d="M3 12h10M5 12V7M8 12V5M11 12V8"/>'
+  };
+
+  const MCP_ICON = '<rect x="3" y="3" width="4.2" height="4.2" rx=".8"/><rect x="8.8" y="3" width="4.2" height="4.2" rx=".8"/><rect x="3" y="8.8" width="4.2" height="4.2" rx=".8"/><rect x="8.8" y="8.8" width="4.2" height="4.2" rx=".8"/>';
+
+  const state = {
+    page: 'agent',
+    agentTab: 'agents',
+    agentCat: 'All',
+    agentSort: 'popular',
+    skillTab: 'market',
+    skillSeg: 'recommended',
+    skillCat: 'All',
+    recOffset: 0,
+    q: '',
+    installed: new Set(['s3','s6','s8','s11']),
+    connected: new Set(MCPS.filter((m) => m.status === 'connected').map((m) => m.id))
+  };
+
+  let toastT = 0;
+  function toast(msg) {
+    const el = $('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  const tipEl = $('tip');
+  let tipHide = 0;
+  function showTip(e, text) {
+    if (!text) return;
+    clearTimeout(tipHide);
+    tipEl.textContent = text;
+    tipEl.classList.add('show');
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = Math.min(window.innerWidth - 260, Math.max(8, r.left + r.width / 2 - 120));
+    const y = r.top - 8;
+    tipEl.style.left = x + 'px';
+    tipEl.style.top = Math.max(8, y - tipEl.offsetHeight) + 'px';
+  }
+  function hideTip() {
+    tipHide = setTimeout(() => tipEl.classList.remove('show'), 80);
+  }
+
+  function matchQ(parts) {
+    const q = state.q.trim().toLowerCase();
+    if (!q) return true;
+    return parts.join(' ').toLowerCase().includes(q);
+  }
+
+  function emptyHtml() {
+    return `<div class="empty"><h3>No matching results</h3><p>Try a different keyword or category.</p><button type="button" class="ghost" data-act="clear">Clear Filters</button></div>`;
+  }
+
+  function plusBtn(on, opts) {
+    const lab = opts.label;
+    const cls = `plus${on ? ' on' : ''}${opts.sm ? ' sm' : ''}`;
+    const off = opts.disabled ? 'true' : 'false';
+    return `<button type="button" class="${cls}" aria-disabled="${off}" data-off="${opts.disabled ? '1' : ''}" data-act="${opts.act}" data-id="${opts.id}" aria-label="${lab}" title="${lab}">${on ? ICO.check : ICO.plus}</button>`;
+  }
+
+  function renderAgent() {
+    const cats = AGENT_CATS.map((c) => `<button type="button" class="chip${state.agentCat === c ? ' on' : ''}" data-act="acat" data-v="${c}">${c}</button>`).join('');
+    const scenes = SCENARIOS.map((s) => `<article class="scen ${s.cls}" tabindex="0">
+        <div class="art">${art(s.svg)}</div><div class="veil"></div>
+        <div class="body"><h3>${s.title}</h3>${s.agents.map((a) => `<div class="ag">${AV(a.i, a.c, 'xs')} ${a.n}</div>`).join('')}</div>
+      </article>`).join('');
+
+    let body;
+    if (state.agentTab === 'teams') {
+      let list = TEAMS.filter((t) => (state.agentCat === 'All' || t.cats.includes(state.agentCat)) && matchQ([t.name, t.desc, ...t.tags, ...t.members.map((m) => m.n)]));
+      body = `<div class="grid-agents">${list.length ? list.map((t) => `<button type="button" class="tcard" data-act="agent-card">
+          <div class="avs">${t.members.map((m) => AV(m.i, m.c, 'sm')).join('')}</div>
+          <h3>${t.name}</h3>
+          <p class="desc">${t.desc}</p>
+          <div class="tags">${t.tags.map((x) => `<span class="tag">${x}</span>`).join('')}</div>
+        </button>`).join('') : emptyHtml()}</div>`;
+    } else {
+      let list = AGENTS.filter((a) => (state.agentCat === 'All' || a.cats.includes(state.agentCat)) && matchQ([a.name, a.owner, a.desc, ...a.tags]));
+      list = list.slice().sort((a, b) => state.agentSort === 'newest' ? b.added - a.added : b.popular - a.popular);
+      body = `<div class="grid-agents">${list.length ? list.map((a) => `<article class="acard" data-act="agent-card" tabindex="0">
+          <button type="button" class="invoke" data-act="invoke" aria-label="Invoke ${a.name}">Invoke</button>
+          <div class="head">${AV(a.initials, a.color)}<div class="meta"><h3>${a.name}</h3><div class="owner">${a.owner}</div></div></div>
+          <p class="desc">${a.desc}</p>
+          <div class="tags">${a.tags.map((x) => `<span class="tag">${x}</span>`).join('')}</div>
+        </article>`).join('') : emptyHtml()}</div>`;
+    }
+
+    return `<section class="feat">
+        <div class="feat-h"><h1>Featured Scenarios</h1></div>
+        <div class="feat-track-wrap">
+          <div class="feat-track" id="featTrack">${scenes}</div>
+          <button type="button" class="feat-next" data-act="scroll-feat" aria-label="Show more scenarios">
+            <svg viewBox="0 0 16 16"><path d="M6 3.5L11 8l-5 4.5"/></svg>
+          </button>
+        </div>
+      </section>
+      <div class="row-h">
+        <div class="tabs" role="tablist" aria-label="Agent views">
+          <button type="button" class="tab${state.agentTab === 'agents' ? ' on' : ''}" role="tab" aria-selected="${state.agentTab === 'agents'}" data-act="atab" data-v="agents">Agents</button>
+          <button type="button" class="tab${state.agentTab === 'teams' ? ' on' : ''}" role="tab" aria-selected="${state.agentTab === 'teams'}" data-act="atab" data-v="teams">Agent Teams</button>
+        </div>
+        <div class="filters">${cats}</div>
+        <div class="seg" role="group" aria-label="Sort agents">
+          <button type="button" class="${state.agentSort === 'popular' ? 'on' : ''}" data-act="asort" data-v="popular">Most Popular</button>
+          <button type="button" class="${state.agentSort === 'newest' ? 'on' : ''}" data-act="asort" data-v="newest">Newest</button>
+        </div>
+      </div>
+      ${body}`;
+  }
+
+  function skillIco(s, lg) {
+    const path = SKILL_ICON[s.cat] || SKILL_ICON['Task Generation'];
+    return `<span class="ico${lg ? ' lg' : ''}" style="background:${s.color}" aria-hidden="true"><svg viewBox="0 0 16 16">${path}</svg></span>`;
+  }
+
+  function recSkills() {
+    return [0, 1, 2, 3].map((i) => SKILLS.find((s) => s.id === REC_POOL[(i + state.recOffset) % REC_POOL.length]));
+  }
+
+  function filteredSkills() {
+    let list = SKILLS.filter((s) => s.grid);
+    if (state.skillTab === 'installed') list = SKILLS.filter((s) => state.installed.has(s.id));
+    else if (state.skillSeg === 'recommended') list = list.filter((s) => ['s3', 's6', 's8', 's11', 's1', 's16'].includes(s.id) && s.grid);
+    else if (state.skillSeg === 'bundles') list = [];
+    if (state.skillCat !== 'All') list = list.filter((s) => s.cat === state.skillCat);
+    list = list.filter((s) => matchQ([s.name, s.desc, s.cat]));
+    return list;
+  }
+
+  function renderSkill() {
+    const rec = recSkills();
+    const list = filteredSkills();
+    const recBlock = state.skillTab === 'market' ? `<div class="rec-h"><h2>Recommended for You</h2>
+        <button type="button" class="icon-lab" data-act="refresh"><svg viewBox="0 0 16 16"><path d="M3.2 8a4.8 4.8 0 0 1 8.2-3.2M12.8 8a4.8 4.8 0 0 1-8.2 3.2"/><path d="M11.2 2.8V4.8h2M4.8 13.2V11.2H2.8"/></svg>Refresh</button></div>
+        <div class="grid-rec">${rec.filter((s) => matchQ([s.name, s.desc, s.cat])).map((s) => {
+          const on = state.installed.has(s.id);
+          return `<article class="rcard">
+            <div class="ih">${skillIco(s, true)}${plusBtn(on, { act:'skill', id:s.id, label: on ? 'Installed' : 'Add Skill' })}</div>
+            <h3>${s.name}</h3>
+            <p>${s.desc}</p>
+          </article>`;
+        }).join('') || emptyHtml()}</div>` : '';
+
+    return `${recBlock}
+      <div class="row-h">
+        <div class="tabs" role="tablist" aria-label="Skill views">
+          <button type="button" class="tab${state.skillTab === 'market' ? ' on' : ''}" data-act="stab" data-v="market">Skill Market</button>
+          <button type="button" class="tab${state.skillTab === 'installed' ? ' on' : ''}" data-act="stab" data-v="installed">Installed<span class="badge">${state.installed.size}</span></button>
+        </div>
+        ${state.skillTab === 'market' ? `<div class="seg" role="group" aria-label="Skill collections">
+          <button type="button" class="${state.skillSeg === 'recommended' ? 'on' : ''}" data-act="sseg" data-v="recommended">Recommended</button>
+          <button type="button" class="${state.skillSeg === 'hub' ? 'on' : ''}" data-act="sseg" data-v="hub">PCR SkillHub</button>
+          <button type="button" class="${state.skillSeg === 'bundles' ? 'on' : ''}" data-act="sseg" data-v="bundles">Bundles</button>
+        </div>` : ''}
+      </div>
+      <div class="filters" style="margin-bottom:14px">${SKILL_CATS.map((c) => `<button type="button" class="chip${state.skillCat === c ? ' on' : ''}" data-act="scat" data-v="${c}">${c}</button>`).join('')}</div>
+      <div class="grid-skills">${list.length ? list.map((s) => {
+        const on = state.installed.has(s.id);
+        return `<article class="scard">
+          ${skillIco(s)}
+          <div class="copy"><h3>${s.name}</h3><p>${s.desc}</p></div>
+          ${plusBtn(on, { act:'skill', id:s.id, label: on ? 'Installed' : 'Add Skill' })}
+        </article>`;
+      }).join('') : emptyHtml()}</div>`;
+  }
+
+  function mcpStatus(m) {
+    if (state.connected.has(m.id)) return 'connected';
+    return m.status;
+  }
+
+  function renderMcp() {
+    const list = MCPS.filter((m) => matchQ([m.name, m.desc, ...m.tags, mcpStatus(m), m.status]));
+    return `<div class="grid-mcp">${list.length ? list.map((m) => {
+        const st = mcpStatus(m);
+        const connected = st === 'connected';
+        const planning = m.status === 'planning';
+        const restricted = m.status === 'restricted';
+        const disabled = planning || restricted;
+        const tip = planning ? 'This connector is planned for a future release' : restricted ? 'Additional access permission is required' : (connected ? 'Connected' : 'Connect');
+        const tags = m.tags.map((t) => {
+          const cls = t === 'In Planning' ? 'plan' : t === 'Restricted' ? 'risk' : '';
+          return `<span class="tag ${cls}">${t}</span>`;
+        }).join('');
+        return `<article class="mcard">
+          <span class="ico lg" style="background:${m.color}" aria-hidden="true"><svg viewBox="0 0 16 16">${MCP_ICON}</svg></span>
+          <div class="copy">
+            <h3>${m.name}</h3>
+            <p>${m.desc}</p>
+            <div class="tags">${tags}${connected ? '<span class="tag ok">Connected</span>' : ''}</div>
+          </div>
+          ${plusBtn(connected, { act:'mcp', id:m.id, label: tip, disabled })}
+        </article>`;
+      }).join('') : emptyHtml()}</div>`;
+  }
+
+  const PLACE = {
+    agent: 'Search agents by role or capability',
+    skill: 'Search skills',
+    mcp: 'Search MCP connectors'
+  };
+  const ACT = { agent: 'My Agents', skill: 'Add Skill', mcp: 'Custom MCP' };
+
+  function render() {
+    document.querySelectorAll('.nav-btn').forEach((b) => b.classList.toggle('on', b.dataset.page === state.page));
+    $('q').placeholder = PLACE[state.page];
+    $('q').value = state.q;
+    $('actBtn').textContent = ACT[state.page];
+    $('app').innerHTML = state.page === 'agent' ? renderAgent() : state.page === 'skill' ? renderSkill() : renderMcp();
+    bindTips();
+  }
+
+  function bindTips() {
+    $('app').querySelectorAll('.plus[aria-disabled="true"]').forEach((btn) => {
+      btn.addEventListener('mouseenter', (e) => showTip(e, btn.getAttribute('title')));
+      btn.addEventListener('mouseleave', hideTip);
+      btn.addEventListener('focus', (e) => showTip(e, btn.getAttribute('title')));
+      btn.addEventListener('blur', hideTip);
+    });
+  }
+
+  function setPage(page) {
+    state.page = page;
+    state.q = '';
+    if (location.hash.replace('#', '') !== page) history.replaceState(null, '', '#' + page);
+    render();
+  }
+
+  function openModal(open) {
+    const el = $('scrim');
+    el.classList.toggle('on', open);
+    el.hidden = !open;
+    if (open) $('mcpName').focus();
+    else $('mcpForm').reset();
+  }
+
+  document.querySelector('.nav').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-page]');
+    if (b) setPage(b.dataset.page);
+  });
+
+  $('q').addEventListener('input', () => { state.q = $('q').value; render(); $('q').focus(); });
+
+  $('actBtn').addEventListener('click', () => {
+    if (state.page === 'agent') toast('My Agents is not included in this prototype');
+    else if (state.page === 'skill') toast('Use the plus button on a skill card to add it');
+    else openModal(true);
+  });
+
+  $('app').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.dataset.act;
+    const v = b.dataset.v;
+    if (act === 'scroll-feat') {
+      $('featTrack').scrollBy({ left: 300, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      return;
+    }
+    if (act === 'atab') state.agentTab = v;
+    if (act === 'acat') state.agentCat = v;
+    if (act === 'asort') state.agentSort = v;
+    if (act === 'stab') state.skillTab = v;
+    if (act === 'sseg') state.skillSeg = v;
+    if (act === 'scat') state.skillCat = v;
+    if (act === 'clear') { state.q = ''; state.agentCat = 'All'; state.skillCat = 'All'; }
+    if (act === 'refresh') { state.recOffset = (state.recOffset + 1) % REC_POOL.length; toast('Recommendations updated'); }
+    if (act === 'invoke') { toast('Invoke is for demonstration only'); return; }
+    if (act === 'agent-card') { toast('Agent details are not included in this prototype'); return; }
+    if (act === 'skill') {
+      e.stopPropagation();
+      if (state.installed.has(b.dataset.id)) state.installed.delete(b.dataset.id);
+      else { state.installed.add(b.dataset.id); toast('Skill added to your workspace'); }
+    }
+    if (act === 'mcp') {
+      e.stopPropagation();
+      if (b.dataset.off === '1') return;
+      const m = MCPS.find((x) => x.id === b.dataset.id);
+      if (!m || m.status === 'planning' || m.status === 'restricted') return;
+      if (state.connected.has(m.id)) state.connected.delete(m.id);
+      else { state.connected.add(m.id); toast('MCP connector added'); }
+    }
+    render();
+  });
+
+  $('mcpCancel').addEventListener('click', () => openModal(false));
+  $('scrim').addEventListener('click', (e) => { if (e.target === $('scrim')) openModal(false); });
+  $('mcpForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    openModal(false);
+    toast('Custom MCP saved in prototype mode');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { openModal(false); hideTip(); }
+    if (e.target.classList && e.target.classList.contains('acard') && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
+
+  window.addEventListener('hashchange', () => {
+    const p = location.hash.replace('#', '');
+    if (['agent', 'skill', 'mcp'].includes(p) && p !== state.page) setPage(p);
+  });
+
+  const start = location.hash.replace('#', '');
+  if (['agent', 'skill', 'mcp'].includes(start)) state.page = start;
+  render();
+})();
+  </script>
+</body>
+</html>
