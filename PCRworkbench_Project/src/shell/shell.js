@@ -164,6 +164,38 @@ const TIPS_TASK={
    ix:'弹窗明示「该记录将在 OTM 汇总的异常区中显示」，并列出未通过项与完整度，理由必填。',
    fn:'事先告知后果本身就是一道软性门禁，比单纯要求填理由更有约束力。',
    ref:['7.5 Force Submit']},
+ otm2NoDissolve:{t:'异常不得在汇总层被消解',
+   ix:'顶部常驻异常摘要行、只读参考区、结论第三段不得为空；删除异常内容时提示但不阻断。',
+   fn:'底层 Vote Task 发现的问题，在上层汇总时若被 AI 的漂亮措辞抹平，整个质量门禁就形同虚设；这是 OTM-06/07/08 三条规则的共同目的。',
+   ref:['OTM-06','OTM-07','OTM-08']},
+ otm2Split:{t:'只读参考区与可编辑结论区必须分离',
+   ix:'原始 Vote 记录只读，结论文本可编辑。即使结论被改得再漂亮，原始异常仍摆在那里。',
+   fn:'防止 OTM 把「资料不全」改写成「全部通过」。',
+   ref:['OTM-11']},
+ otm2NoImpact:{t:'No Impact 不等于 Agree',
+   ix:'汇总表中 Vote Result 分别统计，不把 No Impact 与 Agree 合并计数。',
+   fn:'No Impact 表示该职能认为与己无关，Agree 表示明确认可，把两者混为一谈会高估共识程度。',
+   ref:['OTM-08']},
+ otm2ForceNeq:{t:'强制提交不等于校验通过',
+   ix:'强制提交记录在异常区独立呈现，含未通过项与原因，不得摘要成检查全部通过。',
+   fn:'强制提交是受控例外，不是质量合格；若被摘要成「检查全部通过」，下游将失去判断依据。',
+   ref:['OTM-08','7.5']},
+ otm2Single:{t:'决策用单一入口而非平铺按钮',
+   ix:'底部只有「完成 Assessment」，点击后按四组呈现八个选项，每项带结果说明。',
+   fn:'八个决策名称对 OTM 并不自解释，平铺会让人无从下手；分组 + 结果说明 + 按状态动态隐藏，才能既保留完整业务选项又可理解。',
+   ref:['OTM-12']},
+ otm2Gate:{t:'按校验结果禁用不合法决策',
+   ix:'Mandatory 未完成或存在 Disagree 时禁用 Approve，并给出具体原因与可用替代路径。',
+   fn:'只提示错误而不限制操作，等于把责任完全推给用户；禁用 + 说明原因 + 给出可用替代路径，才是有效的门禁。',
+   ref:['OTM-12']},
+ otm2Trace:{t:'Work Item 来源必须可追溯',
+   ix:'每条标注来源 Function Team、来源 Vote Task、来源 Dimension / Required Action；合并后保留所有来源。',
+   fn:'OTM 汇总时若丢失来源，后续无法判断该待办为何存在、由谁提出。',
+   ref:['OTM-02','OTM-15']},
+ otm2RelDate:{t:'相对时间要展示计算过程',
+   ix:'展示基准日、计算式与结果三行，而不是只给最终日期。',
+   fn:'只给最终日期时，用户无法判断该日期是否合理，也无法在基准日变更后察觉影响。',
+   ref:['OTM-13']},
 };
 
 
@@ -561,7 +593,7 @@ function setFil(b){
   renderList();
 }
 function tipNum(key){
-  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73,ganttInsight:74,ganttColor:75,ganttEntry:76,vt2VoteFirst:77,vt2Dim:78,vt2Valid:79,vt2WiName:80,vt2WiAfter:81,vt2Rules:82,vt2Force:83};
+  const HARD={sessTop:50,sessTask:51,sessDone:52,taskChat:53,taskActs:54,taskUpdate:55,askOne:56,flowVsSess:57,batchJudge:58,batchIndep:59,batchExit:60,batchVsRisk:61,ahSplit:62,ahConcern:63,ahSkip:64,ahReturn:65,dmStream:66,dmWarnLast:67,dmScroll:68,dmSkip:69,pinCustom:70,pinVsHist:71,pinLive:72,pinLimit:73,ganttInsight:74,ganttColor:75,ganttEntry:76,vt2VoteFirst:77,vt2Dim:78,vt2Valid:79,vt2WiName:80,vt2WiAfter:81,vt2Rules:82,vt2Force:83,otm2NoDissolve:84,otm2Split:85,otm2NoImpact:86,otm2ForceNeq:87,otm2Single:88,otm2Gate:89,otm2Trace:90,otm2RelDate:91};
   if(HARD[key]!=null) return HARD[key];
   const dict=(VIEW==='task'?TIPS_TASK:TIPS_HOME);
   const i=Object.keys(dict).indexOf(key);
@@ -684,10 +716,15 @@ function ensureIinfoTip(){
   return iinfoTipEl;
 }
 function resolveIinfo(el){
-  const key=el.getAttribute('data-info')||el.getAttribute('data-vt2-info');
+  const key=el.getAttribute('data-info')||el.getAttribute('data-vt2-info')||el.getAttribute('data-otm2-info');
   if(!key) return null;
   if(typeof PCR_IINFO!=='undefined' && PCR_IINFO[key]) return PCR_IINFO[key];
-  if(window.VoteV2 && typeof VoteV2.stepInfo==='function') return VoteV2.stepInfo(key);
+  if(window.VoteV2 && typeof VoteV2.stepInfo==='function'){
+    const d=VoteV2.stepInfo(key); if(d) return d;
+  }
+  if(window.OtmV2 && typeof OtmV2.stepInfo==='function'){
+    const d=OtmV2.stepInfo(key); if(d) return d;
+  }
   return null;
 }
 function showIinfoTip(el){

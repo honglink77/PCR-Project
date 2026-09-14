@@ -99,7 +99,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       ],
       showDiff: false, diffA: 1, diffB: 2,
       ignoreMissing: false, missingDone: false, crDone: false, reviewed: false,
-      commentReady: false, checkReady: false, compReady: false,
+      commentReady: false, checkReady: false, compReady: false, commentDirty: false,
       wiOpen: false, wis: [], wiDirty: false, confirmedText: '', editWi: null,
       forceNote: '', openId: 'vote', playedIntro: false,
       simOpen: true, rootOpen: true,
@@ -843,19 +843,22 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     } else box.innerHTML = `<div class="vt2-hint">将取相似 PCR 中同一 Function Team（Development）的 Vote Comment，按当前维度模板解析后回填。</div>`;
   }
 
+  function vt2RunDebouncedChecks() {
+    const st = vt2St();
+    if (st.vote !== 'agree' || !st.commentReady) return;
+    if (!st.commentDirty) return;
+    st.commentDirty = false;
+    st.missingDone = true;
+    st.crDone = true;
+    st.checkReady = true;
+    st.compReady = true;
+    toast('已按防抖规则触发 Missing Points Check 与 Control Run Validation');
+    vt2RenderPlist();
+  }
+
   function vt2ScheduleCheck() {
     clearTimeout(vt2Debounce);
-    vt2Debounce = setTimeout(() => {
-      const st = vt2St();
-      if (st.vote !== 'agree') return;
-      if (vt2ReqMiss(st.covered).length) return;
-      st.missingDone = true;
-      st.crDone = true;
-      st.checkReady = true;
-      st.compReady = true;
-      toast('已按防抖规则触发 Missing Points Check 与 Control Run Validation');
-      if (st.openId === 'comp' || st.openId === 'missing' || st.openId === 'cr' || st.openId === 'review') vt2RenderPlist();
-    }, 500);
+    vt2Debounce = setTimeout(vt2RunDebouncedChecks, 500);
   }
 
   function vt2Wire() {
@@ -894,6 +897,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       cmt.oninput = () => {
         s.comment = cmt.innerText;
         st.comment = s.comment;
+        st.commentDirty = true;
         if (st.wiOpen && st.confirmedText && s.comment !== st.confirmedText) st.wiDirty = true;
       };
       cmt.onblur = () => vt2ScheduleCheck();
@@ -905,6 +909,8 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     root.querySelector('[data-vt2=xls]')?.addEventListener('click', vt2DownloadXls);
     root.querySelector('[data-vt2=recheck]')?.addEventListener('click', async (e) => {
       e.stopPropagation();
+      clearTimeout(vt2Debounce);
+      st.commentDirty = false;
       if (!st.commentReady) { toast('请先生成 Comment'); return; }
       st.compReady = false;
       st.checkReady = false;
@@ -926,6 +932,8 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
     });
     root.querySelector('[data-vt2=diff]')?.addEventListener('click', () => { st.showDiff = !st.showDiff; vt2RenderPlist(); });
     root.querySelector('[data-vt2=regen]')?.addEventListener('click', () => {
+      clearTimeout(vt2Debounce);
+      st.commentDirty = false;
       st.hist.push({ v: st.ver, at: '草稿', text: vt2Cmt(), pct: vt2Pct(st.covered), n: vt2CoveredN(st.covered) });
       st.ver += 1; s.comment = VT2_COMMENT; st.comment = VT2_COMMENT; st.showDiff = true;
       toast('已重新生成草稿'); vt2RenderPlist();
