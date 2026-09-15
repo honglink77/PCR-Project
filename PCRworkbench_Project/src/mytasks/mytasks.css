@@ -209,6 +209,21 @@
   .view-task .sec{margin-bottom:18px}
   .view-task .sec-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:9px;cursor:pointer;user-select:none}
   .view-task .sec-h .caret{transition:.15s;font-size:10px}
+  .view-task .sec-h .sec-fs,.view-task .cr-read-h .sec-fs{margin-left:auto;border:none;background:transparent;color:var(--ink-3);cursor:pointer;border-radius:6px;padding:0;flex:none}
+  .view-task .cr-read-h .sec-fs{width:22px;height:22px;display:grid;place-items:center}
+  .view-task .sec-h .sec-fs{height:22px;width:auto;display:inline-flex;align-items:center;gap:6px;padding:0 8px;background:var(--panel,#fff);border:1px solid var(--border);border-radius:8px}
+  .view-task .sec-h .sec-fs[hidden]{display:none!important}
+  .view-task .sec-h .sec-fs .i{width:12px;height:12px;flex:none}
+  .view-task .sec-h .sec-fs .sec-fs-lab{font-size:12px;font-weight:500;letter-spacing:0;line-height:1}
+  .view-task .sec-h .sec-fs:hover{color:var(--accent-ink);background:var(--accent-soft);border-color:var(--accent)}
+  .view-task .cr-read-h .sec-fs:hover{color:var(--accent-ink);background:var(--soft)}
+  .view-task .cr-read{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--bg);min-height:0}
+  .view-task .cr-read-h{flex:none;display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border)}
+  .view-task .cr-read-t{font-size:13px;font-weight:650;color:var(--ink)}
+  .view-task .cr-read-b{flex:1;min-height:0;min-width:0;width:100%;overflow:auto}
+  .view-task .cr-read-inner{max-width:920px;padding:20px 28px 32px;font-size:14px;line-height:1.7;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .view-task .cr-clip{height:148px;max-height:148px;overflow:auto;font-size:12.5px;line-height:1.6;color:var(--ink);background:var(--soft);border-radius:8px;padding:10px 12px}
+  .view-task .cr-clip-body{white-space:pre;word-break:normal;min-width:min-content}
   .view-task .sec.collapsed .caret{transform:rotate(-90deg)}
   .view-task .sec.collapsed .sec-c{display:none}
 

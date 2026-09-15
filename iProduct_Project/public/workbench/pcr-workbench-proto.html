@@ -1200,6 +1200,12 @@
   .view-task .sec{margin-bottom:18px}
   .view-task .sec-h{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--ink-3);letter-spacing:.04em;margin-bottom:9px;cursor:pointer;user-select:none}
   .view-task .sec-h .caret{transition:.15s;font-size:10px}
+  .view-task .sec-h .sec-fs,.view-task .cr-read-h .sec-fs{margin-left:auto;width:22px;height:22px;border:none;background:transparent;color:var(--ink-3);display:grid;place-items:center;cursor:pointer;border-radius:6px;padding:0;flex:none}
+  .view-task .sec-h .sec-fs:hover,.view-task .cr-read-h .sec-fs:hover{color:var(--accent-ink);background:var(--soft)}
+  .view-task .cr-read{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;background:var(--bg);min-height:0}
+  .view-task .cr-read-h{flex:none;display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border)}
+  .view-task .cr-read-t{font-size:13px;font-weight:650;color:var(--ink)}
+  .view-task .cr-read-b{flex:1;overflow:auto;padding:20px 28px 32px;font-size:14px;line-height:1.7;color:var(--ink);max-width:920px}
   .view-task .sec.collapsed .caret{transform:rotate(-90deg)}
   .view-task .sec.collapsed .sec-c{display:none}
 
@@ -4340,7 +4346,46 @@ function renderProcessProgress(t){
     </div>
   </div>`;
 }
+const CR_FS_ICO=`<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>`;
+const CR_FS_MIN=`<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>`;
+function crFsBtn(){
+  return `<button type="button" class="sec-fs" data-cr-fs title="全屏查看" aria-label="全屏查看">${CR_FS_ICO}</button>`;
+}
+function closeCrRead(){
+  document.getElementById('crReadLayer')?.remove();
+}
+function openCrRead(html){
+  closeCrRead();
+  const cols=document.querySelector('.view-task .cols');
+  if(!cols) return;
+  const el=document.createElement('div');
+  el.id='crReadLayer';
+  el.className='cr-read';
+  el.innerHTML=`<div class="cr-read-h"><span class="cr-read-t">Change Request in Detail</span>
+    <button type="button" class="sec-fs" data-cr-read-x title="退出全屏" aria-label="退出全屏">${CR_FS_MIN}</button></div>
+    <div class="cr-read-b">${html}</div>`;
+  cols.appendChild(el);
+  el.querySelector('[data-cr-read-x]').onclick=closeCrRead;
+}
+function wireCrRead(root){
+  const host=root||document.getElementById('ctxBody');
+  if(!host) return;
+  host.querySelectorAll('[data-cr-fs]').forEach(btn=>{
+    btn.onclick=e=>{
+      e.stopPropagation();
+      if(document.getElementById('crReadLayer')){ closeCrRead(); return; }
+      const html=btn.closest('.sec')?.querySelector('.sec-c')?.innerHTML||'';
+      openCrRead(html);
+    };
+  });
+}
+window.crFsBtn=crFsBtn;
+window.wireCrRead=wireCrRead;
+window.closeCrRead=closeCrRead;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCrRead(); });
+
 function renderCtx(){
+  closeCrRead();
   if(TASKS[cur]?.voteV2 && window.VoteV2 && VoteV2.renderCtx()) return;
   if(TASKS[cur]?.otmV2 && window.OtmV2 && OtmV2.renderCtx()) return;
   const t=TASKS[cur];
@@ -4365,7 +4410,7 @@ function renderCtx(){
         <div class="sec-c">${renderProcessProgress(t)}</div>
       </div>
       <div class="sec" data-sec>
-        <div class="sec-h"><span class="caret">▾</span>Change Request in Detail</div>
+        <div class="sec-h"><span class="caret">▾</span>Change Request in Detail${crFsBtn()}</div>
         <div class="sec-c"><div style="font-size:12.5px;line-height:1.6;color:var(--ink)">${t.change}</div></div>
       </div>
       <div class="sec" data-sec>
@@ -4393,7 +4438,11 @@ function renderCtx(){
     body.innerHTML=`<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Evidence sources behind each AI suggestion; click to trace original records</div>`+
       ev.map((e,i)=>`<div class="evi"><span class="en">${i+1}</span><div class="ec"><div>${e.t}</div><span class="src">${e.s}</span></div></div>`).join('');
   }
-  body.querySelectorAll('[data-sec] .sec-h').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('collapsed'));
+  body.querySelectorAll('[data-sec] .sec-h').forEach(h=>h.onclick=e=>{
+    if(e.target.closest('[data-cr-fs]')) return;
+    h.parentElement.classList.toggle('collapsed');
+  });
+  wireCrRead(body);
 }
 document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
   ctxTab=b.dataset.t;
@@ -6207,7 +6256,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
           <div class="sec-c">${typeof renderProcessProgress === 'function' ? renderProcessProgress(t) : ''}</div>
         </div>
         <div class="sec" data-sec>
-          <div class="sec-h"><span class="caret">▾</span>Change Request in Detail</div>
+          <div class="sec-h"><span class="caret">▾</span>Change Request in Detail${typeof crFsBtn==='function'?crFsBtn():''}</div>
           <div class="sec-c"><div style="font-size:12.5px;line-height:1.6">${t.change}</div></div>
         </div>
         <div class="sec" data-sec>
@@ -6228,7 +6277,13 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       body.innerHTML = `<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Evidence sources</div>`
         + ev.map((e, i) => `<div class="evi"><span class="en">${i + 1}</span><div class="ec"><div>${e.t}</div><span class="src">${e.s}</span></div></div>`).join('');
     }
-    body.querySelectorAll('[data-sec] .sec-h').forEach((h) => { h.onclick = () => h.parentElement.classList.toggle('collapsed'); });
+    body.querySelectorAll('[data-sec] .sec-h').forEach((h) => {
+      h.onclick = (e) => {
+        if (e.target.closest('[data-cr-fs]')) return;
+        h.parentElement.classList.toggle('collapsed');
+      };
+    });
+    if (typeof wireCrRead === 'function') wireCrRead(body);
     return true;
   }
 
@@ -7707,7 +7762,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
           <div class="sec-c">${typeof renderProcessProgress === 'function' ? renderProcessProgress(t) : ''}</div>
         </div>
         <div class="sec" data-sec>
-          <div class="sec-h"><span class="caret">▾</span>Change Request in Detail</div>
+          <div class="sec-h"><span class="caret">▾</span>Change Request in Detail${typeof crFsBtn==='function'?crFsBtn():''}</div>
           <div class="sec-c"><div style="font-size:12.5px;line-height:1.6">${t.change}</div></div>
         </div>`;
     } else if (ctxTab === 'similar') {
@@ -7721,7 +7776,13 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       const ev = (typeof EVI !== 'undefined' && EVI[OTM2_ID]) || [];
       body.innerHTML = ev.map((e, i) => `<div class="evi"><span class="en">${i + 1}</span><div class="ec"><div>${e.t}</div><span class="src">${e.s}</span></div></div>`).join('');
     }
-    body.querySelectorAll('[data-sec] .sec-h').forEach((h) => { h.onclick = () => h.parentElement.classList.toggle('collapsed'); });
+    body.querySelectorAll('[data-sec] .sec-h').forEach((h) => {
+      h.onclick = (e) => {
+        if (e.target.closest('[data-cr-fs]')) return;
+        h.parentElement.classList.toggle('collapsed');
+      };
+    });
+    if (typeof wireCrRead === 'function') wireCrRead(body);
     return true;
   }
 

@@ -592,7 +592,244 @@ function renderProcessProgress(t){
     </div>
   </div>`;
 }
+const CR_FS_ICO=`<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>`;
+const CR_FS_MIN=`<svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>`;
+const PCR_CR_DETAIL = `Change background & reason:
+
+Lenovo is recommended to do upgrade test for 21H1. According to the requirement of PM Stanley Jackson, PA pick partial inhouse projects for sniff testing.
+
+Change details:
+
+We are required to execute the 21H1 upgrade test for partial products in the 21H1 BCT scope and report the test result to Microsoft.
+
+We should use standard format test case which is come from Microsoft. The result can be Pass/Fail.
+
+Using the latest Windows 10 preload, then upgrade to 20H2 via Windows Update, then upgrade to 21H1 for testing.
+
+All issues found during 21H1 upgrade test need to be reported on DTS, and provide all necessary data and information so that we can report to Microsoft to resolve.
+
+Test scope: please see attached excel file.
+
+Change action implementation date:
+
+Upgrade test will start from 2021/2/22, and end on 2021/3/26. About Five weeks.
+
+Should using the latest 21H1 EEAP build to do upgrade test.
+
+Should also do bug regression and verification during the whole test process if needed.
+
+Provide upgrade test result weekly.
+
+All systems divided into three waves, w.0/w.1/w.2. w.0 products should be finished at first and then w.1, the w.2 is the last priority to test.
+
+All bug found during 21H1 upgrade test should be verify with latest 21H1 build to make sure all of them are fixed before 21H1 RTM.
+
+Please refer to the attached scope for implementation:
+
+Wave: w.2
+Project Name: Mofushi_QT
+Marketing Name: QT M410
+Series: QT M
+TC/Lenovo Desktop: Lenovo Desktop
+Test Owner: BJ PA
+
+Wave: w.2
+Project Name: Palau QT
+Marketing Name: QT M610
+Series: QT M
+TC/Lenovo Desktop: Lenovo Desktop
+Test Owner: SZ PA
+
+Wave: w.2
+Project Name: Mofushi_M
+Marketing Name: ThinkCentre M710t/s
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.2
+Project Name: Palau_M
+Marketing Name: ThinkCentre M910q
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.2
+Project Name: Edinburgh_M220_GML_QT
+Marketing Name: QT M220
+Series: QT M
+TC/Lenovo Desktop: Lenovo Desktop
+Test Owner: BJ PA
+
+Wave: w.2
+Project Name: Paros_M920_Mansfield_M720_Tiny5_P330 tiny
+Marketing Name: ThinkCentre M920t/s
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.2
+Project Name: Mansfield_B360_M Tiny
+Marketing Name: ThinkCentre M720q
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.1
+Project Name: Duke_M_Tiny_M75q-1
+Marketing Name: ThinkCentre M75q-1
+Series: ThinkCentre M(AMD)
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.1
+Project Name: M90M80M70tsq_P340Tiny_Q/H470
+Marketing Name: ThinkCentre M70t/s
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.1
+Project Name: M90M80M70tsq_P340Tiny_Q/H470
+Marketing Name: ThinkCentre M90q
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.1
+Project Name: Durham_M
+Marketing Name: ThinkCentre M75ts Gen 2
+Series: ThinkCentre M(AMD)
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: Pleasanton-M
+Marketing Name: ThinCentre M90t/s Gen 2
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: Moroni-M
+Marketing Name: ThinkCentre M70q Gen 2
+Series: ThinkCentre M
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: KT_M940ts_Q570
+Marketing Name: ThinkCentre M940t/s
+Series: ThinkCentre M(PRC) KT
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: KT_M740tsM747t_B560/H570
+Marketing Name: ThinkCentre M747t
+Series: ThinkCentre M(PRC) KT
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: KT_M740q_B560
+Marketing Name: ThinkCentre M740q
+Series: ThinkCentre M(PRC) KT
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: KT_Durham_M600t_P565
+Marketing Name: KT M600t
+Series: ThinkCentre M(PRC) KT
+TC/Lenovo Desktop: TC
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: QT_M640_Phoenix_Q570
+Marketing Name: QT M640
+Series: QT M
+TC/Lenovo Desktop: Lenovo Desktop
+Test Owner: SZ PA
+
+Wave: w.0
+Project Name: QT_MB445_Moroni_B560
+Marketing Name: QT B445
+Series: QT M
+TC/Lenovo Desktop: Lenovo Desktop
+Test Owner: BJ PA`;
+function crEsc(t){
+  return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+}
+function crFsBtn(){
+  return `<button type="button" class="sec-fs" data-cr-fs title="View All Full Screen" aria-label="View All Full Screen">${CR_FS_ICO}<span class="sec-fs-lab">View All</span></button>`;
+}
+function crDetailBlock(text){
+  return `<div class="cr-clip"><div class="cr-clip-body" data-cr-body>${crEsc(text)}</div></div>`;
+}
+function closeCrRead(){
+  document.getElementById('crReadLayer')?.remove();
+}
+function openCrRead(html){
+  closeCrRead();
+  const cols=document.querySelector('.view-task .cols');
+  if(!cols) return;
+  const el=document.createElement('div');
+  el.id='crReadLayer';
+  el.className='cr-read';
+  el.innerHTML=`<div class="cr-read-h"><span class="cr-read-t">Change Request in Detail</span>
+    <button type="button" class="sec-fs" data-cr-read-x title="退出全屏" aria-label="退出全屏">${CR_FS_MIN}</button></div>
+    <div class="cr-read-b"><div class="cr-read-inner">${html}</div></div>`;
+  cols.appendChild(el);
+  el.querySelector('[data-cr-read-x]').onclick=closeCrRead;
+}
+function crReadHtmlFrom(btn){
+  const sec=btn.closest('.sec');
+  const body=sec?.querySelector('[data-cr-body]');
+  if(body) return body.innerHTML;
+  return sec?.querySelector('.sec-c')?.innerHTML||'';
+}
+function syncCrFs(root){
+  const host=root||document.getElementById('ctxBody');
+  if(!host) return;
+  host.querySelectorAll('[data-cr-fs]').forEach(btn=>{
+    const sec=btn.closest('.sec');
+    if(!sec||sec.classList.contains('collapsed')) return;
+    const box=sec.querySelector('.cr-clip')||sec.querySelector('.sec-c');
+    if(!box){ btn.hidden=true; return; }
+    const overflow=box.scrollHeight>box.clientHeight+1||box.scrollWidth>box.clientWidth+1;
+    btn.hidden=!overflow;
+  });
+}
+function wireCrRead(root){
+  const host=root||document.getElementById('ctxBody');
+  if(!host) return;
+  host.querySelectorAll('[data-cr-fs]').forEach(btn=>{
+    btn.onclick=e=>{
+      e.stopPropagation();
+      if(document.getElementById('crReadLayer')){ closeCrRead(); return; }
+      openCrRead(crReadHtmlFrom(btn));
+    };
+  });
+  const measure=()=>syncCrFs(host);
+  requestAnimationFrame(measure);
+  if(typeof ResizeObserver!=='undefined'){
+    host.querySelectorAll('.cr-clip, .sec-c').forEach(el=>{
+      if(!el.closest('.sec')?.querySelector('[data-cr-fs]')) return;
+      new ResizeObserver(measure).observe(el);
+    });
+  }
+}
+window.PCR_CR_DETAIL=PCR_CR_DETAIL;
+window.crFsBtn=crFsBtn;
+window.crDetailBlock=crDetailBlock;
+window.wireCrRead=wireCrRead;
+window.syncCrFs=syncCrFs;
+window.closeCrRead=closeCrRead;
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeCrRead(); });
+
 function renderCtx(){
+  closeCrRead();
   if(TASKS[cur]?.voteV2 && window.VoteV2 && VoteV2.renderCtx()) return;
   if(TASKS[cur]?.otmV2 && window.OtmV2 && OtmV2.renderCtx()) return;
   const t=TASKS[cur];
@@ -617,7 +854,7 @@ function renderCtx(){
         <div class="sec-c">${renderProcessProgress(t)}</div>
       </div>
       <div class="sec" data-sec>
-        <div class="sec-h"><span class="caret">▾</span>Change Request in Detail</div>
+        <div class="sec-h"><span class="caret">▾</span>Change Request in Detail${crFsBtn()}</div>
         <div class="sec-c"><div style="font-size:12.5px;line-height:1.6;color:var(--ink)">${t.change}</div></div>
       </div>
       <div class="sec" data-sec>
@@ -645,7 +882,12 @@ function renderCtx(){
     body.innerHTML=`<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Evidence sources behind each AI suggestion; click to trace original records</div>`+
       ev.map((e,i)=>`<div class="evi"><span class="en">${i+1}</span><div class="ec"><div>${e.t}</div><span class="src">${e.s}</span></div></div>`).join('');
   }
-  body.querySelectorAll('[data-sec] .sec-h').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('collapsed'));
+  body.querySelectorAll('[data-sec] .sec-h').forEach(h=>h.onclick=e=>{
+    if(e.target.closest('[data-cr-fs],[data-cr-fs-more]')) return;
+    h.parentElement.classList.toggle('collapsed');
+    if(typeof syncCrFs==='function') requestAnimationFrame(()=>syncCrFs(body));
+  });
+  wireCrRead(body);
 }
 document.querySelectorAll('.ctx-tab').forEach(b=>b.onclick=()=>{
   ctxTab=b.dataset.t;

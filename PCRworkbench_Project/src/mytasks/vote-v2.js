@@ -157,8 +157,16 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
   function vt2IsDis() { const v = vt2St().vote; return v === 'dis' || v === 'ni'; }
   function vt2VoteLabel() { return { agree: 'Agree', dis: 'Disagree', ni: 'No Impact' }[vt2St().vote] || ''; }
 
+  function vt2ChangeText() {
+    return (typeof PCR_CR_DETAIL !== 'undefined' && PCR_CR_DETAIL) || (window.PCR_CR_DETAIL || '');
+  }
   function vt2EnsureTask() {
-    if (typeof TASKS === 'undefined' || TASKS[VT2_ID]) return;
+    if (typeof TASKS === 'undefined') return;
+    const change = vt2ChangeText();
+    if (TASKS[VT2_ID]) {
+      if (change) TASKS[VT2_ID].change = change;
+      return;
+    }
     TASKS[VT2_ID] = {
       type: 'vote', tt: 'VOTE', voteV2: true,
       ttl: 'CPU SKU 替换 · Development Vote',
@@ -166,7 +174,7 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       product: 'ThinkPad T14p Gen 5 / T14p Gen 5 AMD',
       func: 'Development', mandatory: true, critical: false,
       due: '2026-11-20', late: false,
-      change: 'Replace Intel Core Ultra 7 155U with Ultra 7 165U on T14p Gen5, same package pin-to-pin, no PCBA quantity change. Need to confirm BIOS microcode and certification impact.',
+      change,
       name: 'T14p Gen5 CPU SKU Replacement (Ultra 7 155U → 165U)',
       geo: 'WW', date: '2026-11-20', stage: 'Assessment', progress: 42, risk: 'mid',
       pcrType: 'Hardware/SBB_CPU', category: 'ThinkPad_Commercial',
@@ -1236,8 +1244,8 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
           <div class="sec-c">${typeof renderProcessProgress === 'function' ? renderProcessProgress(t) : ''}</div>
         </div>
         <div class="sec" data-sec>
-          <div class="sec-h"><span class="caret">▾</span>Change Request in Detail</div>
-          <div class="sec-c"><div style="font-size:12.5px;line-height:1.6">${t.change}</div></div>
+          <div class="sec-h"><span class="caret">▾</span>Change Request in Detail${typeof crFsBtn==='function'?crFsBtn():''}</div>
+          <div class="sec-c">${typeof crDetailBlock==='function'?crDetailBlock(t.change):`<div style="font-size:12.5px;line-height:1.6">${t.change}</div>`}</div>
         </div>
         <div class="sec" data-sec>
           <div class="sec-h"><span class="caret">▾</span>Attachments &amp; Reference</div>
@@ -1257,7 +1265,14 @@ Thermal: TDP 保持 15W，散热方案沿用现有方案，无需更新风扇曲
       body.innerHTML = `<div style="font-size:11.5px;color:var(--ink-3);margin-bottom:10px">Evidence sources</div>`
         + ev.map((e, i) => `<div class="evi"><span class="en">${i + 1}</span><div class="ec"><div>${e.t}</div><span class="src">${e.s}</span></div></div>`).join('');
     }
-    body.querySelectorAll('[data-sec] .sec-h').forEach((h) => { h.onclick = () => h.parentElement.classList.toggle('collapsed'); });
+    body.querySelectorAll('[data-sec] .sec-h').forEach((h) => {
+      h.onclick = (e) => {
+        if (e.target.closest('[data-cr-fs],[data-cr-fs-more]')) return;
+        h.parentElement.classList.toggle('collapsed');
+        if (typeof syncCrFs === 'function') requestAnimationFrame(() => syncCrFs(body));
+      };
+    });
+    if (typeof wireCrRead === 'function') wireCrRead(body);
     return true;
   }
 
